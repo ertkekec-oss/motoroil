@@ -31,38 +31,41 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
     const uniquePages = pages.filter((p, i, a) => p !== a[i - 1] || p !== '...'); // simple dedup not strictly needed with correct logic but good safety
 
     return (
-        <div className="flex justify-center items-center gap-2 mt-6 p-4 animate-fade-in">
+        <div className="flex justify-center items-center gap-2 mt-6 p-4 animate-in fade-in">
             <button
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 text-white/70 text-sm font-bold transition-all"
+                className="px-4 py-2 rounded-[12px] bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white/80 text-[13px] font-bold transition-all"
             >
                 ← Önceki
             </button>
 
-            {uniquePages?.map((p, idx) => (
-                <button
-                    key={idx}
-                    onClick={() => typeof p === 'number' ? onPageChange(p) : null}
-                    disabled={typeof p !== 'number'}
-                    className={`min-w-[40px] h-[40px] px-2 rounded-lg text-sm font-bold transition-all border ${p === currentPage
-                            ? 'bg-[var(--primary)] border-[var(--primary)] text-white shadow-sm shadow-[var(--primary)]/20'
-                            : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10'
-                        } ${typeof p !== 'number' ? 'cursor-default !bg-transparent !border-transparent' : ''}`}
-                >
-                    {p}
-                </button>
-            ))}
+            <div className="flex items-center gap-1.5">
+                {uniquePages?.map((p, idx) => (
+                    <button
+                        key={idx}
+                        onClick={() => typeof p === 'number' ? onPageChange(p) : null}
+                        disabled={typeof p !== 'number'}
+                        className={`min-w-[40px] h-[40px] flex items-center justify-center rounded-[12px] text-[13px] font-bold transition-all border ${
+                            p === currentPage
+                                ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:shadow-indigo-500/20'
+                                : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white/70 hover:bg-slate-50 dark:hover:bg-white/10'
+                        } ${typeof p !== 'number' ? 'cursor-default !bg-transparent !border-transparent !text-slate-400 dark:!text-slate-500 !shadow-none' : ''}`}
+                    >
+                        {p}
+                    </button>
+                ))}
+            </div>
 
             <button
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 text-white/70 text-sm font-bold transition-all"
+                className="px-4 py-2 rounded-[12px] bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white/80 text-[13px] font-bold transition-all"
             >
                 Sonraki →
             </button>
 
-            <span className="text-white/30 text-xs font-medium ml-4">
+            <span className="text-slate-400 dark:text-white/30 text-[12px] font-bold ml-4 border-l border-slate-200 dark:border-slate-800 pl-4 py-1">
                 Toplam {totalPages} Sayfa
             </span>
         </div>
