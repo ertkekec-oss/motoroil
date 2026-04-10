@@ -2,10 +2,8 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect, Suspense } from 'react';
-import { useApp } from '@/contexts/AppContext';
 import { useModal } from '@/contexts/ModalContext';
 import { useFinancials } from '@/contexts/FinancialContext';
-import { EnterpriseCard, EnterpriseButton, EnterpriseInput, EnterpriseSelect } from '@/components/ui/enterprise';
 
 function PaymentContent() {
     const searchParams = useSearchParams();
@@ -18,6 +16,8 @@ function PaymentContent() {
     const title = searchParams.get('title') || 'Genel İşlem';
     const typeParam = searchParams.get('type') || 'income';
     const paymentType = (typeParam === 'payment' || typeParam === 'payable') ? 'payable' : 'income';
+    
+    // Parse customer/supplier ID from either URL parameter or the ref string format
     const customerId = searchParams.get('customerId') ||
         (refId.includes('cust-') ? refId.split('cust-')[1] :
             refId.startsWith('CUST-') ? refId.split('-')[1] : undefined);
@@ -32,7 +32,6 @@ function PaymentContent() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [installment, setInstallment] = useState(1);
 
-    // Get available installment options from settings
     const availableInstallments = salesExpenses?.posCommissions || [];
     const installmentOptions = [
         { value: 1, label: 'Tek Çekim' },
@@ -70,11 +69,9 @@ function PaymentContent() {
         }
 
         if (isProcessing) return;
-
         setIsProcessing(true);
 
         const timeoutId = setTimeout(() => {
-            console.warn('Payment API timeout - resetting state');
             setIsProcessing(false);
             showError('Zaman Aşımı', 'İşlem çok uzun sürdü. Lütfen işlemin tamamlanıp tamamlanmadığını kontrol edin.');
         }, 10000);
@@ -105,196 +102,156 @@ function PaymentContent() {
                 const redirectUrl = supplierId ? '/suppliers' : customerId ? `/customers/${customerId}` : '/';
                 setTimeout(() => router.push(redirectUrl), 500);
             } else {
-                const errMsg = result?.error || 'Bilinmeyen hata';
-                showError('Hata', errMsg);
+                showError('Hata', result?.error || 'Bilinmeyen hata');
             }
         } catch (error) {
-            console.error('Payment exception:', error);
             clearTimeout(timeoutId);
             setIsProcessing(false);
             showError('Hata', 'Sistem hatası oluştu. Lütfen tekrar deneyin.');
         }
     };
 
-    const paymentMethods = [
-        { id: 'cash', icon: '💵', label: 'Nakit Kasa', colorClass: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/30' },
-        { id: 'cc', icon: '💳', label: 'POS / Kredi Kartı', colorClass: 'text-blue-500 bg-blue-50 dark:bg-blue-500/10 border-blue-500/30' },
-        { id: 'iban', icon: '🏦', label: 'Banka / Havale', colorClass: 'text-amber-500 bg-amber-50 dark:bg-amber-500/10 border-amber-500/30' }
-    ];
+    const isPayable = paymentType === 'payable';
+    const mainColor = isPayable ? 'red' : 'emerald';
+    const bgColor = isPayable ? 'bg-red-50 dark:bg-red-500/10' : 'bg-emerald-50 dark:bg-emerald-500/10';
+    const textColor = isPayable ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400';
+    const actionBg = isPayable ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700';
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 sm:p-8 bg-slate-50 dark:bg-[#080a0f] font-sans">
-            <EnterpriseCard className="w-full max-w-[1200px] bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-3xl shadow-2xl border-slate-200 dark:border-white/5 p-8 sm:p-12 animate-in zoom-in-95 duration-300 rounded-[32px]">
+        <div className="flex justify-center p-4 sm:p-6 lg:p-10 font-sans min-h-[calc(100vh-80px)] items-start">
+            <div className="w-full max-w-2xl bg-white dark:bg-[#0f172a] shadow-xl shadow-blue-900/5 rounded-[24px] border border-slate-200 dark:border-white/5 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                 
                 {/* Header */}
-                <div className="text-center mb-10 pb-8 border-b border-slate-200 dark:border-slate-800">
-                    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-black text-[13px] tracking-[0.2em] uppercase mb-4 ${
-                        paymentType === 'payable' 
-                            ? 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/40' 
-                            : 'text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40'
-                    }`}>
-                        <span className="text-lg">{paymentType === 'payable' ? '💸' : '💰'}</span>
-                        {paymentType === 'payable' ? 'ÖDEME İŞLEMİ' : 'TAHSİLAT İŞLEMİ'}
+                <div className={`p-8 text-center border-b border-slate-100 dark:border-white/5 ${bgColor}`}>
+                    <div className={\`inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-slate-900 rounded-full text-[11px] font-black tracking-widest uppercase mb-4 shadow-sm \${textColor}\`}>
+                        <span>{isPayable ? '💸' : '💰'}</span>
+                        {isPayable ? 'ÖDEME ÇIKIŞI' : 'TAHSİLAT İŞLEMİ'}
                     </div>
-                    <div className="mt-2 text-slate-600 dark:text-slate-400 font-semibold text-[15px] max-w-xl mx-auto flex items-center justify-center gap-3">
-                        <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-blue-600 dark:text-blue-400 font-bold border border-slate-200 dark:border-white/5 shadow-sm">#{refId}</span>
-                        <span>{title}</span>
+                    <div className="text-[14px] text-slate-500 dark:text-slate-400 font-medium mb-1">İşlem Referansı ve Açıklama</div>
+                    <div className="text-[16px] font-bold text-slate-800 dark:text-white flex items-center justify-center gap-2">
+                        <span className="px-2 py-0.5 bg-slate-200/50 dark:bg-slate-800 rounded font-mono text-[13px] text-slate-600 dark:text-slate-300">#{refId}</span>
+                        {title}
                     </div>
                 </div>
 
-                {/* Main Content - Flex/Grid Layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                {/* Body Content */}
+                <div className="p-8 space-y-8">
                     
-                    {/* Left: Amount */}
-                    <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[24px] border border-slate-200 dark:border-white/5 flex flex-col justify-center items-center lg:items-start transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80">
-                        <label className="text-[11px] uppercase tracking-widest font-black text-slate-400 mb-6">
-                            İŞLEM TUTARI
-                        </label>
-                        <div className="flex items-center gap-4 w-full justify-center lg:justify-start">
-                            <span className="text-[48px] font-black text-blue-500 leading-none">₺</span>
+                    {/* Amount Input */}
+                    <div className="flex flex-col items-center justify-center">
+                        <label className="text-[11px] uppercase tracking-widest font-bold text-slate-400 mb-2">İŞLEM TUTARI</label>
+                        <div className="relative group w-full max-w-[300px]">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-400">₺</span>
                             <input
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                className="bg-transparent border-none text-slate-900 dark:text-white text-[56px] font-black w-full min-w-[200px] outline-none placeholder:text-slate-300 dark:placeholder:text-slate-700 font-mono tracking-tighter"
+                                className="w-full h-16 pl-12 pr-4 bg-slate-50 dark:bg-[#1e293b] border-2 border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10 outline-none rounded-2xl text-[28px] font-black text-center text-slate-800 dark:text-white transition-all focus:border-blue-500 dark:focus:border-blue-500 font-mono tracking-tight"
                                 placeholder="0.00"
                             />
                         </div>
                     </div>
 
-                    {/* Middle: Payment Method */}
-                    <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[24px] border border-slate-200 dark:border-white/5 transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80">
-                        <label className="text-[11px] uppercase tracking-widest font-black text-slate-400 mb-6 block">
-                            ÖDEME YÖNTEMİ
-                        </label>
-                        <div className="flex flex-col gap-3">
-                            {paymentMethods.map(method => {
-                                const isSelected = paymentMethod === method.id;
-                                return (
-                                    <button
-                                        key={method.id}
-                                        onClick={() => setPaymentMethod(method.id)}
-                                        className={`flex items-center gap-4 p-4 rounded-[16px] border-2 transition-all duration-200 w-full text-left ${
-                                            isSelected 
-                                                ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-500/10 shadow-sm' 
-                                                : 'border-transparent bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm'
-                                        }`}
-                                    >
-                                        <div className={`w-12 h-12 rounded-[12px] flex items-center justify-center text-[24px] shadow-sm ${method.colorClass}`}>
-                                            {method.icon}
-                                        </div>
-                                        <span className={`font-bold text-[16px] flex-1 ${isSelected ? 'text-blue-700 dark:text-blue-400' : 'text-slate-700 dark:text-slate-200'}`}>
-                                            {method.label}
-                                        </span>
-                                        {isSelected && (
-                                            <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-[12px] font-black shadow-sm">
-                                                ✓
-                                            </div>
-                                        )}
-                                    </button>
-                                );
-                            })}
+                    {/* Payment Method Selector */}
+                    <div>
+                        <label className="text-[11px] uppercase tracking-widest font-bold text-slate-400 mb-3 block text-center">ÖDEME YÖNTEMİ</label>
+                        <div className="grid grid-cols-3 gap-3">
+                            <button
+                                onClick={() => setPaymentMethod('cash')}
+                                className={\`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all \${paymentMethod === 'cash' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'}\`}
+                            >
+                                <span className="text-2xl">💵</span>
+                                <span className="text-[12px] font-bold">Nakit</span>
+                            </button>
+                            <button
+                                onClick={() => setPaymentMethod('cc')}
+                                className={\`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all \${paymentMethod === 'cc' ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'}\`}
+                            >
+                                <span className="text-2xl">💳</span>
+                                <span className="text-[12px] font-bold">Kredi Kartı</span>
+                            </button>
+                            <button
+                                onClick={() => setPaymentMethod('iban')}
+                                className={\`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all \${paymentMethod === 'iban' ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'}\`}
+                            >
+                                <span className="text-2xl">🏦</span>
+                                <span className="text-[12px] font-bold">Havale / EFT</span>
+                            </button>
                         </div>
                     </div>
 
-                    {/* Right: Account & Installments */}
-                    <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[24px] border border-slate-200 dark:border-white/5 transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80 flex flex-col gap-6">
-                        <div>
-                            <label className="text-[11px] uppercase tracking-widest font-black text-slate-400 mb-4 block">
-                                HEDEF KASA/BANKA
-                            </label>
-                            <EnterpriseSelect
+                    {/* Account Selector */}
+                    <div>
+                        <label className="text-[11px] uppercase tracking-widest font-bold text-slate-400 mb-3 block text-center">HEDEF KASA / HESAP</label>
+                        <div className="relative max-w-md mx-auto">
+                            <select
                                 value={selectedAccount}
                                 onChange={(e) => setSelectedAccount(e.target.value)}
+                                className="w-full h-12 px-4 bg-slate-50 dark:bg-[#1e293b] border-2 border-slate-100 dark:border-white/5 rounded-xl text-[13px] font-bold text-slate-700 dark:text-slate-200 outline-none focus:border-blue-500 appearance-none cursor-pointer"
                             >
-                                {paymentMethod === 'cash' && kasalar.filter(k => k.type === 'Nakit').map(c => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                                {paymentMethod === 'cc' && kasalar.filter(k => k.type === 'POS' || k.type === 'Kredi Kartı Tahsilat').map(p => (
-                                    <option key={p.id} value={p.id}>{p.name}</option>
-                                ))}
-                                {paymentMethod === 'iban' && kasalar.filter(k => k.type === 'Banka').map(b => (
-                                    <option key={b.id} value={b.id}>{b.name}</option>
-                                ))}
-                            </EnterpriseSelect>
-                        </div>
-
-                        {/* Installments Wrapper */}
-                        {paymentMethod === 'cc' && (
-                            <div className="animate-in fade-in slide-in-from-top-4 duration-300 mt-2">
-                                <label className="text-[11px] uppercase tracking-widest font-black text-slate-400 mb-4 block">
-                                    TAKSİT / KOMİSYON ORANI
-                                </label>
-                                {installmentOptions.length === 0 ? (
-                                    <div className="p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-[16px] text-center text-red-600 dark:text-red-400 font-bold text-[13px]">
-                                        ⚠️ Pos Taksit Oranları Girilmemiş
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {installmentOptions.map(opt => (
-                                            <button
-                                                key={opt.value}
-                                                onClick={() => setInstallment(opt.value)}
-                                                className={`py-3 px-2 rounded-[12px] font-bold text-[12px] transition-all border-2 ${
-                                                    installment === opt.value
-                                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 shadow-sm'
-                                                        : 'border-transparent bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm'
-                                                }`}
-                                            >
-                                                {opt.value === 1 ? 'Tek Çekim' : `${opt.value} Taksit`}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
+                                {paymentMethod === 'cash' && kasalar.filter(k => k.type === 'Nakit').map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                {paymentMethod === 'cc' && kasalar.filter(k => k.type === 'POS' || k.type === 'Kredi Kartı Tahsilat').map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                {paymentMethod === 'iban' && kasalar.filter(k => k.type === 'Banka').map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
-                        )}
+                        </div>
                     </div>
+
+                    {/* Installments (Only for CC) */}
+                    {paymentMethod === 'cc' && (
+                        <div className="animate-in fade-in zoom-in-95 duration-200">
+                            <label className="text-[11px] uppercase tracking-widest font-bold text-slate-400 mb-3 block text-center">TAKSİT SEÇENEKLERİ</label>
+                            {installmentOptions.length === 0 ? (
+                                <div className="p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl text-center text-[12px] font-bold text-red-600">⚠️ Pos Oranları Tanımlanmamış</div>
+                            ) : (
+                                <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
+                                    {installmentOptions.map(opt => (
+                                        <button
+                                            key={opt.value}
+                                            onClick={() => setInstallment(opt.value)}
+                                            className={\`px-4 py-2 rounded-lg text-[12px] font-bold transition-all border-2 \${installment === opt.value ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white dark:bg-[#1e293b] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-slate-300'}\`}
+                                        >
+                                            {opt.value === 1 ? 'Tek Çekim' : \`\${opt.value} Taksit\`}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                 </div>
 
-                {/* Bottom Actions */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-between items-center pt-8 border-t border-slate-200 dark:border-slate-800">
-                    <EnterpriseButton
-                        variant="secondary"
-                        onClick={() => router.back()}
+                {/* Footer Actions */}
+                <div className="p-6 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-white/5 flex gap-3 sm:gap-4 flex-col-reverse sm:flex-row">
+                    <button 
+                        onClick={() => router.back()} 
+                        className="flex-1 h-12 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-white/10 rounded-xl font-bold text-[13px] text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors uppercase tracking-widest"
                         disabled={isProcessing}
-                        className="w-full sm:w-auto h-16 px-8 rounded-[20px] text-[15px] font-bold"
                     >
-                        ← GERİ DÖN
-                    </EnterpriseButton>
-
-                    <button
+                        GERİ DÖN
+                    </button>
+                    <button 
                         onClick={handlePayment}
                         disabled={isProcessing}
-                        className={`w-full sm:w-[60%] h-16 rounded-[20px] text-[16px] font-black text-white flex items-center justify-center gap-3 transition-all duration-300 shadow-xl ${
-                            paymentType === 'payable'
-                                ? 'bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 shadow-red-500/25 border border-red-400/20'
-                                : 'bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-400 shadow-blue-500/25 border border-blue-400/20'
-                        } ${isProcessing ? 'opacity-80 scale-[0.98]' : 'hover:-translate-y-1'}`}
+                        className={\`flex-[2] h-12 rounded-xl font-black text-[14px] text-white flex items-center justify-center gap-2 uppercase tracking-wide transition-all \${actionBg} \${isProcessing ? 'opacity-75 cursor-not-allowed scale-[0.98]' : 'shadow-lg hover:shadow-xl hover:-translate-y-0.5'}\`}
                     >
                         {isProcessing ? (
-                            <>
-                                <span className="w-5 h-5 border-4 border-white/30 border-t-white rounded-full animate-spin"></span>
-                                İŞLEM ONAYLANIYOR...
-                            </>
-                        ) : paymentType === 'payable' ? (
-                            <>💸 ONAYLA VE ÖDEMEYİ GERÇEKLEŞTİR</>
+                            <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span> İŞLENİYOR...</>
                         ) : (
-                            <>💰 ONAYLA VE TAHSİLATI KAYDET</>
+                            <>ONAYLA VE {isPayable ? 'ÖDE' : 'KAYDET'}</>
                         )}
                     </button>
                 </div>
-            </EnterpriseCard>
+            </div>
         </div>
     );
 }
 
 export default function PaymentPage() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#080a0f]">
-                <div className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-            </div>
-        }>
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div></div>}>
             <PaymentContent />
         </Suspense>
     );
