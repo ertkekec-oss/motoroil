@@ -36,7 +36,7 @@ export default function CEODashboardPage() {
     const { isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
     const [roleMode, setRoleMode] = useState<'CEO' | 'CFO' | 'COO' | 'Growth'>('CEO');
-    const [scopeMode, setScopeMode] = useState<'Yerel' | 'Bölgesel' | 'Global'>('Global');
+    const [scopeMode, setScopeMode] = useState<'Tek Şube' | 'Grup Şirketler' | 'Tüm Organizasyon'>('Tüm Organizasyon');
 
     // YENI EKLENEN CEO-METRICS (ESKI KOKPITTEN GELEN)
     const [data, setData] = React.useState<any>(null);
@@ -82,63 +82,69 @@ export default function CEODashboardPage() {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-200 font-sans p-6 md:p-10 pb-24 animate-in fade-in duration-500">
 
-            {/* 2. Dark Hero Alanı */}
-            <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-8 mb-6 shadow-md relative z-10">
+            {/* 2. Soft Container Header Alanı */}
+            <div className="bg-white dark:bg-[#0f172a] rounded-3xl p-6 lg:p-8 mb-6 shadow-sm border border-slate-200 dark:border-white/5 relative z-10">
                 <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
-                    {/* LEFT BLOCK */}
-                    <div>
-                        <h1 className="text-3xl font-black tracking-tight text-white mb-2">
-                            Strateji Merkezi
-                        </h1>
-                        <p className="text-slate-400 font-medium text-sm mb-6">
-                            Şirket genel performans, risk ve öncelik analiz paneli
-                        </p>
+                    {/* LEFT BLOCK: Title & Score */}
+                    <div className="flex items-center gap-8">
+                        <div>
+                            <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white mb-1">
+                                Strateji Merkezi
+                            </h1>
+                            <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">
+                                Şirket genel performans, risk ve öncelik analiz paneli
+                            </p>
+                        </div>
 
-                        <div className="flex items-center gap-3">
-                            <div className="flex flex-col">
-                                <div className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1 flex items-center">
-                                    Şirket Sağlık Skoru
-                                    <InfoTooltip content="Nakit, stok ve kârlılık verilerinden hesaplanan genel performans göstergesi." iconClassName="w-3.5 h-3.5 text-slate-500 hover:text-slate-300" />
-                                </div>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-5xl font-black text-emerald-400">81</span>
-                                    <span className="text-lg font-bold text-slate-500 dark:text-slate-400">/ 100</span>
-                                </div>
+                        <div className="hidden md:block w-px h-12 bg-slate-200 dark:bg-slate-700/50"></div>
+
+                        <div className="flex flex-col">
+                            <div className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5 flex items-center">
+                                Şirket Sağlık Skoru
+                                <InfoTooltip content="Nakit, stok ve kârlılık verilerinden hesaplanan genel performans göstergesi." />
+                            </div>
+                            <div className="flex items-baseline gap-1.5">
+                                <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 leading-none">81</span>
+                                <span className="text-sm font-bold text-slate-400 dark:text-slate-500">/ 100</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* RIGHT BLOCK */}
-                    <div className="flex flex-col gap-4 shrink-0 w-full md:w-auto">
+                    {/* RIGHT BLOCK: Scope & Role Selection (Pill style matching Staff page) */}
+                    <div className="flex flex-col gap-3 shrink-0 w-full xl:w-auto">
+                        
                         {/* Scope Toggle */}
-                        <div className="flex bg-slate-950/50 border border-slate-700/50 rounded-xl p-1 shadow-inner items-center">
-                            {(['Yerel', 'Bölgesel', 'Global'] as const).map(s => (
+                        <div className="flex bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1 items-center overflow-x-auto hide-scrollbar">
+                            {(['Tek Şube', 'Grup Şirketler', 'Tüm Organizasyon'] as const).map(s => {
+                                // Map display label to logical scope for internal state state if needed, but we can just use the label itself
+                                const displayName = s;
+                                return (
                                 <button
-                                    key={s}
-                                    onClick={() => setScopeMode(s)}
-                                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 flex-1 justify-center md:flex-none ${scopeMode === s ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+                                    key={displayName}
+                                    onClick={() => setScopeMode(displayName as any)}
+                                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 flex-1 justify-center whitespace-nowrap ${scopeMode === displayName ? 'bg-white dark:bg-[#0f172a] text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200 dark:border-slate-700' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:bg-white/5 border border-transparent'}`}
                                 >
-                                    {s}
-                                    {s === 'Yerel' && <InfoTooltip content="Seçili şirket ve ülke verileri analiz edilir." iconClassName={`w-3.5 h-3.5 ${scopeMode === s ? 'text-blue-200' : 'text-slate-500 hover:text-slate-300'}`} />}
-                                    {s === 'Bölgesel' && <InfoTooltip content="Birden fazla şube karşılaştırmalı analiz edilir." iconClassName={`w-3.5 h-3.5 ${scopeMode === s ? 'text-blue-200' : 'text-slate-500 hover:text-slate-300'}`} />}
-                                    {s === 'Global' && <InfoTooltip content="Tüm bölgeler ve para birimleri birlikte değerlendirilir." iconClassName={`w-3.5 h-3.5 ${scopeMode === s ? 'text-blue-200' : 'text-slate-500 hover:text-slate-300'}`} />}
+                                    {displayName}
                                 </button>
-                            ))}
+                            )})}
                         </div>
 
                         {/* Role Toggle */}
-                        <div className="flex bg-white dark:bg-[#0f172a] rounded-xl p-1 shadow-lg items-center self-end w-full md:w-auto">
-                            {(['CEO', 'CFO', 'COO', 'Growth'] as const).map(r => (
+                        <div className="flex bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-1 items-center overflow-x-auto hide-scrollbar">
+                            {(['CEO', 'CFO', 'COO', 'Growth'] as const).map(r => {
+                                const roleLabelMap: Record<string, string> = { 'CEO': 'İcra (CEO)', 'CFO': 'Finans (CFO)', 'COO': 'Operasyon (COO)', 'Growth': 'Büyüme (Growth)' };
+                                const roleName = roleLabelMap[r];
+                                return (
                                 <button
                                     key={r}
-                                    onClick={() => setRoleMode(r)}
-                                    className={`px-6 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 flex-1 justify-center md:flex-none ${roleMode === r ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                                    onClick={() => setRoleMode(r as any)}
+                                    className={`px-5 py-2 rounded-xl text-[11px] uppercase tracking-wider font-bold transition-all flex items-center gap-1 flex-1 justify-center whitespace-nowrap ${roleMode === r ? 'bg-white dark:bg-[#0f172a] text-slate-800 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:bg-white/5 border border-transparent'}`}
                                 >
-                                    {r}
-                                    {roleMode === r && <InfoTooltip content="Seçilen role göre metrik ve öncelikler sadeleştirilir." iconClassName="w-[14px] h-[14px] text-slate-400 hover:text-white/80" />}
+                                    {roleName}
                                 </button>
-                            ))}
+                            )})}
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -274,7 +280,7 @@ export default function CEODashboardPage() {
                                 <span>Konsolide Ciro</span>
                                 <InfoTooltip content="Tüm şubeler ve döviz cinslerinden elde edilen net ciro tutarı." />
                             </div>
-                            <div className="text-3xl font-black text-slate-900 dark:text-white">$4.2M</div>
+                            <div className="text-3xl font-black text-slate-900 dark:text-white">₺4.2M</div>
                         </div>
                         <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
                             <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
@@ -295,7 +301,7 @@ export default function CEODashboardPage() {
                                 <span>Tahmini 30G Kâr</span>
                                 <InfoTooltip content="Gelecek 30 gün içinde beklenen operasyonel kâr tahmini." />
                             </div>
-                            <div className="text-3xl font-black text-emerald-600">+$124K</div>
+                            <div className="text-3xl font-black text-emerald-600">+₺124.000</div>
                         </div>
                     </>
                 )}
@@ -321,14 +327,14 @@ export default function CEODashboardPage() {
                                 <span>Tahmini Nakit Açığı</span>
                                 <InfoTooltip content="15 gün içinde oluşması muhtemel nakit rezerv eksikliği." />
                             </div>
-                            <div className="text-3xl font-black text-slate-900 dark:text-white">$0 <span className="text-sm font-medium text-slate-400 ml-1">(Yok)</span></div>
+                            <div className="text-3xl font-black text-slate-900 dark:text-white">₺0 <span className="text-sm font-medium text-slate-400 ml-1">(Yok)</span></div>
                         </div>
                         <div className="bg-white dark:bg-[#0f172a] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/5 flex flex-col justify-center">
                             <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex justify-between items-center w-full">
                                 <span>Geciken Tahsilatlar</span>
                                 <InfoTooltip content="Vadesi geçmiş ve tahsil edilememiş toplam alacaklar." />
                             </div>
-                            <div className="text-3xl font-black text-red-500">$28K</div>
+                            <div className="text-3xl font-black text-red-500">₺28.000</div>
                         </div>
                     </>
                 )}
@@ -406,38 +412,37 @@ export default function CEODashboardPage() {
                     <div className="flex justify-between items-start mb-2">
                         <div>
                             <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center mb-1">
-                                Risk Haritası
-                                <InfoTooltip content="Operasyonel risk (X) ve finansal risk (Y) yoğunluğunu gösterir." />
+                                Kriz & Darboğaz Radarı
+                                <InfoTooltip content="Sol-Sağ ekseni şirket iş akışının durma ihtimalini, Alt-Üst ekseni ise şirketin yaşayacağı maddi hasar/para kaybı ihtimalini gösterir." />
                             </h2>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide">Kırmızı: Kritik | Turuncu: Risk | Yeşil: Stabil</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide">🔴 Kırmızı: Acil Müdahale Gerekli | 🟠 Turuncu: Dikkat | 🟢 Yeşil: Olağan</p>
                         </div>
                     </div>
                     <div className="flex-1 w-full mt-4">
                         <ResponsiveContainer width="100%" height="100%">
-                            <ScatterChart margin={{ top: 10, right: 10, bottom: 20, left: 0 }}>
-                                <XAxis type="number" dataKey="opRisk" name="Operasyonel" tick={{ fontSize: 11 }} hide domain={[0, 100]} />
-                                <YAxis type="number" dataKey="finRisk" name="Finansal" tick={{ fontSize: 11 }} hide domain={[0, 100]} />
-                                <ZAxis type="number" dataKey="z" range={[100, 800]} name="Bölgesel Etki" />
+                            <ScatterChart margin={{ top: 10, right: 10, bottom: 20, left: 20 }}>
+                                <XAxis type="number" dataKey="opRisk" name="İş Akışı Kilitlenmesi" tick={{ fontSize: 11 }} domain={[0, 100]} />
+                                <YAxis type="number" dataKey="finRisk" name="Maddi Zarar" tick={{ fontSize: 11 }} domain={[0, 100]} />
+                                <ZAxis type="number" dataKey="z" range={[100, 800]} name="Hasar Hacmi" />
                                 <Tooltip cursor={{ strokeDasharray: '3 3' }}
                                     content={(props: any) => {
                                         const { active, payload } = props;
                                         if (active && payload && payload.length) {
                                             const data = payload[0].payload;
                                             return (
-                                                <div className="bg-slate-900 text-white p-3 rounded-xl shadow-xl text-[11px] font-medium border border-slate-700 min-w-[160px]">
-                                                    <div className="font-bold border-b border-slate-700 pb-2 mb-2 flex justify-between items-center">
-                                                        <span>{data.name}</span>
-                                                        <span className="bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded text-[9px]">{data.region}</span>
+                                                <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white p-4 rounded-xl shadow-xl text-xs font-medium border border-slate-200 dark:border-slate-700 min-w-[200px]">
+                                                    <div className="font-black text-sm border-b border-slate-200 dark:border-slate-700 pb-2 mb-3 flex flex-col gap-1">
+                                                        <span className="text-blue-600 dark:text-blue-400">{data.name}</span>
                                                     </div>
-                                                    <div className="flex justify-between text-slate-300 mb-1"><span>Finansal Risk:</span> <span className="text-white font-bold">% {data.finRisk}</span></div>
-                                                    <div className="flex justify-between text-slate-300 mb-1"><span>Operasyonel:</span> <span className="text-white font-bold">% {data.opRisk}</span></div>
+                                                    <div className="flex justify-between text-slate-500 dark:text-slate-400 mb-1.5"><span className="font-bold">Maddi Hasar Düzeyi:</span> <span className="text-slate-900 dark:text-white font-black">% {data.finRisk}</span></div>
+                                                    <div className="flex justify-between text-slate-500 dark:text-slate-400 mb-1.5"><span className="font-bold">İş Akışı Blokajı:</span> <span className="text-slate-900 dark:text-white font-black">% {data.opRisk}</span></div>
                                                 </div>
                                             )
                                         }
                                         return null;
                                     }}
                                 />
-                                <Scatter name="Risk" data={riskData} fill="#8884d8">
+                                <Scatter name="Tehlike Radarı" data={riskData} fill="#8884d8">
                                     {riskData.map((entry, index) => {
                                         const score = (entry.finRisk + entry.opRisk) / 2;
                                         let color = '#10b981'; // emerald
