@@ -184,10 +184,11 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         }
     }, [showContent]);
     const isPortalPage = pathname?.startsWith('/portal');
-    const showSidebar = auth.isAuthenticated && !isAdminPage && !isPortalPage;
+    const isTvPage = pathname?.startsWith('/tv');
+    const showSidebar = auth.isAuthenticated && !isAdminPage && !isPortalPage && !isTvPage;
 
     // Handle Global Errors
-    if (hasCriticalError && !isAdminPage && !isPortalPage) {
+    if (hasCriticalError && !isAdminPage && !isPortalPage && !isTvPage) {
         return <GlobalErrorScreen error={hasCriticalError} />;
     }
 
@@ -200,7 +201,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     }
 
     // APP LAYOUT WITH LOADING OVERLAY
-    if (!showContent && !isAdminPage && !isPortalPage) {
+    if (!showContent && !isAdminPage && !isPortalPage && !isTvPage) {
         return <AppSkeleton />;
     }
 

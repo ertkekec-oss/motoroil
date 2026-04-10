@@ -314,6 +314,7 @@ export default function Sidebar() {
                             { name: 'İş Emirleri', href: '/service/work-orders' },
                             { name: 'Yeni İş Emri', href: '/service/new' },
                             { name: 'Servis Randevuları', href: '/service/calendar' },
+                            { name: 'Atölye Canlı TV', href: '/tv/workshop' },
                             { name: 'SAHA SERVİS', href: '' },
                             { name: 'Saha Planlama Panosu', href: '/service/field/planner' },
                             { name: 'Servis Saha Paneli', href: '/service/field/dashboard' },
@@ -603,14 +604,16 @@ export default function Sidebar() {
                                                     )
                                                 }
                                                 const isActive = pathname === child.href;
+                                                const isExternal = child.href.startsWith('/tv/');
+                                                
                                                 return (
-                                                    <Link key={child.href} href={child.href} className="group/child relative">
+                                                    <Link key={child.href} href={child.href} target={isExternal ? '_blank' : undefined} className="group/child relative">
                                                         <div className={`sb-item flex items-center mx-2 pl-9 pr-3 py-[7px] rounded-[10px] transition-all duration-200 outline-none
                                                             ${isActive
                                                                 ? 'sb-active font-semibold'
                                                                 : 'sb-default hover:translate-x-[2px]'}
                                                         `}>
-                                                            <span className="text-[13px]">{child.name}</span>
+                                                            <span className="text-[13px]">{child.name} {isExternal && '↗'}</span>
 
                                                             {/* Dynamic Left Accent for active child */}
                                                             {isActive && (

@@ -10,6 +10,10 @@ export default function ClientTV() {
     const { activeBranchName, activeTenantId } = useApp();
     const [currentTime, setCurrentTime] = useState(new Date());
     const [orders, setOrders] = useState<any[]>([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const ITEMS_PER_PAGE = 8;
+
+    const lifts = appSettings?.service_lifts || [];
 
     // 1. Clock Polling
     useEffect(() => {
@@ -17,12 +21,20 @@ export default function ClientTV() {
         return () => clearInterval(timer);
     }, []);
 
-    // 2. Data Polling (every 10 seconds)
+    // 2. Data Polling & Auto-Pagination (every 10 seconds)
     useEffect(() => {
         fetchDashboardData();
-        const poller = setInterval(fetchDashboardData, 10000);
+        const poller = setInterval(() => {
+            fetchDashboardData();
+            if (lifts.length > ITEMS_PER_PAGE) {
+                setCurrentPage(prev => {
+                    const totalPages = Math.ceil(lifts.length / ITEMS_PER_PAGE);
+                    return (prev + 1) >= totalPages ? 0 : prev + 1;
+                });
+            }
+        }, 10000);
         return () => clearInterval(poller);
-    }, [activeBranchName, activeTenantId]);
+    }, [activeBranchName, activeTenantId, lifts.length]);
 
     const fetchDashboardData = async () => {
         try {
@@ -35,8 +47,6 @@ export default function ClientTV() {
             console.error('TV Board fetch error', error);
         }
     };
-
-    const lifts = appSettings?.service_lifts || [];
 
     // Utility: Mask plate/serial securely for public TV (e.g., 34 ABC 123 -> 34 AB* ***)
     const maskIdentifier = (id: string) => {
@@ -55,7 +65,7 @@ export default function ClientTV() {
             case 'PENDING':
                 return { text: 'Sırada Bekliyor', color: 'text-slate-400', bg: 'bg-slate-800/50', border: 'border-slate-700', icon: <Clock className="w-8 h-8" /> };
             case 'WAITING_APPROVAL':
-                return { text: 'Müşteri Onayı Bekleniyor', color: 'text-amber-400', bg: 'bg-amber-900/20', border: 'border-amber-500/30', icon: <AlertTriangle className="w-8 h-8 animate-pulse" /> };
+                return { text: 'Müşteri Onayı Bekliyor', color: 'text-amber-400', bg: 'bg-amber-900/20', border: 'border-amber-500/30', icon: <AlertTriangle className="w-8 h-8 animate-pulse" /> };
             case 'IN_PROGRESS':
                 return { text: 'İşlem Devam Ediyor', color: 'text-blue-400', bg: 'bg-blue-900/20', border: 'border-blue-500/30', icon: <Wrench className="w-8 h-8 animate-bounce" /> };
             case 'COMPLETED':
@@ -66,8 +76,11 @@ export default function ClientTV() {
         }
     };
 
+    // Pagination Logic
+    const paginatedLifts = lifts.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE);
+
     // Calculate Grid Columns automatically for TV
-    const gridCols = lifts.length <= 2 ? 'grid-cols-1 md:grid-cols-2' : lifts.length <= 4 ? 'grid-cols-2' : lifts.length <= 6 ? 'grid-cols-3' : 'grid-cols-4';
+    const gridCols = paginatedLifts.length <= 2 ? 'grid-cols-1 md:grid-cols-2' : paginatedLifts.length <= 4 ? 'grid-cols-2' : paginatedLifts.length <= 6 ? 'grid-cols-3' : 'grid-cols-4';
 
     return (
         <div className="min-h-screen bg-[#050505] text-white font-sans flex flex-col p-6 selection:bg-transparent cursor-none relative overflow-hidden">
@@ -105,7 +118,7 @@ export default function ClientTV() {
                         <h2 className="text-3xl font-black tracking-widest uppercase">Atölye Lifti Tanımlanmamış</h2>
                     </div>
                 ) : (
-                    lifts.map((liftName: string) => {
+                    paginatedLifts.map((liftName: string) => {
                         const occupyingOrder = orders.find((o: any) => o.bayName === liftName && o.status !== 'CANCELLED');
                         const isOccupied = !!occupyingOrder;
 
@@ -169,8 +182,11 @@ export default function ClientTV() {
                 <div className="text-slate-500 font-bold tracking-widest text-sm uppercase">
                     PERIODYA ENTERPRISE • WORKSHOP OS
                 </div>
-                <div className="text-slate-600 font-bold tracking-widest text-sm uppercase">
-                    OTOMATİK GÜNCELLENİR
+                <div className="text-slate-600 font-bold tracking-widest text-sm uppercase flex items-center gap-4">
+                    {lifts.length > ITEMS_PER_PAGE && (
+                        <span className="text-blue-400 bg-blue-900/20 px-3 py-1 rounded-lg">SAYFA {currentPage + 1} / {Math.ceil(lifts.length / ITEMS_PER_PAGE)}</span>
+                    )}
+                    <span>OTOMATİK GÜNCELLENİR</span>
                 </div>
             </div>
         </div>
