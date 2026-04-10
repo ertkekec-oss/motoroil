@@ -554,28 +554,59 @@ export default function ReportsPage() {
                                 </div>
                             </div>
 
-                            {/* Recent Transactions */}
-                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-6">
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5 tracking-tight border-b border-slate-100 dark:border-white/5 pb-3">Son İşlemler</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {recentTransactions.map((tx, i) => (
-                                        <div key={i} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-xl p-4 flex flex-col justify-center">
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                                                    {new Date(tx.date).toLocaleDateString('tr-TR')}
-                                                </span>
-                                                <span style={{ fontSize: '11px', fontWeight: '700', color: tx.type === 'Sales' ? COLORS.success : COLORS.danger }}>
-                                                    {tx.type}
-                                                </span>
-                                            </div>
-                                            <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
-                                                {tx.description || 'İşlem'}
-                                            </div>
-                                            <div style={{ fontSize: '18px', fontWeight: '900', color: tx.type === 'Sales' ? COLORS.success : 'white' }}>
-                                                ₺{Number(tx.amount).toLocaleString()}
-                                            </div>
-                                        </div>
-                                    ))}
+                            
+                            {/* Recent Transactions DataGrid */}
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl overflow-hidden flex flex-col">
+                                <div className="p-5 border-b border-slate-100 dark:border-white/5">
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Son Tamamlanan İşlemler</h3>
+                                    <p className="text-xs text-slate-500 font-semibold mt-0.5">İşlemlere tıklayarak detayına (Drill-down) inebilirsiniz.</p>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="bg-slate-50/50 dark:bg-slate-800/30 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 dark:border-white/5">
+                                                <th className="p-4 whitespace-nowrap">Tarih</th>
+                                                <th className="p-4 whitespace-nowrap">Tür</th>
+                                                <th className="p-4 whitespace-nowrap">Açıklama / Kategori</th>
+                                                <th className="p-4 whitespace-nowrap text-right">Tutar</th>
+                                                <th className="p-4 whitespace-nowrap text-right">Aksiyon</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {recentTransactions.map((tx: any, i) => (
+                                                <tr key={i} className="group border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer" onClick={() => {
+                                                    if(tx.type === 'Sales') router.push('/sales');
+                                                    if(tx.type === 'Expense') router.push('/expenses');
+                                                }}>
+                                                    <td className="p-4 text-sm font-semibold text-slate-600 dark:text-slate-400">
+                                                        {new Date(tx.date).toLocaleString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider ${tx.type === 'Sales' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'}`}>
+                                                            {tx.type}
+                                                        </span>
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{tx.description || 'Sistem İşlemi'}</div>
+                                                        <div className="text-xs text-slate-400 font-semibold">{tx.category || '-'}</div>
+                                                    </td>
+                                                    <td className="p-4 text-right">
+                                                        <div className={`text-base font-black ${tx.type === 'Sales' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>
+                                                            {tx.type === 'Sales' ? '+' : '-'}₺{Number(tx.amount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 text-right">
+                                                        <button className="text-slate-400 group-hover:text-blue-500 transition-colors text-xs font-bold uppercase tracking-wider">İncele →</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {recentTransactions.length === 0 && (
+                                                <tr>
+                                                    <td colSpan={5} className="p-8 text-center text-slate-400 text-sm font-semibold">Bu dönemde işlem kaydı bulunamadı.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -688,6 +719,7 @@ export default function ReportsPage() {
                         </div>
                     )}
 
+                    
                     {/* Inventory Tab */}
                     {activeTab === 'inventory' && (
                         <div className="flex flex-col gap-6">
@@ -705,27 +737,68 @@ export default function ReportsPage() {
                                 </div>
                             </div>
 
-                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-6">
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5 tracking-tight border-b border-slate-100 dark:border-white/5 pb-3">En Yüksek Stok Değerine Sahip Ürünler</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {inventoryStats.topProducts.map((product, i) => (
-                                        <div key={i} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-xl p-5 flex flex-col justify-center">
-                                            <div className="flex justify-between items-center mb-3">
-                                                <span className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg">📦</span>
-                                                <span className={`text-[10px] uppercase font-black px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 border ${Number(product.stock) < Number(product.minStock) ? "text-red-500 border-red-200 dark:border-red-500/20" : "text-emerald-500 border-emerald-200 dark:border-emerald-500/20"}`}>
-                                                    {Number(product.stock) < Number(product.minStock) ? 'DÜŞÜK' : 'NORMAL'}
-                                                </span>
-                                            </div>
-                                            <div className="text-sm font-bold text-slate-900 dark:text-white mb-2 truncate">{product.name}</div>
-                                            <div className="flex justify-between items-center text-xs font-semibold text-slate-500 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-                                                <span>Stok: {product.stock}</span>
-                                                <span>Alış: ₺{Number(product.buyPrice || product.price).toLocaleString()}</span>
-                                            </div>
-                                            <div className="text-xl font-black text-slate-900 dark:text-white">
-                                                ₺{product.stockValue.toLocaleString()}
-                                            </div>
-                                        </div>
-                                    ))}
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl overflow-hidden flex flex-col">
+                                <div className="p-5 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                                    <div>
+                                        <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">En Yüksek Değerli Envanter (Top 8)</h3>
+                                        <p className="text-xs text-slate-500 font-semibold mt-0.5">Depo ve maliyet değeri en yüksek operasyonel emtialar.</p>
+                                    </div>
+                                    <button onClick={() => router.push('/inventory')} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white rounded-xl text-xs font-bold transition-colors">
+                                        Tüm Stoğu Aç
+                                    </button>
+                                </div>
+
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="bg-slate-50/50 dark:bg-slate-800/30 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 dark:border-white/5">
+                                                <th className="p-4 whitespace-nowrap">Ürün Referansı</th>
+                                                <th className="p-4 whitespace-nowrap">Stok Miktarı</th>
+                                                <th className="p-4 whitespace-nowrap">Birim Maliyet</th>
+                                                <th className="p-4 whitespace-nowrap text-right">Toplam Değer</th>
+                                                <th className="p-4 whitespace-nowrap text-right">Durum</th>
+                                                <th className="p-4 whitespace-nowrap text-right">Aksiyon</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {inventoryStats.topProducts.map((product: any, i: number) => {
+                                                const isLow = Number(product.stock) < Number(product.minStock);
+                                                return (
+                                                <tr key={i} className="group border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer" onClick={() => router.push(`/inventory/${product.id || ''}`)}>
+                                                    <td className="p-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-800/40 flex items-center justify-center text-slate-400 font-black text-[10px]">
+                                                                SKU
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors max-w-[200px] truncate" title={product.name}>{product.name}</div>
+                                                                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{product.barcode || 'BARKODSUZ'}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 text-sm font-black text-slate-700 dark:text-slate-300">
+                                                        {product.stock} {product.unit || 'Adet'}
+                                                    </td>
+                                                    <td className="p-4 text-sm font-semibold text-slate-600 dark:text-slate-400">
+                                                        ₺{Number(product.buyPrice || product.price).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+                                                    </td>
+                                                    <td className="p-4 text-right">
+                                                        <div className="text-base font-black text-slate-900 dark:text-white">
+                                                            ₺{product.stockValue.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 text-right">
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider ${isLow ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'}`}>
+                                                            {isLow ? 'KRİTİK' : 'NORMAL'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="p-4 text-right">
+                                                        <button className="text-slate-400 group-hover:text-blue-500 transition-colors text-xs font-bold uppercase tracking-wider">İncele →</button>
+                                                    </td>
+                                                </tr>
+                                            )})}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -734,29 +807,69 @@ export default function ReportsPage() {
                     {/* Customers Tab */}
                     {activeTab === 'customers' && (
                         <div className="flex flex-col gap-6">
-                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl p-6">
-                                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5 tracking-tight border-b border-slate-100 dark:border-white/5 pb-3">Cari Bakiye Durumu</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                                    {topCustomers.map((customer, i) => (
-                                        <div key={i} className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-xl p-5 flex flex-col justify-center">
-                                            <div className="flex justify-between items-start mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
-                                                <div>
-                                                    <div className="text-base font-black text-slate-900 dark:text-white mb-1 leading-tight">{customer.name}</div>
-                                                    <div className="text-xs font-semibold text-slate-500">{customer.phone || 'Telefon yok'}</div>
-                                                </div>
-                                                <div style={{ fontSize: '24px' }}>👤</div>
-                                            </div>
-                                            <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 flex flex-col justify-center items-center">
-                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">BAKİYE DURUMU</div>
-                                                <div className={`text-2xl font-black ${Number(customer.balance) > 0 ? "text-emerald-600 dark:text-emerald-400" : Number(customer.balance) < 0 ? "text-red-500 dark:text-red-400" : "text-slate-900 dark:text-white"}`}>
-                                                    {Number(customer.balance) > 0 ? '+' : ''}₺{Number(customer.balance).toLocaleString()}
-                                                </div>
-                                                <div className="text-xs font-semibold text-slate-500 mt-1">
-                                                    {Number(customer.balance) > 0 ? 'Alacak' : Number(customer.balance) < 0 ? 'Borç' : 'Dengede'}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+                            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-2xl overflow-hidden flex flex-col">
+                                <div className="p-5 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                                    <div>
+                                        <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Kritik Cari Bakiyeler</h3>
+                                        <p className="text-xs text-slate-500 font-semibold mt-0.5">Sadece bakiyesi olan veya borcu bulunan müşteri (Cari) listesi. Detaylar için Drill-down özelliğini kullanın.</p>
+                                    </div>
+                                    <button onClick={() => router.push('/customers')} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white rounded-xl text-xs font-bold transition-colors">
+                                        Tüm Müşterileri Aç
+                                    </button>
+                                </div>
+                                
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="bg-slate-50/50 dark:bg-slate-800/30 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 dark:border-white/5">
+                                                <th className="p-4 whitespace-nowrap">Müşteri / Cari Ünvan</th>
+                                                <th className="p-4 whitespace-nowrap">İletişim</th>
+                                                <th className="p-4 whitespace-nowrap">Durum Tipi</th>
+                                                <th className="p-4 whitespace-nowrap text-right">Açık Bakiye</th>
+                                                <th className="p-4 whitespace-nowrap text-right">Aksiyon</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {topCustomers.map((customer: any, i: number) => {
+                                                const balance = Number(customer.balance);
+                                                return (
+                                                <tr key={i} className="group border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer" onClick={() => router.push(`/customers/${customer.id}`)}>
+                                                    <td className="p-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 font-black text-xs">
+                                                                {customer.name?.slice(0, 2).toUpperCase() || 'CR'}
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{customer.name}</div>
+                                                                <div className="text-xs text-slate-400 font-semibold">{customer.taxNumber ? `VKN: ${customer.taxNumber}` : 'Kayıtsız VKN'}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 text-sm font-semibold text-slate-600 dark:text-slate-400">
+                                                        {customer.phone || 'Girilmemiş'}
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider ${balance > 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : balance < 0 ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400'}`}>
+                                                            {balance > 0 ? 'Alacaklıyız' : balance < 0 ? 'Borçluyuz' : 'Dengede'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="p-4 text-right">
+                                                        <div className={`text-base font-black ${balance > 0 ? 'text-emerald-600 dark:text-emerald-400' : balance < 0 ? 'text-red-600 dark:text-red-500' : 'text-slate-900 dark:text-white'}`}>
+                                                            {balance > 0 ? '+' : ''}₺{balance.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 text-right">
+                                                        <button className="text-slate-400 group-hover:text-blue-500 transition-colors text-xs font-bold uppercase tracking-wider">Cari Ekstresi →</button>
+                                                    </td>
+                                                </tr>
+                                            )})}
+                                            {topCustomers.length === 0 && (
+                                                <tr>
+                                                    <td colSpan={5} className="p-8 text-center text-slate-400 text-sm font-semibold">Aktif cari veya bakiye kaydı bulunamadı.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
