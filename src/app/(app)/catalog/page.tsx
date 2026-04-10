@@ -117,8 +117,8 @@ export default async function CatalogPage({
     itemsWithImages.length > 0 ? itemsWithImages[0] : items[0];
   const sixPackItems =
     itemsWithImages.length > 1
-      ? itemsWithImages.slice(1, 11)
-      : items.slice(1, 11);
+      ? itemsWithImages.slice(0, 10)
+      : items.slice(0, 10);
 
   // Everything else to Ledger
   const usedIds = new Set([
@@ -437,3 +437,4 @@ export default async function CatalogPage({
     </div>
   );
 }
+

@@ -1,0 +1,1 @@
+const { PrismaClient } = require('@prisma/client'); const prisma = new PrismaClient(); async function main() { const data = await prisma.networkListing.findMany({ include: { globalProduct: true } }); console.log(data); } main().finally(() => prisma.$disconnect());

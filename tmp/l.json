@@ -1,0 +1,102 @@
+[
+  {
+    "erpProductId": "cmmsgda2s0003ko16xi2doz1f",
+    "availableQty": 10,
+    "minQty": 1,
+    "status": "ACTIVE",
+    "globalProduct": {
+      "status": "APPROVED",
+      "name": "STK-00001 - Ofis Yazıcı Kağıdı A4 80gr 500’lü"
+    }
+  },
+  {
+    "erpProductId": "cmms9qnds00032esyw2sijr6a",
+    "availableQty": 63,
+    "minQty": 1,
+    "status": "ACTIVE",
+    "globalProduct": {
+      "status": "APPROVED",
+      "name": "9 Ledli Pilli El Feneri"
+    }
+  },
+  {
+    "erpProductId": "cmmqvyac900m7jdzkkxhkxvhq",
+    "availableQty": 5,
+    "minQty": 1,
+    "status": "ACTIVE",
+    "globalProduct": {
+      "status": "APPROVED",
+      "name": "XRS066"
+    }
+  },
+  {
+    "erpProductId": "cmn26blv4003gam9uuqlprm8x",
+    "availableQty": 5,
+    "minQty": 1,
+    "status": "ACTIVE",
+    "globalProduct": {
+      "status": "APPROVED",
+      "name": "XRS044 SORA"
+    }
+  },
+  {
+    "erpProductId": "cmn26blna003aam9u3emypeiq",
+    "availableQty": 5,
+    "minQty": 1,
+    "status": "ACTIVE",
+    "globalProduct": {
+      "status": "APPROVED",
+      "name": "XRS044 CLARIS"
+    }
+  },
+  {
+    "erpProductId": "cmn3j7lp900a06rvq528ezube",
+    "availableQty": 0,
+    "minQty": 1,
+    "status": "ACTIVE",
+    "globalProduct": {
+      "status": "APPROVED",
+      "name": "RBF 700"
+    }
+  },
+  {
+    "erpProductId": "cmn3j7pkn00cy6rvqk6eqa87c",
+    "availableQty": 33,
+    "minQty": 1,
+    "status": "ACTIVE",
+    "globalProduct": {
+      "status": "APPROVED",
+      "name": "ZİNCİR TEMİZLEME FIRÇASI"
+    }
+  },
+  {
+    "erpProductId": "cmn26bm2x003mam9u3svqa439",
+    "availableQty": 4,
+    "minQty": 1,
+    "status": "ACTIVE",
+    "globalProduct": {
+      "status": "APPROVED",
+      "name": "XRS066"
+    }
+  },
+  {
+    "erpProductId": "cmnf3kw8f000211a3hevaw4na",
+    "availableQty": 10,
+    "minQty": 1,
+    "status": "ACTIVE",
+    "globalProduct": {
+      "status": "APPROVED",
+      "name": "BOTOGEN DPF TEMİZLEYİCİ YAKIT KATKISI 300ML 1737"
+    }
+  },
+  {
+    "erpProductId": "cmn3j7pnc00d06rvq3522wu1s",
+    "availableQty": 123,
+    "minQty": 1,
+    "status": "ACTIVE",
+    "globalProduct": {
+      "status": "APPROVED",
+      "name": "ZİNCİR YAĞLAMA SPREYİ"
+    }
+  }
+]

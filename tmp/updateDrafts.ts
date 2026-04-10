@@ -1,0 +1,1 @@
+import { PrismaClient } from '@prisma/client'; const prisma = new PrismaClient(); async function main() { const u = await prisma.globalProduct.updateMany({ where: { status: 'DRAFT' }, data: { status: 'APPROVED' } }); console.log('Updated:', u.count); } main().finally(() => prisma.$disconnect());

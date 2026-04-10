@@ -77,6 +77,7 @@ export async function matchOrCreateGlobalProduct(erpProduct: any, autoApprove: b
             barcode: erpProduct.barcode || null,
             description: erpProduct.description || null,
             categoryId: aiExtractedCategory || erpProduct.globalCategoryId || null,
+            status: autoApprove ? 'APPROVED' : 'DRAFT',
             // e.g. brand: aiExtractedBrand // (if `brand` is added to schema)
         }
     });
