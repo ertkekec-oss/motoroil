@@ -29,6 +29,13 @@ export async function GET(request: Request) {
         });
         
         const where: any = { deletedAt: null };
+        let defaultBranchString = 'Merkez';
+        if (company) {
+            const defBranchSetting = await prisma.appSettings.findFirst({ where: { companyId: company.id, key: 'company_default_branch' }});
+            if (defBranchSetting && defBranchSetting.value) {
+                defaultBranchString = defBranchSetting.value;
+            }
+        }
         if (company) {
             where.companyId = company.id;
         } else if (user.tenantId !== 'PLATFORM_ADMIN') {
@@ -139,7 +146,7 @@ export async function GET(request: Request) {
             id: c.id,
             name: c.name,
             phone: c.phone || '',
-            branch: c.branch || 'Merkez',
+            branch: c.branch || defaultBranchString,
             balance: Number(c.balance || 0),
             category: c.category?.name || c.customerClass || 'Genel',
             priceListId: c.category?.priceListId || null,
@@ -214,6 +221,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: 'İşlem için geçerli bir Firma ID (Company ID) bulunamadı.' }, { status: 400 });
         }
 
+        let defaultBranchString = 'Merkez';
+        if (targetCompanyId) {
+            const defBranchSetting = await prisma.appSettings.findFirst({ where: { companyId: targetCompanyId, key: 'company_default_branch' }});
+            if (defBranchSetting && defBranchSetting.value) {
+                defaultBranchString = defBranchSetting.value;
+            }
+        }
+        
         // Genel kategori otomatik seçilsin mi? Eğer categoryId gönderilmezse:
         let targetCategoryId = categoryId;
         if (!targetCategoryId) {
@@ -233,7 +248,7 @@ export async function POST(req: Request) {
             const newCustomer = await (tx as any).customer.create({
                 data: {
                     name, phone, email, address, city, district, taxNumber, taxOffice, contactPerson, iban,
-                    branch: branch || 'Merkez',
+                    branch: branch || defaultBranchString,
                     categoryId: targetCategoryId,
                     companyId: targetCompanyId, // Use valid ID
                     supplierClass,

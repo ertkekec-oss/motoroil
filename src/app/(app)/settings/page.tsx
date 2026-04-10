@@ -129,7 +129,8 @@ export default function SettingsPage() {
                 company_address: appSettings.company_address || '',
                 company_city: appSettings.company_city || '',
                 company_district: appSettings.company_district || '',
-                company_phone: appSettings.company_phone || ''
+                company_phone: appSettings.company_phone || '',
+                company_default_branch: appSettings.company_default_branch || ''
             });
         }
     }, [activeTab, appSettings]);

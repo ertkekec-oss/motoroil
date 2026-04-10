@@ -279,7 +279,7 @@ export default function CompanyProfileForm(props: any) {
 
                     {/* İletişim */}
                     <ERPBlock title="Dijital İletişim Kanalları" description="Fatura, mail şablonları ve SMS gönderimlerinde kullanılacak olan ulaşım rotaları.">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                             <ERPField label="Resmi E-Posta">
                                 <ERPInput
                                     type="email"
@@ -321,6 +321,18 @@ export default function CompanyProfileForm(props: any) {
                                         <option value="">İl Seçiniz</option>
                                         {(TURKISH_CITIES || []).map((city: string) => (
                                             <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </ERPSelect>
+                                </ERPField>
+                                <ERPField label="Varsayılan Şube (Default Branch)">
+                                    <ERPSelect
+                                        value={tempCompanyInfo?.company_default_branch || ''}
+                                        onChange={(e: any) => setTempCompanyInfo({ ...tempCompanyInfo, company_default_branch: e.target.value })}
+                                    >
+                                        <option value="">Sabit Merkez Kelimesini Kullan</option>
+                                        <option value="Merkez">Merkez</option>
+                                        {(props.contextBranches || []).map((b: any) => (
+                                            <option key={b.id} value={b.name}>{b.name}</option>
                                         ))}
                                     </ERPSelect>
                                 </ERPField>

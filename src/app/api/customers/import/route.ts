@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+import { authorize } from '@/lib/auth';
 export async function POST(request: Request) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
         const body = await request.json();
         const { data } = body; // Array of customers
 
@@ -11,6 +15,20 @@ export async function POST(request: Request) {
         }
 
         let successCount = 0;
+        let targetCompanyId = auth.user.companyId;
+        if (!targetCompanyId) {
+            const c = await prisma.company.findFirst({ where: { tenantId: auth.user.tenantId } });
+            targetCompanyId = c?.id;
+        }
+
+        let defaultBranchString = 'Merkez';
+        if (targetCompanyId) {
+            const defBranchSetting = await prisma.appSettings.findFirst({ where: { companyId: targetCompanyId, key: 'company_default_branch' }});
+            if (defBranchSetting && defBranchSetting.value) {
+                defaultBranchString = defBranchSetting.value;
+            }
+        }
+        
         const generalCat = await prisma.customerCategory.findFirst({ where: { name: 'Genel' } });
         const categoryId = generalCat ? generalCat.id : undefined;
 
@@ -29,7 +47,9 @@ export async function POST(request: Request) {
                             address: item.address,
                             contactPerson: item.contactPerson,
                             iban: item.iban,
-                            categoryId: categoryId
+                            categoryId: categoryId,
+                            branch: defaultBranchString,
+                            companyId: targetCompanyId
                         }
                     });
                     successCount++;
