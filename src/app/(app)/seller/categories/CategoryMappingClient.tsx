@@ -160,15 +160,15 @@ export default function CategoryMappingClient({
                                         break;
                                     }
                                     totalProcessed += (res.count || 0);
-                                    if ((res.count || 0) < 200) {
+                                    if ((res.count || 0) < 25) {
                                         showSuccess(
-                                            totalProcessed > 0 ? "Düzen Sağlandı!" : "Aksiyon Tamamlandı", 
-                                            `Toplam ${totalProcessed} ürün tespit edildi ve yerel kategorileriniz modernize edilerek ağa eklendi.`
+                                            totalProcessed > 0 ? "Otonom Düzen Sağlandı!" : "Aksiyon Tamamlandı", 
+                                            `Toplam ${totalProcessed} ürün arka planda tespit edildi ve yerel kategorileriniz modernize edilerek ağa eklendi.`
                                         );
                                         running = false;
                                     } else {
-                                        showSuccess("AI Tarıyor...", `Şu ana kadar ${totalProcessed} ürün lokalde düzeltildi. Döngü devam ediyor...`);
-                                        await new Promise(r => setTimeout(r, 1500));
+                                        showSuccess("Deep-B2B Tarıyor...", `Şu ana kadar ${totalProcessed} ürün arka planda eşlendi. Bot kesintisiz taramaya devam ediyor... Lütfen Bekleyin.`);
+                                        await new Promise(r => setTimeout(r, 4500)); // Sleep 4.5s between chunks to respect Google API 15 RPM
                                     }
                                 }
                             });
