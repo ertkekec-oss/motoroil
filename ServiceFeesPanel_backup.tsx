@@ -23,9 +23,6 @@ export default function ServiceSettingsPanel() {
     // 2. DYNAMIC ASSET TYPES (TAŞIT TÜRLERİ & KUTULAR) STATE
     const [assetTypes, setAssetTypes] = useState<any[]>([]);
 
-    // 3. WORKSHOP BAYS/LIFTS STATE
-    const [lifts, setLifts] = useState<any[]>([]);
-
     // Load Data
     useEffect(() => {
         // Load Rates
@@ -63,16 +60,6 @@ export default function ServiceSettingsPanel() {
                 }
             ]);
         }
-
-        // Load Lifts/Bays
-        if (appSettings?.service_lifts) {
-            setLifts(appSettings.service_lifts.map((name: string) => ({ id: Math.random().toString(36).substr(2,9), name })));
-        } else {
-            setLifts([
-                { id: 'l1', name: 'Lift 1' },
-                { id: 'l2', name: 'Lift 2' }
-            ]);
-        }
     }, [serviceSettings, appSettings]);
 
     const handleSave = async () => {
@@ -86,15 +73,11 @@ export default function ServiceSettingsPanel() {
             // 2. Filter empty asset types
             const finalAssetTypes = assetTypes.filter(t => t.name.trim() !== '');
 
-            // 3. Filter empty lifts
-            const finalLifts = lifts.filter(l => l.name.trim() !== '').map(l => l.name.trim());
-
-            // 4. Save to Global Contexts & DB
+            // 3. Save to Global Contexts & DB
             await updateServiceSettings(ratesObj);
             await updateAppSetting('asset_types_schema', finalAssetTypes);
-            await updateAppSetting('service_lifts', finalLifts);
 
-            showSuccess('Başarılı', 'Servis ayarları, liftler ve cihaz türleri kaydedildi.');
+            showSuccess('Başarılı', 'Servis tarifeleri ve taşıt (cihaz) türü alanları kaydedildi.');
         } catch (e) {
             showError('Hata', 'Ayarlar kaydedilemedi.');
         }
@@ -149,20 +132,13 @@ export default function ServiceSettingsPanel() {
         }));
     };
 
-    // --- LIFTS HANDLERS ---
-    const addLift = () => setLifts([...lifts, { id: Math.random().toString(36).substr(2,9), name: '' }]);
-    const removeLift = (id: string) => setLifts(lifts.filter(l => l.id !== id));
-    const updateLift = (id: string, name: string) => {
-        setLifts(lifts.map(l => l.id === id ? { ...l, name } : l));
-    };
-
     return (
-        <div className="max-w-7xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300 font-sans h-full flex flex-col">
+        <div className="max-w-7xl mx-auto w-full p-8 pt-10 animate-in fade-in duration-300 font-sans">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                     <h2 className="text-[24px] font-bold text-slate-900 dark:text-white tracking-tight">Servis & Cihaz Ayarları</h2>
-                    <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-1">Servis tarifeleri, lift/istasyon kapasitesi ve dinamik taşıt karneleri.</p>
+                    <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-1">Servis tarifelerini (fiyatları) ve dinamik cihaz (taşıt) karnesi alanlarını buradan yönetin.</p>
                 </div>
 
                 <div className="shrink-0">
@@ -175,52 +151,11 @@ export default function ServiceSettingsPanel() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 flex-1 min-h-0">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 
-                {/* SOL KOLON: LİFTLER VE TARİFELER */}
-                <div className="flex flex-col gap-8 h-full">
-
-                    {/* ATÖLYE LİFT & İSTASYONLARI */}
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl shadow-sm overflow-hidden flex flex-col min-h-[300px]">
-                        <div className="px-5 py-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-emerald-50/50">
-                            <div>
-                                <h3 className="text-[16px] font-bold text-emerald-800 dark:text-emerald-400">Atölye Lift & İstasyonları</h3>
-                                <p className="text-xs font-medium text-emerald-600 dark:text-emerald-500 mt-1">Servis alanlarınızın/liftlerinizin isimlerini belirleyin.</p>
-                            </div>
-                            <button onClick={addLift} className="text-sm font-bold text-emerald-700 hover:text-emerald-900 transition-colors bg-white shadow-sm border border-emerald-200 hover:bg-emerald-50 px-3 py-1.5 rounded">
-                                + Lift Ekle
-                            </button>
-                        </div>
-                        <div className="p-5 flex-1 overflow-y-auto bg-slate-50/50">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {lifts.length === 0 ? (
-                                    <div className="col-span-full text-sm font-medium text-slate-400 text-center py-6 bg-white rounded border border-dashed border-slate-200">Kayıtlı lift/istasyon bulunmuyor.</div>
-                                ) : lifts.map((l, i) => (
-                                    <div key={l.id} className="flex items-center gap-2 bg-white px-3 py-2 border border-slate-200 rounded shadow-sm group hover:border-emerald-300 transition-all">
-                                        <div className="font-black text-emerald-500 w-6 text-center text-xs">{i+1}.</div>
-                                        <div className="flex-1">
-                                            <input 
-                                                type="text" 
-                                                placeholder="Örn: Lift 1" 
-                                                value={l.name}
-                                                onChange={(e) => updateLift(l.id, e.target.value)}
-                                                className="w-full h-8 text-[13px] font-bold text-slate-800 focus:outline-none focus:ring-0 border-none px-0"
-                                            />
-                                        </div>
-                                        <button 
-                                            onClick={() => removeLift(l.id)} 
-                                            className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors shrink-0"
-                                            title="Sil"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-[300px]">
+                {/* SOL KOLON: SABİT SERVİS VE İŞÇİLİK TARİFELERİ */}
+                <div>
+                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
                         <div className="px-5 py-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50">
                             <div>
                                 <h3 className="text-[16px] font-bold text-slate-800 dark:text-white">Servis & İşçilik Tarifeleri</h3>
@@ -231,7 +166,7 @@ export default function ServiceSettingsPanel() {
                             </button>
                         </div>
 
-                        <div className="p-5 flex-1 overflow-y-auto w-full bg-slate-50 custom-scroll">
+                        <div className="p-5 flex-1 overflow-y-auto w-full bg-slate-50">
                             <div className="space-y-3">
                                 {rates.length === 0 ? (
                                     <div className="text-sm font-medium text-slate-400 text-center py-10 bg-white rounded border border-dashed border-slate-200">Kayıtlı tarife bulunmuyor.</div>
@@ -280,11 +215,11 @@ export default function ServiceSettingsPanel() {
                                 <p className="text-xs font-medium text-slate-500 mt-1">İstediğiniz türü ekleyin ve altına ona özel giriş kutuları (alanlar) yaratın.</p>
                             </div>
                             <button onClick={addAssetType} className="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors bg-white shadow-sm border border-blue-200 hover:bg-blue-50 px-3 py-1.5 rounded">
-                                + Yeni Taşıt Türü
+                                + Yeni Cihaz/Taşıt Türü
                             </button>
                         </div>
 
-                        <div className="p-5 flex-1 overflow-y-auto bg-slate-50/50 custom-scroll">
+                        <div className="p-5 flex-1 overflow-y-auto bg-slate-50/50">
                             <div className="space-y-6">
                                 {assetTypes.length === 0 ? (
                                     <div className="text-sm font-medium text-slate-400 text-center py-10 bg-white rounded border border-dashed border-slate-200">Kayıtlı cihaz türü (taşıt) bulunamadı.</div>
@@ -326,7 +261,7 @@ export default function ServiceSettingsPanel() {
                                                                 <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">KUTU {fIdx+1}</span>
                                                                 <input
                                                                     type="text"
-                                                                    placeholder="İsim (Örn: KM, Seri No)"
+                                                                    placeholder="İsim (Örn: KM, Seri No, Plaka)"
                                                                     value={f.label}
                                                                     onChange={(e) => updateFieldLabel(type.id, f.id, e.target.value)}
                                                                     className="w-full bg-transparent border-none text-sm font-semibold text-slate-700 placeholder:font-medium placeholder:text-slate-400 focus:outline-none focus:ring-0"

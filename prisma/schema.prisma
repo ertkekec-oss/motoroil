@@ -900,6 +900,7 @@ model ServiceOrder {
   digitalSignature String? @db.Text
 
   branch          String  @default("Merkez")
+  bayName         String? // Lift or Workshop Bay name
   linkedInvoiceId String?
 
   company  Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)

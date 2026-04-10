@@ -435,6 +435,30 @@ export default function ServiceDetailClient({ id }: { id: string }) {
                                                     <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Servis Tarihi</div>
                                                     <div className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{new Date(order.createdAt).toLocaleDateString('tr-TR')}</div>
                                                 </div>
+                                                <div className="col-span-2 mt-1">
+                                                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1">🛠️ Atölye / İstasyon (Lift)</div>
+                                                    <select 
+                                                        value={order.bayName || ''} 
+                                                        onChange={(e) => {
+                                                            fetch(`/api/services/work-orders/${id}`, {
+                                                                method: 'PATCH',
+                                                                headers: { 'Content-Type': 'application/json' },
+                                                                body: JSON.stringify({ bayName: e.target.value })
+                                                            }).then(res => {
+                                                                if(res.ok) {
+                                                                    setOrder({...order, bayName: e.target.value});
+                                                                    showSuccess("Lift Atandı", "Araç atölye istasyonuna atandı.");
+                                                                }
+                                                            });
+                                                        }}
+                                                        className="w-full h-8 px-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-lg text-[13px] font-black text-indigo-700 dark:text-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                    >
+                                                        <option value="">İstasyon Seçilmedi (Beklemede)</option>
+                                                        {(appSettings?.service_lifts || []).map((lift: string) => (
+                                                            <option key={lift} value={lift}>{lift}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                     ) : (

@@ -30,7 +30,7 @@ export async function PATCH(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { status, nextKm_or_Use, nextMaintenanceAt, technicianNotes, attachments, digitalSignature, checkInLocation, checkOutLocation } = body;
+        const { status, nextKm_or_Use, nextMaintenanceAt, technicianNotes, attachments, digitalSignature, checkInLocation, checkOutLocation, bayName } = body;
 
         const updateData: any = {};
         if (status) updateData.status = status;
@@ -41,6 +41,7 @@ export async function PATCH(
         if (digitalSignature !== undefined) updateData.digitalSignature = digitalSignature;
         if (checkInLocation !== undefined) updateData.checkInLocation = checkInLocation;
         if (checkOutLocation !== undefined) updateData.checkOutLocation = checkOutLocation;
+        if (bayName !== undefined) updateData.bayName = bayName;
 
         if (status === 'IN_PROGRESS') {
             updateData.startedAt = new Date();
