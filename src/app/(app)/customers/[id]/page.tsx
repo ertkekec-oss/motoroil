@@ -59,6 +59,14 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 offers: {
                     orderBy: { createdAt: 'desc' },
                     include: { lines: true, terms: true }
+                },
+                serviceOrders: {
+                    where: { deletedAt: null },
+                    orderBy: { createdAt: 'desc' }
+                },
+                serviceOrders: {
+                    where: { deletedAt: null },
+                    orderBy: { createdAt: 'desc' }
                 }
             }
         });
@@ -284,6 +292,34 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             };
         });
 
+        const svcList = (customer.serviceOrders || []).map((s: any) => {
+            const isCompleted = s.status === 'COMPLETED' || s.status === 'TAMAMLANDI' || s.status === 'READY'; 
+            
+            // Map english status to turkish
+            let trStatus = s.status;
+            if (s.status === 'PENDING') trStatus = 'BEKLEYEN İş';
+            else if (s.status === 'IN_PROGRESS') trStatus = 'İŞLEMEDE';
+            else if (s.status === 'WAITING_APPROVAL') trStatus = 'MÜŞTERİ ONAYI BEKLİYOR';
+            else if (s.status === 'WAITING_PART') trStatus = 'PARÇA BEKLİYOR';
+            else if (s.status === 'READY') trStatus = 'TESLİMAT BEKLİYOR';
+            else if (s.status === 'COMPLETED') trStatus = 'TAMAMLANDI';
+            else if (s.status === 'CANCELLED') trStatus = 'İPTAL EDİLDİ';
+
+            return {
+                id: s.id,
+                date: new Date(s.createdAt).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                rawDate: s.createdAt,
+                type: 'Servis',
+                desc: `Servis Kaydı #${s.id.slice(-6).toUpperCase()} (${trStatus})`,
+                amount: Number(s.totalAmount || 0),
+                color: isCompleted ? '#10b981' : (s.status === 'CANCELLED' ? '#ef4444' : '#3b82f6'),
+                items: null,
+                orderId: s.id,
+                isService: true,
+                status: s.status
+            };
+        });
+
         const planList = (customer.paymentPlans || []).map((p: any) => {
             const isCanceled = p.status === 'İptal' || p.status === 'Cancelled'; 
             return {
@@ -301,7 +337,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             };
         });
 
-        const historyList = [...txs, ...invs, ...orderList, ...planList]
+        const historyList = [...txs, ...invs, ...orderList, ...planList, ...svcList]
             .sort((a: any, b: any) => {
                 const tA = a.rawDate ? new Date(a.rawDate).getTime() : 0;
                 const tB = b.rawDate ? new Date(b.rawDate).getTime() : 0;
