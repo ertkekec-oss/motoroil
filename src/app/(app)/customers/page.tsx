@@ -68,7 +68,7 @@ export default function CustomersPage() {
             if (cust.customerClass !== classFilter && cust.category !== classFilter) return false;
         }
 
-        if (branchFilter !== 'all' && (cust.branch || 'Merkez').trim().toLocaleLowerCase('tr-TR') !== branchFilter.trim().toLocaleLowerCase('tr-TR')) return false;
+        // Removed local branch filtering. The API handles it via Sidebar context.
 
         return true;
     });
@@ -391,21 +391,7 @@ export default function CustomersPage() {
             </div>
 
             {/* Branch Filters (Eskiden Controls içinde select olan filte) */}
-            {hasPermission('branch_administration') && (
-                <div className="flex flex-col gap-4 mt-6">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-2">ŞUBE</span>
-                        <button onClick={() => setBranchFilter('all')} className={`h-[36px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest border transition-all whitespace-nowrap outline-none ${branchFilter === 'all' ? (isLight ? 'bg-blue-50/50 border-blue-600 text-blue-700 shadow-sm' : 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-sm') : (isLight ? 'bg-white border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50' : 'bg-slate-900 border-slate-700/50 text-slate-400 hover:text-slate-300 hover:bg-slate-800')}`}>
-                            Tüm Şubeler
-                        </button>
-                        {branches.map(b => (
-                            <button key={b.name} onClick={() => setBranchFilter(b.name)} className={`h-[36px] px-5 rounded-full text-[11px] font-black uppercase tracking-widest border transition-all whitespace-nowrap outline-none ${branchFilter === b.name ? (isLight ? 'bg-blue-50/50 border-blue-600 text-blue-700 shadow-sm' : 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-sm') : (isLight ? 'bg-white border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50' : 'bg-slate-900 border-slate-700/50 text-slate-400 hover:text-slate-300 hover:bg-slate-800')}`}>
-                                {b.name}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
+            {/* Branch Filters removed because they conflict with Global Context */}
 
             {/* List/Grid Container */}
             <div className={`mt-6 rounded-[24px] border border-slate-200 dark:border-white/5 flex flex-col overflow-hidden shadow-sm bg-white dark:bg-[#0f172a]`}>
