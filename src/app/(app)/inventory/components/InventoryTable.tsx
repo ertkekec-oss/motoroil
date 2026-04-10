@@ -125,12 +125,12 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                     </div>
 
                                     <div className="flex-[2] px-3 overflow-hidden">
-                                        <div className={`font-black text-[13px] ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-900 dark:text-white'} truncate`}>{item.name}</div>
-                                        <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate mt-0.5">{item.code} {item.brand && `• ${item.brand}`}</div>
+                                        <div className={`font-semibold text-[13px] ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-800 dark:text-slate-200'} truncate`}>{item.name}</div>
+                                        <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">{item.code} {item.brand && `• ${item.brand}`}</div>
                                     </div>
 
                                     <div className="flex-1 px-3 overflow-hidden">
-                                        <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] items-center font-bold uppercase bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] items-center font-bold uppercase ${item.category && item.category !== '-' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
                                             {item.category || '-'}
                                         </span>
                                     </div>
@@ -156,14 +156,14 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                                                 <div className="text-[12px] font-bold text-slate-600 dark:text-slate-400">{item.branch || 'Mrkz:'} <span className="text-slate-900 dark:text-white">{Math.floor((item.stock || 0) * 0.4)}</span></div>
                                             </div>
                                             <div className="flex-1 px-3 text-right flex flex-col">
-                                                <div className="text-[14px] font-black text-indigo-600 dark:text-indigo-400 tabular-nums">{item.stock} <span className="text-indigo-400/80 text-[10px] font-bold">{item.unit || 'Adet'}</span></div>
+                                                <div className="text-[14px] font-bold text-indigo-600 dark:text-indigo-400 tabular-nums">{item.stock} <span className="text-indigo-400/80 text-[10px] font-bold">{item.unit || 'Adet'}</span></div>
                                                 <div className="text-[10px] font-bold text-slate-400">₺{Number(item.price).toLocaleString('tr-TR', { maximumFractionDigits: 0 })}</div>
                                             </div>
                                             <div className="w-24 px-3 flex justify-end">
                                                 <span className="text-[12px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 rounded-md">42 Gün</span>
                                             </div>
                                             <div className="w-24 px-3 flex justify-end">
-                                                <span className="text-[12px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 rounded-md">%{(Number(item.id) % 20) + 12}</span>
+                                                <span className="text-[12px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 rounded-md">%{(String(item.id).charCodeAt(String(item.id).length - 1) % 25) + 10}</span>
                                             </div>
                                             <div className="w-24 px-3 flex justify-center">
                                                 <div className="flex items-center gap-1.5">
