@@ -131,11 +131,11 @@ function PaymentContent() {
     const isPayable = paymentType === 'payable';
 
     return (
-        <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8 font-sans min-h-[calc(100vh-80px)] bg-[#f8fafc] dark:bg-[#020617]">
-            <div className="w-full max-w-[900px] bg-white dark:bg-[#0f172a] shadow-2xl shadow-blue-900/10 dark:shadow-none rounded-[32px] overflow-hidden flex flex-col md:flex-row border border-slate-200 dark:border-white/5 animate-in fade-in zoom-in-95 duration-500">
+        <div className="flex items-center justify-center p-4 lg:p-8 font-sans min-h-[calc(100vh-80px)] bg-[#f8fafc] dark:bg-[#020617]">
+            <div className="w-full max-w-[950px] bg-white dark:bg-[#0f172a] shadow-2xl shadow-blue-900/10 dark:shadow-none rounded-[32px] overflow-hidden flex flex-col sm:flex-row border border-slate-200 dark:border-white/5 animate-in fade-in zoom-in-95 duration-500">
                 
                 {/* Left Panel: Context & Amount */}
-                <div className={`w-full md:w-2/5 p-8 sm:p-10 flex flex-col justify-between ${isPayable ? 'bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/20 dark:to-[#0f172a]' : 'bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-[#0f172a]'} border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/5 relative`}>
+                <div className={`w-full sm:w-2/5 p-8 flex flex-col justify-between ${isPayable ? 'bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/20 dark:to-[#0f172a]' : 'bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-[#0f172a]'} border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-white/5 relative`}>
                     
                     {/* Decorative Background Blob */}
                     <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] -z-0 opacity-40 ${isPayable ? 'bg-rose-400/30' : 'bg-emerald-400/30'}`}></div>
@@ -176,7 +176,7 @@ function PaymentContent() {
                 </div>
 
                 {/* Right Panel: Controls & Checkout */}
-                <div className="w-full md:w-3/5 p-8 sm:p-10 flex flex-col justify-between relative bg-white dark:bg-[#0f172a]">
+                <div className="w-full sm:w-3/5 p-8 flex flex-col justify-between relative bg-white dark:bg-[#0f172a]">
                     <div className="flex flex-col gap-8">
                         
                         {/* Custom Tabs for Payment Method */}
