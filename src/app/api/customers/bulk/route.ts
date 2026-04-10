@@ -49,6 +49,20 @@ export async function PATCH(req: Request) {
                 }
             });
             return NextResponse.json({ success: true, message: `${customerIds.length} müşteri sınıfı güncellendi.` });
+        } else if (action === 'update_branch') {
+            if (!data || !data.branch) {
+                 return NextResponse.json({ success: false, error: 'Şube belirtilmedi.' }, { status: 400 });
+            }
+            await prisma.customer.updateMany({
+                where: {
+                    id: { in: customerIds },
+                    companyId: company.id
+                },
+                data: {
+                    branch: data.branch
+                }
+            });
+            return NextResponse.json({ success: true, message: `${customerIds.length} müşteri şubesi güncellendi.` });
         }
 
         return NextResponse.json({ success: false, error: 'Geçersiz işlem.' }, { status: 400 });
