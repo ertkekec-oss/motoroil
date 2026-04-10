@@ -163,10 +163,11 @@ ${JSON.stringify(payload)}`;
                         updatedAt: new Date()
                     }
                 });
-                processedCount++;
+                    processedCount++;
                 }
-            } // end of !geminiFailed block
-        } 
+            } // end of if (data.error) else
+        } // end of if (!response) else
+    } // end of if (GEMINI_API_KEY) 
         
         if (!GEMINI_API_KEY || geminiFailed) {
             // --- FALLBACK REGEX ENGINE (If no OpenAI API Key configured or API in High Demand) ---
