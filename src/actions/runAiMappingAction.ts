@@ -20,7 +20,7 @@ export async function runAiMappingAction(updateLocalNames: boolean = false) {
                 companyId,
                 OR: [{ category: null }, { category: "" }, { category: "-" }, { category: "Diğer" }, { globalCategoryId: null }]
             },
-            take: 50, // Reduced batch size
+            take: 25, // Reduced batch size further to 25 to mitigate High Demand 503 errors
             orderBy: { updatedAt: 'asc' }
         });
 
@@ -78,7 +78,7 @@ ${JSON.stringify(payload)}`;
             
             while(retries > 0 && !successFetch) {
                 try {
-                    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                    response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
