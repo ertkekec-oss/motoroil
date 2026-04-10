@@ -16,7 +16,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, Legend
 } from 'recharts';
-import { BarChart3, PieChart, LineChart, Target, Building2, Store, Users, FileText, Factory, Presentation, Package, FileDown, Briefcase, Activity } from 'lucide-react';
+import { BarChart3, PieChart as PieChartIcon, LineChart as LineChartIcon, Target, Building2, Store, Users, FileText, Factory, Presentation, Package, FileDown, Briefcase, Activity } from 'lucide-react';
 
 // Chart Colors
 const COLORS = {
@@ -46,7 +46,7 @@ const REPORT_CATEGORIES = [
         label: 'Saha & Operasyon',
         reports: [
             { id: 'daily', label: 'Gün Sonu & Kasa Ana Ekranı', icon: <Store className="w-4 h-4" /> },
-            { id: 'sales', label: 'Satış İşlemleri', icon: <LineChart className="w-4 h-4" /> },
+            { id: 'sales', label: 'Satış İşlemleri', icon: <LineChartIcon className="w-4 h-4" /> },
             { id: 'customers', label: 'Müşteri Skor & Performans', icon: <Users className="w-4 h-4" /> },
         ]
     },
