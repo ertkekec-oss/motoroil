@@ -1,4 +1,5 @@
 import { marketplaceWorker } from "../../services/marketplaces/actions/worker";
+import { reportsWorker } from "../../services/reports/worker";
 
 let isInitialized = false;
 
@@ -41,6 +42,11 @@ export function initMarketplaceWorker() {
             jobName: job.name,
         }));
     });
+
+    try {
+        reportsWorker.on('completed', (job) => console.log('Report Worker Success:', job.id));
+        reportsWorker.on('failed', (job, err) => console.error('Report Worker Failed:', job?.id, err));
+    } catch(e) {}
 
     isInitialized = true;
 }

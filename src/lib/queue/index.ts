@@ -35,6 +35,16 @@ export const marketplaceDlq = disableRedis ? new Proxy({}, { get: () => () => Pr
 // HEALTH CHECK
 // ============================================================================
 
+export const reportsQueue = disableRedis ? new Proxy({}, { get: () => () => Promise.resolve() }) as any : new Queue('reports-generation', {
+    connection: redisConnection as any,
+    defaultJobOptions: {
+        attempts: 2,
+        backoff: { type: 'exponential', delay: 2000 },
+        removeOnComplete: { count: 50, age: 3600 },
+        removeOnFail: { count: 100 },
+    },
+});
+
 export async function isRedisHealthy(): Promise<boolean> {
     try {
         await redisConnection.ping();
