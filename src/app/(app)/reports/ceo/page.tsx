@@ -7,18 +7,18 @@ import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 import { HelpCircle, CheckCircle2, ArrowRight, AlertTriangle, AlertCircle, MoveRight, DollarSign, Package, Users, Settings } from 'lucide-react';
 
 const riskData = [
-    { id: '1', name: 'Tahsilat Gecikmesi (Vadesi Geçenler)', finRisk: 85, opRisk: 30, z: 50, region: 'Kayseri Merkez' },
-    { id: '2', name: 'Depoda Atıl Kalan Ürünler', finRisk: 40, opRisk: 75, z: 80, region: 'Lojistik Depo' },
-    { id: '3', name: 'Çok Satan Ürünlerde Stok Bitişi', finRisk: 60, opRisk: 90, z: 60, region: 'Tüm Şubeler' },
-    { id: '4', name: 'Tedarikçi Kur/Fiyat Zammı Tehlikesi', finRisk: 70, opRisk: 50, z: 40, region: 'Bölge Geneli' },
-    { id: '5', name: 'Olağan Tedarik Akışı', finRisk: 20, opRisk: 20, z: 90, region: 'Kayseri Merkez' },
+    { id: '1', name: 'Geciken Açık Hesap Tahsilatları', finRisk: 85, opRisk: 30, z: 50, region: 'Merkez Şube' },
+    { id: '2', name: 'Depoda Atıl Kalan Stoklar', finRisk: 40, opRisk: 75, z: 80, region: 'Ana Lojistik' },
+    { id: '3', name: 'Çok Satanlarda Tedarik Gecikmesi', finRisk: 60, opRisk: 90, z: 60, region: 'Tüm Şubeler' },
+    { id: '4', name: 'Kur Dalgalanması & Marj Aşınması', finRisk: 70, opRisk: 50, z: 40, region: 'Bölge Geneli' },
+    { id: '5', name: 'Olağan Ticari Akış', finRisk: 20, opRisk: 20, z: 90, region: 'Merkez Şube' },
 ];
 
 const decisionQueue = [
-    { id: 1, action: 'Acil Tedarik Siparişi Oluştur', reason: 'Aşırı talep var, 10W-40 stokları bitmek üzere', impact: 'Kritik Stok Kaybı Tehlikesi', color: 'red' },
-    { id: 2, action: 'Geciken 4 Müşteriyi Krediye Kapat', reason: 'Ödeme gecikmesi 45 günü aştı', impact: 'Kasa Nakit Açığı Riski', color: 'blue' },
-    { id: 3, action: 'Şubeler Arası Depo Transferi Yap', reason: 'Lojistik depoda atıl, şubede acil talep var', impact: 'Maliyet Optimizasyonu', color: 'emerald' },
-    { id: 4, action: 'Yeni Kampanya: Filtre + Yağ Seti', reason: 'Bekleyen stokları tahsilata çevirme potansiyeli', impact: 'Satış Hızlandırma', color: 'slate' },
+    { id: 1, action: 'Otomatik Tedarik Siparişi Oluştur', reason: 'Kritik stok seviyesinin altına düşen 14 ürün var', impact: 'Stoksuz Kalma Tehlikesi', color: 'red' },
+    { id: 2, action: 'Riskli Müşterileri Krediye Kapat', reason: 'Ödeme gecikmeleri tolerans sınırını aştı', impact: 'Nakit Akış Darboğazı', color: 'blue' },
+    { id: 3, action: 'Şubeler Arası Envanter Kaydır', reason: 'Tesisiler arası dengesiz yığılma ve acil talep', impact: 'Maliyet Optimizasyonu', color: 'emerald' },
+    { id: 4, action: 'Fiyatlandırma Şablonlarını Güncelle', reason: 'Artan tedarikçi maliyetleri satış kârlılığını düşürüyor', impact: 'Kâr Marjı Koruması', color: 'slate' },
 ];
 
 const InfoTooltip = ({ content, iconClassName = "w-4 h-4 text-slate-400 hover:text-slate-600" }: { content: string, iconClassName?: string }) => (
