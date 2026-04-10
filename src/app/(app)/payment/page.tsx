@@ -123,7 +123,7 @@ function PaymentContent() {
                 
                 {/* Header */}
                 <div className={`p-8 text-center border-b border-slate-100 dark:border-white/5 ${bgColor}`}>
-                    <div className={\`inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-slate-900 rounded-full text-[11px] font-black tracking-widest uppercase mb-4 shadow-sm \${textColor}\`}>
+                    <div className={`inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-slate-900 rounded-full text-[11px] font-black tracking-widest uppercase mb-4 shadow-sm \${textColor}`}>
                         <span>{isPayable ? '💸' : '💰'}</span>
                         {isPayable ? 'ÖDEME ÇIKIŞI' : 'TAHSİLAT İŞLEMİ'}
                     </div>
@@ -158,21 +158,21 @@ function PaymentContent() {
                         <div className="grid grid-cols-3 gap-3">
                             <button
                                 onClick={() => setPaymentMethod('cash')}
-                                className={\`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all \${paymentMethod === 'cash' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'}\`}
+                                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all \${paymentMethod === 'cash' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'}`}
                             >
                                 <span className="text-2xl">💵</span>
                                 <span className="text-[12px] font-bold">Nakit</span>
                             </button>
                             <button
                                 onClick={() => setPaymentMethod('cc')}
-                                className={\`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all \${paymentMethod === 'cc' ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'}\`}
+                                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all \${paymentMethod === 'cc' ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'}`}
                             >
                                 <span className="text-2xl">💳</span>
                                 <span className="text-[12px] font-bold">Kredi Kartı</span>
                             </button>
                             <button
                                 onClick={() => setPaymentMethod('iban')}
-                                className={\`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all \${paymentMethod === 'iban' ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'}\`}
+                                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all \${paymentMethod === 'iban' ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0f172a] text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'}`}
                             >
                                 <span className="text-2xl">🏦</span>
                                 <span className="text-[12px] font-bold">Havale / EFT</span>
@@ -211,9 +211,9 @@ function PaymentContent() {
                                         <button
                                             key={opt.value}
                                             onClick={() => setInstallment(opt.value)}
-                                            className={\`px-4 py-2 rounded-lg text-[12px] font-bold transition-all border-2 \${installment === opt.value ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white dark:bg-[#1e293b] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-slate-300'}\`}
+                                            className={`px-4 py-2 rounded-lg text-[12px] font-bold transition-all border-2 \${installment === opt.value ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white dark:bg-[#1e293b] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-slate-300'}`}
                                         >
-                                            {opt.value === 1 ? 'Tek Çekim' : \`\${opt.value} Taksit\`}
+                                            {opt.value === 1 ? 'Tek Çekim' : `\${opt.value} Taksit`}
                                         </button>
                                     ))}
                                 </div>
@@ -235,7 +235,7 @@ function PaymentContent() {
                     <button 
                         onClick={handlePayment}
                         disabled={isProcessing}
-                        className={\`flex-[2] h-12 rounded-xl font-black text-[14px] text-white flex items-center justify-center gap-2 uppercase tracking-wide transition-all \${actionBg} \${isProcessing ? 'opacity-75 cursor-not-allowed scale-[0.98]' : 'shadow-lg hover:shadow-xl hover:-translate-y-0.5'}\`}
+                        className={`flex-[2] h-12 rounded-xl font-black text-[14px] text-white flex items-center justify-center gap-2 uppercase tracking-wide transition-all \${actionBg} \${isProcessing ? 'opacity-75 cursor-not-allowed scale-[0.98]' : 'shadow-lg hover:shadow-xl hover:-translate-y-0.5'}`}
                     >
                         {isProcessing ? (
                             <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span> İŞLENİYOR...</>
