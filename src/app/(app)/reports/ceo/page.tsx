@@ -7,18 +7,18 @@ import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 import { HelpCircle, CheckCircle2, ArrowRight, AlertTriangle, AlertCircle, MoveRight, DollarSign, Package, Users, Settings } from 'lucide-react';
 
 const riskData = [
-    { id: '1', name: 'Nakit Sıkışıklığı (EU)', finRisk: 85, opRisk: 30, z: 50, region: 'EU' },
-    { id: '2', name: 'Atıl Stok (TR)', finRisk: 40, opRisk: 75, z: 80, region: 'TR' },
-    { id: '3', name: 'Tedarik Gecikmesi (USA)', finRisk: 60, opRisk: 90, z: 60, region: 'USA' },
-    { id: '4', name: 'Fiyat/Marj Eriyişi (EU)', finRisk: 70, opRisk: 50, z: 40, region: 'EU' },
-    { id: '5', name: 'Düzenli Akış (MEA)', finRisk: 20, opRisk: 20, z: 90, region: 'MEA' },
+    { id: '1', name: 'Tahsilat Gecikmesi (Vadesi Geçenler)', finRisk: 85, opRisk: 30, z: 50, region: 'Kayseri Merkez' },
+    { id: '2', name: 'Depoda Atıl Kalan Ürünler', finRisk: 40, opRisk: 75, z: 80, region: 'Lojistik Depo' },
+    { id: '3', name: 'Çok Satan Ürünlerde Stok Bitişi', finRisk: 60, opRisk: 90, z: 60, region: 'Tüm Şubeler' },
+    { id: '4', name: 'Tedarikçi Kur/Fiyat Zammı Tehlikesi', finRisk: 70, opRisk: 50, z: 40, region: 'Bölge Geneli' },
+    { id: '5', name: 'Olağan Tedarik Akışı', finRisk: 20, opRisk: 20, z: 90, region: 'Kayseri Merkez' },
 ];
 
 const decisionQueue = [
-    { id: 1, action: '3 ürün için Global RFQ aç', reason: 'Aşırı Talep & Avrupa Deposunda Kritik Stok', impact: 'Kritik Operasyonel Risk', color: 'red' },
-    { id: 2, action: '4 ürünü B2B Global Network\'e aç', reason: '120 gündür atıl stok (TR)', impact: 'Yüksek Nakit Etkisi ($84K)', color: 'blue' },
-    { id: 3, action: 'TR/EU Arası Fiyat Arbitrajı', reason: 'Kur farkı %4\'ü aştı', impact: 'Orta Marj Etkisi', color: 'emerald' },
-    { id: 4, action: 'Depolar Arası Transfer (TR -> EU)', reason: 'Dengesiz stok dağılımı ve vergi avantajı', impact: 'Düşük Operasyonel Değer', color: 'slate' },
+    { id: 1, action: 'Acil Tedarik Siparişi Oluştur', reason: 'Aşırı talep var, 10W-40 stokları bitmek üzere', impact: 'Kritik Stok Kaybı Tehlikesi', color: 'red' },
+    { id: 2, action: 'Geciken 4 Müşteriyi Krediye Kapat', reason: 'Ödeme gecikmesi 45 günü aştı', impact: 'Kasa Nakit Açığı Riski', color: 'blue' },
+    { id: 3, action: 'Şubeler Arası Depo Transferi Yap', reason: 'Lojistik depoda atıl, şubede acil talep var', impact: 'Maliyet Optimizasyonu', color: 'emerald' },
+    { id: 4, action: 'Yeni Kampanya: Filtre + Yağ Seti', reason: 'Bekleyen stokları tahsilata çevirme potansiyeli', impact: 'Satış Hızlandırma', color: 'slate' },
 ];
 
 const InfoTooltip = ({ content, iconClassName = "w-4 h-4 text-slate-400 hover:text-slate-600" }: { content: string, iconClassName?: string }) => (
@@ -421,9 +421,9 @@ export default function CEODashboardPage() {
                     <div className="flex-1 w-full mt-4">
                         <ResponsiveContainer width="100%" height="100%">
                             <ScatterChart margin={{ top: 10, right: 10, bottom: 20, left: 20 }}>
-                                <XAxis type="number" dataKey="opRisk" name="İş Akışı Kilitlenmesi" tick={{ fontSize: 11 }} domain={[0, 100]} />
-                                <YAxis type="number" dataKey="finRisk" name="Maddi Zarar" tick={{ fontSize: 11 }} domain={[0, 100]} />
-                                <ZAxis type="number" dataKey="z" range={[100, 800]} name="Hasar Hacmi" />
+                                <XAxis type="number" dataKey="opRisk" name="Operasyonel Aksama" tick={{ fontSize: 11 }} domain={[0, 100]} />
+                                <YAxis type="number" dataKey="finRisk" name="Finansal Kayıp" tick={{ fontSize: 11 }} domain={[0, 100]} />
+                                <ZAxis type="number" dataKey="z" range={[100, 800]} name="Etkilenen Hacim" />
                                 <Tooltip cursor={{ strokeDasharray: '3 3' }}
                                     content={(props: any) => {
                                         const { active, payload } = props;
@@ -434,8 +434,8 @@ export default function CEODashboardPage() {
                                                     <div className="font-black text-sm border-b border-slate-200 dark:border-slate-700 pb-2 mb-3 flex flex-col gap-1">
                                                         <span className="text-blue-600 dark:text-blue-400">{data.name}</span>
                                                     </div>
-                                                    <div className="flex justify-between text-slate-500 dark:text-slate-400 mb-1.5"><span className="font-bold">Maddi Hasar Düzeyi:</span> <span className="text-slate-900 dark:text-white font-black">% {data.finRisk}</span></div>
-                                                    <div className="flex justify-between text-slate-500 dark:text-slate-400 mb-1.5"><span className="font-bold">İş Akışı Blokajı:</span> <span className="text-slate-900 dark:text-white font-black">% {data.opRisk}</span></div>
+                                                    <div className="flex justify-between text-slate-500 dark:text-slate-400 mb-1.5"><span className="font-bold">Para Kaybetme Riski:</span> <span className="text-slate-900 dark:text-white font-black">% {data.finRisk}</span></div>
+                                                    <div className="flex justify-between text-slate-500 dark:text-slate-400 mb-1.5"><span className="font-bold">İşin Aksama (Gecikme) Riski:</span> <span className="text-slate-900 dark:text-white font-black">% {data.opRisk}</span></div>
                                                 </div>
                                             )
                                         }
