@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, Fragment } from 'react';
+import { Users, Sparkles, Zap, Target, Pencil, Shield, LogIn, LogOut } from 'lucide-react';
 
 import HrOverviewTab from '@/app/(app)/staff/_components/HrOverviewTab';
 import HrTargetsTab from '@/app/(app)/staff/_components/HrTargetsTab';
@@ -886,40 +887,48 @@ export default function StaffManagementContent() {
                 <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
                     {/* Compact Metrics */}
                     <div className="flex flex-wrap items-center gap-3">
-                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                            <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center text-[14px]">👥</div>
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center gap-4">
+                            <div className="w-9 h-9 rounded-full bg-slate-50 dark:bg-slate-800/50 text-indigo-500 flex items-center justify-center">
+                                <Users size={16} strokeWidth={2.5} />
+                            </div>
                             <div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Toplam Personel</div>
-                                <div className="text-[16px] font-black leading-none text-slate-900 dark:text-white mt-0.5">{staff.length}</div>
+                                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Toplam Personel</div>
+                                <div className="text-[18px] font-black leading-none text-slate-800 dark:text-white">{staff.length}</div>
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-[14px]">✨</div>
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center gap-4">
+                            <div className="w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                                <Sparkles size={16} strokeWidth={2.5} />
+                            </div>
                             <div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Müsait (Boşta)</div>
-                                <div className="text-[16px] font-black leading-none text-emerald-600 dark:text-emerald-400 mt-0.5">{staff.filter(s => s.status === 'Müsait' || s.status === 'Aktif' || s.status === 'Boşta' || !s.status).length}</div>
+                                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Müsait (Boşta)</div>
+                                <div className="text-[18px] font-black leading-none text-emerald-600 dark:text-emerald-400">{staff.filter(s => s.status === 'Müsait' || s.status === 'Aktif' || s.status === 'Boşta' || !s.status).length}</div>
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                            <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-[14px]">⚡</div>
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center gap-4">
+                            <div className="w-9 h-9 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center">
+                                <Zap size={16} strokeWidth={2.5} />
+                            </div>
                             <div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Meşgul (Görevli)</div>
-                                <div className="text-[16px] font-black leading-none text-amber-600 dark:text-amber-400 mt-0.5">{staff.filter(s => s.status === 'Meşgul' || s.currentJob).length}</div>
+                                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Meşgul (Görevli)</div>
+                                <div className="text-[18px] font-black leading-none text-orange-600 dark:text-orange-400">{staff.filter(s => s.status === 'Meşgul' || s.currentJob).length}</div>
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm">
-                            <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-[14px]">🎯</div>
+                        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center gap-4">
+                            <div className="w-9 h-9 rounded-full bg-rose-50 dark:bg-rose-500/10 text-rose-500 flex items-center justify-center">
+                                <Target size={16} strokeWidth={2.5} />
+                            </div>
                             <div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Açık Hedef</div>
-                                <div className="text-[16px] font-black leading-none text-indigo-600 dark:text-indigo-400 mt-0.5">{targets.filter(t => t.status !== 'Tamamlandı').length}</div>
+                                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Açık Hedef</div>
+                                <div className="text-[18px] font-black leading-none text-blue-600 dark:text-blue-400">{targets.filter(t => t.status !== 'Tamamlandı').length}</div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Quick Actions */}
+                    {/* Quick Actions */}{/* Quick Actions */}
                     <div className="flex items-center gap-2">
                         {hasPermission('create_staff') && (
                             <button onClick={() => setShowAddStaffModal(true)} className="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors shadow-sm">
@@ -937,7 +946,7 @@ export default function StaffManagementContent() {
 
                 {/* GROUPED NAVIGATION & FILTERS */}
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-2">
-                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-6 px-1 custom-scroll select-none pb-1">
+                    <div className="flex w-full lg:w-max whitespace-nowrap overflow-x-auto items-center gap-8 px-1 custom-scroll select-none pb-1">
                         {[
                             { group: 'PERSONEL', items: [{ id: 'list', label: 'Personel Listesi' }, { id: 'roles', label: 'Roller & Yetkiler' }] },
                             { group: 'OPERASYON', items: [{ id: 'tasks', label: 'Görevler' }, { id: 'performance', label: 'Hedefler' }] },
@@ -947,14 +956,14 @@ export default function StaffManagementContent() {
                         ].map((grp, i) => (
                             <div key={grp.group} className="flex items-center gap-3">
                                 {i !== 0 && <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>}
-                                <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/30 p-1 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                <div className="flex items-center gap-1">
                                     {grp.items.map(tab => (
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
                                             className={activeTab === tab.id
-                                                ? "px-3 py-1.5 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/50 dark:border-white/10 rounded-[6px]"
-                                                : "px-3 py-1.5 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-[6px]"
+                                                ? "px-5 py-2 text-[12px] font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] shadow-sm border border-slate-200/80 dark:border-white/10 rounded-full"
+                                                : "px-4 py-2 text-[12px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-all rounded-full"
                                             }
                                         >
                                             {tab.label}
@@ -974,13 +983,13 @@ export default function StaffManagementContent() {
                             <input
                                 type="text"
                                 placeholder="Personel ara..."
-                                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-[8px] h-[36px] pl-9 pr-3 text-[12px] font-semibold outline-none focus:border-blue-500 shadow-sm transition-all text-slate-900 dark:text-white"
+                                className="w-full bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-full h-[40px] pl-10 pr-4 text-[12px] font-semibold outline-none focus:border-blue-500 transition-all text-slate-900 dark:text-white shadow-sm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
                         <select
-                            className="h-[36px] px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 font-bold rounded-[8px] text-[12px] outline-none focus:border-blue-500 shadow-sm transition-colors w-[130px]"
+                            className="h-[40px] px-4 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-full text-[12px] outline-none focus:border-blue-500 shadow-sm transition-colors w-[140px]"
                             onChange={(e) => setSearchTerm(e.target.value)}
                         >
                             <option value="">Tüm Dept.</option>
