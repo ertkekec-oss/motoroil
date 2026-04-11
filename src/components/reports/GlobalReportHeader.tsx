@@ -71,7 +71,7 @@ export default function GlobalReportHeader({ title, description }: { title: stri
                         <option value="q2">2. Çeyrek (Q2)</option>
                         <option value="q3">3. Çeyrek (Q3)</option>
                         <option value="q4">4. Çeyrek (Q4)</option>
-                        <option value="ytd">Yılbaşı -> Bugün</option>
+                        <option value="ytd">Yılbaşı - Bugün</option>
                         <option value="custom">Özel Tarih Seç</option>
                     </select>
                 </div>
