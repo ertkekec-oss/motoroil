@@ -376,6 +376,13 @@ export default function ReportsPage() {
                 </div>
 
                 <div className="space-y-6">
+                    <button onClick={() => router.push('/reports/ceo')} className="w-full bg-gradient-to-tr from-slate-900 to-slate-800 dark:from-blue-600 dark:to-blue-800 p-4 rounded-2xl shadow-lg border border-slate-700 dark:border-blue-500/50 flex flex-col items-start transition-all hover:scale-[1.02]">
+                        <div className="flex items-center gap-2 text-white font-black text-sm mb-1">
+                            <Activity className="w-5 h-5 text-blue-400 dark:text-white" />
+                            Strateji Merkezi & Kokpit
+                        </div>
+                        <p className="text-left text-xs font-semibold text-slate-400 dark:text-blue-100/70">C-Level Yönetici Dashboard'una Git</p>
+                    </button>
                     {REPORT_CATEGORIES.map(category => (
                         <div key={category.id}>
                             <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-3 mb-2">{category.label}</div>
