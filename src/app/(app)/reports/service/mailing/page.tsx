@@ -46,7 +46,7 @@ export default function MailingReportPage() {
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-slate-500 mb-3">
                         <Send className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest">TOPLAM GÖNDERİM</div>
@@ -55,7 +55,7 @@ export default function MailingReportPage() {
                     <div className="text-xs font-semibold text-slate-400 mt-2 block">Başarıyla sunucuya iletilen</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-blue-500/20 dark:border-blue-500/10 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-blue-500 mb-3">
                         <Eye className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-500">AÇILMA ORANI (OPEN RATE)</div>
@@ -66,16 +66,16 @@ export default function MailingReportPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-emerald-500/20 dark:border-emerald-500/10 rounded-3xl p-6 shadow-sm flex flex-col justify-between relative bg-gradient-to-br from-emerald-500/5 to-transparent">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between relative ">
                     <div className="flex items-center gap-3 text-emerald-500 mb-3">
                         <MousePointerClick className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-500">TIKLAMA (CTR)</div>
                     </div>
                     <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400">%9.3</div>
-                    <div className="text-xs font-semibold text-emerald-500/70 mt-2 relative z-10">Bağlantılara dokunma oranı</div>
+                    <div className="text-xs font-semibold text-emerald-500/70 mt-2">Bağlantılara dokunma oranı</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-amber-500 mb-3">
                         <Mail className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">KAMPANYA GİDERİ</div>
@@ -85,7 +85,7 @@ export default function MailingReportPage() {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] overflow-hidden shadow-sm flex flex-col">
                 <div className="p-6 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 className="text-base font-black text-slate-900 dark:text-white">Toplu Gönderim Logları</h3>
                     <button onClick={handleRequestExport} disabled={isGeneratingExcel} className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-xs font-bold transition-colors disabled:opacity-50">

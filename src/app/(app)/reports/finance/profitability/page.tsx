@@ -45,28 +45,28 @@ export default function ProfitabilityReportPage() {
 
             {/* 2. Executive Summaries */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm">
                     <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">TOPLAM CİRO</div>
                     <div className="text-3xl font-black text-slate-900 dark:text-white">₺825,000</div>
                     <div className="text-xs font-semibold text-emerald-500 mt-2 block">+14% geçen periyoda göre</div>
                 </div>
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm">
                     <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">SATILAN MALİYET (COGS)</div>
                     <div className="text-3xl font-black text-red-600 dark:text-red-400">₺487,000</div>
                     <div className="text-xs font-semibold text-red-500 mt-2 block">+5% geçen periyoda göre</div>
                 </div>
-                <div className="bg-white dark:bg-[#0f172a] border border-emerald-500/20 dark:border-emerald-500/10 rounded-3xl p-6 shadow-sm relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent z-0"></div>
-                    <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 relative z-10">BRÜT KAR (Gross Profit)</div>
-                    <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 relative z-10">₺338,000</div>
-                    <div className="text-xs font-black text-emerald-500 mt-2 block border border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded inline-block relative z-10">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm">
+                    
+                    <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">BRÜT KAR (Gross Profit)</div>
+                    <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400">₺338,000</div>
+                    <div className="text-xs font-black text-emerald-500 mt-2 block border border-emerald-200 dark:border-slate-200 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded inline-block">
                         Marj: %40.9
                     </div>
                 </div>
             </div>
 
             {/* 3. The Enterprise Data Grid Array */}
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] overflow-hidden shadow-sm flex flex-col">
                 <div className="p-6 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 className="text-base font-black text-slate-900 dark:text-white">Gelir Kalemleri ve COGS Tablosu</h3>
                     

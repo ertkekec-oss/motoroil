@@ -47,7 +47,7 @@ export default function SalesXReportPage() {
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-blue-500 mb-3">
                         <Map className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-blue-600/70 dark:text-blue-500">TAMAMLANAN ZİYARET</div>
@@ -56,7 +56,7 @@ export default function SalesXReportPage() {
                     <div className="text-xs font-semibold text-slate-500 mt-2 block">Başarılı konum bildirimi</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-emerald-500/20 dark:border-emerald-500/10 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-emerald-500 mb-3">
                         <MapPin className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-500">CHECK-IN DOĞRULUĞU</div>
@@ -65,17 +65,17 @@ export default function SalesXReportPage() {
                     <div className="text-xs font-semibold text-emerald-500/80 mt-2 block">Lokasyon sapma analizi ortalaması</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-red-500/20 dark:border-red-500/10 rounded-3xl p-6 shadow-sm flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-red-500/5 to-transparent">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between ">
                     <div className="absolute inset-0 z-0"></div>
-                    <div className="flex items-center gap-3 text-red-500 mb-3 relative z-10">
+                    <div className="flex items-center gap-3 text-red-500 mb-3">
                         <Route className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-red-600/70 dark:text-red-400">ROTA İHLALİ (SAPMA)</div>
                     </div>
-                    <div className="text-3xl font-black text-red-600 dark:text-red-400 relative z-10">{totalDeviations} İhlal</div>
-                    <div className="text-xs font-semibold text-red-500/70 mt-2 relative z-10">Plana uymayan ziyaretler</div>
+                    <div className="text-3xl font-black text-red-600 dark:text-red-400">{totalDeviations} İhlal</div>
+                    <div className="text-xs font-semibold text-red-500/70 mt-2">Plana uymayan ziyaretler</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-slate-500 mb-3">
                         <Clock className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">ORTALAMA GÖRÜŞME</div>
@@ -85,7 +85,7 @@ export default function SalesXReportPage() {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] overflow-hidden shadow-sm flex flex-col">
                 <div className="p-6 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 className="text-base font-black text-slate-900 dark:text-white">Takım Rota Optimizasyon Matrisi</h3>
                     

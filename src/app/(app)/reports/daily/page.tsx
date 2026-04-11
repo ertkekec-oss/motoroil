@@ -193,7 +193,7 @@ export default function DailyReportPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group relative overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-8 group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5  -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
                     <div className="text-[10px] font-black tracking-widest text-cyan-400 mb-6 flex justify-between">
                         <span>BAKİYE DEĞİŞİMİ</span>
@@ -252,7 +252,7 @@ export default function DailyReportPage() {
                                 </div>
                             ))
                         ) : (
-                            <div className="flex flex-col items-center justify-center py-20 text-white/20 border-2 border-dashed border-white/5 rounded-3xl">
+                            <div className="flex flex-col items-center justify-center py-20 text-white/20 border-2 border-dashed border-white/5 rounded-[20px]">
                                 <span className="text-4xl mb-4">🌑</span>
                                 <p className="text-sm font-bold uppercase tracking-widest">Henüz bir işlem gerçekleştirilmedi.</p>
                             </div>
@@ -290,7 +290,7 @@ export default function DailyReportPage() {
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-10 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent relative overflow-hidden group">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm-card p-10 border-primary/20 group">
                         <div className="absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover:rotate-12 transition-transform">💡</div>
                         <h3 className="text-lg font-black text-white mb-4">Analitik Özet</h3>
                         <div className="space-y-4">

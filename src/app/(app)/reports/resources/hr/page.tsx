@@ -47,7 +47,7 @@ export default function HrScorecardReportPage() {
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-slate-500 mb-3">
                         <Clock className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest">TOPLAM FAZLA MESAİ</div>
@@ -56,17 +56,17 @@ export default function HrScorecardReportPage() {
                     <div className="text-xs font-semibold text-slate-400 mt-2 block">Şirket genel efor eklemesi</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-red-500/20 dark:border-red-500/10 rounded-3xl p-6 shadow-sm flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-red-500/5 to-transparent">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between ">
                     <div className="absolute inset-0 z-0"></div>
-                    <div className="flex items-center gap-3 text-red-500 mb-3 relative z-10">
+                    <div className="flex items-center gap-3 text-red-500 mb-3">
                         <AlertTriangle className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-red-600/70 dark:text-red-400">BURNOUT RİSKİ</div>
                     </div>
-                    <div className="text-3xl font-black text-red-600 dark:text-red-400 relative z-10">{burnoutRisk} Personel</div>
-                    <div className="text-xs font-semibold text-red-500/70 mt-2 relative z-10">Yasal mesai limitini dolduranlar</div>
+                    <div className="text-3xl font-black text-red-600 dark:text-red-400">{burnoutRisk} Personel</div>
+                    <div className="text-xs font-semibold text-red-500/70 mt-2">Yasal mesai limitini dolduranlar</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-emerald-500 mb-3">
                         <CalendarDays className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-500">KULLANILAN İZİN</div>
@@ -75,7 +75,7 @@ export default function HrScorecardReportPage() {
                     <div className="text-xs font-semibold text-slate-400 mt-2 block">Bu periyotta onaylananlar</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-blue-500 mb-3">
                         <Users className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">DEVAMSIZLIK SKORU</div>
@@ -87,7 +87,7 @@ export default function HrScorecardReportPage() {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] overflow-hidden shadow-sm flex flex-col">
                 <div className="p-6 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 className="text-base font-black text-slate-900 dark:text-white">Personel Puantaj Matrisi</h3>
                     

@@ -45,17 +45,17 @@ export default function AnomaliesReportPage() {
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                <div className="bg-white dark:bg-[#0f172a] border border-red-500/20 dark:border-red-500/10 rounded-3xl p-6 shadow-sm flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-red-500/5 to-transparent">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between ">
                     <div className="absolute inset-0 z-0"></div>
-                    <div className="flex items-center gap-3 text-red-500 mb-3 relative z-10">
+                    <div className="flex items-center gap-3 text-red-500 mb-3">
                         <ShieldAlert className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-red-600/70 dark:text-red-400">YÜKSEK RİSKLİ ŞÜPHE</div>
                     </div>
-                    <div className="text-3xl font-black text-red-600 dark:text-red-400 relative z-10">{criticalCount} Tespit</div>
-                    <div className="text-xs font-semibold text-red-500/70 mt-2 relative z-10">İncelenmesi gereken kritik olay</div>
+                    <div className="text-3xl font-black text-red-600 dark:text-red-400">{criticalCount} Tespit</div>
+                    <div className="text-xs font-semibold text-red-500/70 mt-2">İncelenmesi gereken kritik olay</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-amber-500 mb-3">
                         <AlertOctagon className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">KURAL İHLALİ (İSKONTO)</div>
@@ -64,7 +64,7 @@ export default function AnomaliesReportPage() {
                     <div className="text-xs font-semibold text-slate-400 mt-2 block">Yetki dışı fiyat/indirim değişikliği</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-blue-500 mb-3">
                         <Activity className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">MESAİ DIŞI AKTİVİTE</div>
@@ -73,7 +73,7 @@ export default function AnomaliesReportPage() {
                     <div className="text-xs font-semibold text-slate-400 mt-2 block">Gece 22:00 - 06:00 arası girişler</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-emerald-500 mb-3">
                         <Fingerprint className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-500">SİSTEM SAĞLIK SKORU</div>
@@ -85,7 +85,7 @@ export default function AnomaliesReportPage() {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] overflow-hidden shadow-sm flex flex-col">
                 <div className="p-6 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 className="text-base font-black text-slate-900 dark:text-white">AI Log Alarm Kayıtları</h3>
                     
@@ -133,7 +133,7 @@ export default function AnomaliesReportPage() {
                                             {badge}
                                         </td>
                                         <td className="p-5 text-right">
-                                            <span className={`px-2 py-1 rounded border text-[10px] font-bold uppercase ${row.status === 'UNRESOLVED' || row.status === 'INVESTIGATING' ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20' : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:border-white/5'}`}>
+                                            <span className={`px-2 py-1 rounded border text-[10px] font-bold uppercase ${row.status === 'UNRESOLVED' || row.status === 'INVESTIGATING' ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:border-slate-200' : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:border-white/5'}`}>
                                                 {row.status}
                                             </span>
                                         </td>

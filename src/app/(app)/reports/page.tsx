@@ -68,7 +68,7 @@ export default function ReportsCatalogPage() {
             <div className="mb-10">
                 <button 
                     onClick={() => router.push('/reports/ceo')} 
-                    className="w-full bg-gradient-to-r from-slate-900 to-slate-800 dark:from-blue-600 dark:to-blue-800 text-white p-6 rounded-3xl shadow-xl flex items-center justify-between transition-all hover:scale-[1.01]"
+                    className="w-full  dark:from-blue-600 dark:to-blue-800 text-white p-6 rounded-[20px] shadow-xl flex items-center justify-between transition-all hover:scale-[1.01]"
                 >
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center">

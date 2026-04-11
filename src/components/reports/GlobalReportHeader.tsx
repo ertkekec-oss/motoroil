@@ -41,7 +41,7 @@ export default function GlobalReportHeader({ title, description }: { title: stri
     };
 
     return (
-        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-3xl p-5 mb-8 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-[20px] p-5 mb-8 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
             
             {/* Title & Context */}
             <div className="flex flex-col">

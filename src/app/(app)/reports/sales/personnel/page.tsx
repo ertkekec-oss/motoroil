@@ -49,7 +49,7 @@ export default function PersonnelPerformanceReportPage() {
 
             {/* 2. Executive Summaries */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-slate-500 mb-3">
                         <TrendingUp className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest">TOPLAM CİRO BÜYÜKLÜĞÜ</div>
@@ -57,7 +57,7 @@ export default function PersonnelPerformanceReportPage() {
                     <div className="text-3xl font-black text-slate-900 dark:text-white">₺{(totalSalesVol / 1000).toFixed(1)}k</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-emerald-500 mb-3">
                         <Trophy className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">AYIN YILDIZI</div>
@@ -68,7 +68,7 @@ export default function PersonnelPerformanceReportPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-blue-500 mb-3">
                         <Target className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">EKİP HEDEF TUTTURMA</div>
@@ -79,7 +79,7 @@ export default function PersonnelPerformanceReportPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-amber-500 mb-3">
                         <Users className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">EFOR (AKTİF GÖRÜŞME)</div>
@@ -90,7 +90,7 @@ export default function PersonnelPerformanceReportPage() {
             </div>
 
             {/* 3. The Enterprise Data Grid Array */}
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] overflow-hidden shadow-sm flex flex-col">
                 <div className="p-6 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 className="text-base font-black text-slate-900 dark:text-white">Personel Performans Dökümü</h3>
                     

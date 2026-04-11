@@ -69,7 +69,7 @@ export default function CEODashboardPage() {
         <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-200 font-sans p-6 md:p-10 pb-24 animate-in fade-in duration-500">
 
             {/* 2. Soft Container Header Alanı */}
-            <div className="bg-white dark:bg-[#0f172a] rounded-3xl p-6 lg:p-8 mb-6 shadow-sm border border-slate-200 dark:border-white/5 relative z-10">
+            <div className="bg-white dark:bg-[#0f172a] rounded-[20px] p-6 lg:p-8 mb-6 shadow-sm border border-slate-200 dark:border-white/5">
                 <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
                     {/* LEFT BLOCK: Title & Score */}
                     <div className="flex items-center gap-8">
@@ -231,7 +231,7 @@ export default function CEODashboardPage() {
                     </div>
 
                     {/* PERSONEL V. & MVP */}
-                    <div className="bg-gradient-to-br from-indigo-50 to-white dark:from-[#0f172a] dark:to-[#0f172a] rounded-2xl p-5 shadow-sm border border-indigo-100 group flex flex-col justify-between">
+                    <div className=" dark:from-[#0f172a] dark:to-[#0f172a] rounded-2xl p-5 shadow-sm border border-indigo-100 group flex flex-col justify-between">
                         <div>
                             <div className="text-[11px] font-bold text-indigo-800 mb-2 uppercase flex justify-between items-center">
                                 MVP Müşteri

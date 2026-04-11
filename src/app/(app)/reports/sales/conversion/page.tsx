@@ -48,7 +48,7 @@ export default function QuoteConversionReportPage() {
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-emerald-500 mb-3">
                         <Target className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-500">KAZANILAN (WON)</div>
@@ -57,7 +57,7 @@ export default function QuoteConversionReportPage() {
                     <div className="text-xs font-semibold text-emerald-500 mt-2 block">Başarıyla onaylanan</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-red-500/20 dark:border-red-500/10 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-red-500 mb-3">
                         <ThumbsDown className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-red-600/70 dark:text-red-400">KAYBEDİLEN (LOST)</div>
@@ -66,7 +66,7 @@ export default function QuoteConversionReportPage() {
                     <div className="text-xs font-semibold text-red-500/70 mt-2 block">Reddedilen veya zaman aşımı</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-blue-500 mb-3">
                         <TrendingUp className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">ŞİRKET ÇEVRİM ORANI</div>
@@ -77,7 +77,7 @@ export default function QuoteConversionReportPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-amber-500/20 dark:border-amber-500/10 rounded-3xl p-6 shadow-sm flex flex-col justify-between bg-gradient-to-br from-amber-500/5 to-transparent">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between ">
                     <div className="flex items-center gap-3 text-amber-500 mb-3">
                         <HandCoins className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-500">KAYBOLAN CİRO RİSKİ</div>
@@ -87,7 +87,7 @@ export default function QuoteConversionReportPage() {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] overflow-hidden shadow-sm flex flex-col">
                 <div className="p-6 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 className="text-base font-black text-slate-900 dark:text-white">Ekip Conversion Karşılaştırması</h3>
                     
