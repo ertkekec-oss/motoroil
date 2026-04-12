@@ -9,6 +9,9 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
     const [customerSearch, setCustomerSearch] = useState('');
     const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
 
+    const [focusedLineId, setFocusedLineId] = useState<number | null>(null);
+    const [productSearchStr, setProductSearchStr] = useState('');
+
     const [invoiceLines, setInvoiceLines] = useState<any[]>([
         { id: 1, product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, description: '' }
     ]);
@@ -60,7 +63,13 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
         };
     }, { subtotal: 0, discount: 0, netTotal: 0, vatTotal: 0, grandTotal: 0 });
 
-    const filteredCustomers = customers.filter((c: any) => c.name?.toLowerCase().includes(customerSearch.toLowerCase()));
+    const filteredCustomers = customers?.filter((c: any) => c.name?.toLowerCase().includes(customerSearch.toLowerCase())) || [];
+    
+    // Product Search Logic
+    const filteredProducts = products?.filter((p: any) => 
+        p.name?.toLowerCase().includes(productSearchStr.toLowerCase()) || 
+        p.code?.toLowerCase().includes(productSearchStr.toLowerCase())
+    ) || [];
 
     const handleSendInvoice = () => {
         if (!selectedCustomer) {
@@ -155,21 +164,21 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                         )}
                     </div>
 
-                    {/* Metadata Block (Right aligned, dense grid) */}
-                    <div className="flex items-start lg:justify-end gap-6 text-left lg:text-right">
-                        <div className="flex flex-col gap-3">
-                            <div className="flex flex-col lg:flex-row lg:items-center gap-1.5 lg:gap-3 lg:justify-end">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0">Fatura Tipi:</label>
-                                <span className="font-black text-[11px] px-2 py-0.5 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 rounded border border-sky-200 dark:border-sky-500/20 w-fit lg:w-auto">SATIŞ E-FATURASI</span>
-                            </div>
-                            <div className="flex flex-col lg:flex-row lg:items-center gap-1.5 lg:gap-3 lg:justify-end">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0">Düzenlenme Tarihi:</label>
-                                <span className="font-bold text-xs text-slate-800 dark:text-white">{new Date().toLocaleDateString('tr-TR')} {new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>
-                            </div>
-                            <div className="flex flex-col lg:flex-row lg:items-center gap-1.5 lg:gap-3 lg:justify-end">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0">Şube / Kasa:</label>
-                                <span className="font-bold text-xs text-slate-800 dark:text-white">Merkez (Online)</span>
-                            </div>
+                    {/* Metadata Block (Horizontal alignment) */}
+                    <div className="flex flex-col lg:flex-row items-start lg:items-center justify-start lg:justify-end gap-4 lg:gap-8 text-left">
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fatura Tipi</label>
+                            <span className="font-black text-[11px] px-2 py-0.5 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 rounded border border-sky-200 dark:border-sky-500/20 w-max">SATIŞ E-FATURASI</span>
+                        </div>
+                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10 hidden lg:block"></div>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Düzenlenme Tarihi</label>
+                            <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">{new Date().toLocaleDateString('tr-TR')} <br className="hidden lg:block"/> {new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>
+                        </div>
+                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10 hidden lg:block"></div>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Şube / Kasa</label>
+                            <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">Merkez<br className="hidden lg:block"/>(Online)</span>
                         </div>
                     </div>
                 </div>
@@ -203,18 +212,60 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                             <div className="relative">
                                                 <input 
                                                     type="text"
-                                                    value={line.name}
-                                                    onChange={(e) => updateLine(line.id, 'name', e.target.value)}
+                                                    value={focusedLineId === line.id ? productSearchStr : line.name}
+                                                    onChange={(e) => {
+                                                        if (focusedLineId === line.id) {
+                                                            setProductSearchStr(e.target.value);
+                                                            updateLine(line.id, 'name', e.target.value); // Sync manual name optionally
+                                                        } else {
+                                                            updateLine(line.id, 'name', e.target.value);
+                                                        }
+                                                    }}
+                                                    onFocus={() => {
+                                                        setFocusedLineId(line.id);
+                                                        setProductSearchStr(line.name || '');
+                                                    }}
+                                                    onBlur={() => {
+                                                        // Using setTimeout to allow clicking on dropdown items
+                                                        setTimeout(() => {
+                                                            if (focusedLineId === line.id) setFocusedLineId(null);
+                                                        }, 200);
+                                                    }}
                                                     className="w-full bg-transparent font-bold text-slate-800 dark:text-white text-xs outline-none border-b border-transparent focus:border-indigo-500 pb-1"
                                                     placeholder="Açıklama veya ürün adı..."
                                                 />
                                                 <div className="text-[9px] mt-1 space-x-2 font-medium">
-                                                    <span className="text-slate-400 cursor-pointer hover:text-indigo-500">+ Alt Açıklama</span>
                                                     <span className="text-slate-400 cursor-pointer hover:text-indigo-500" onClick={() => {
-                                                        const p = prompt("Stok arayın:");
-                                                        if(p) handleProductSelect(line.id, p);
-                                                    }}>🔍 Stoktan Seç</span>
+                                                        setFocusedLineId(line.id); 
+                                                        setProductSearchStr('');
+                                                    }}>🔍 Stok Arama Listesi</span>
                                                 </div>
+
+                                                {/* Inline Product Search Dropdown */}
+                                                {focusedLineId === line.id && productSearchStr.length >= 2 && (
+                                                    <div className="absolute z-50 left-0 top-full mt-1 w-full min-w-[280px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl shadow-xl max-h-[250px] overflow-y-auto py-2">
+                                                        <div className="px-3 py-1 text-xs font-bold text-slate-400 border-b border-slate-100 dark:border-white/5">Stok Kartları ({filteredProducts.length})</div>
+                                                        {filteredProducts.map((p: any) => (
+                                                            <div 
+                                                                key={p.id} 
+                                                                onClick={() => {
+                                                                    handleProductSelect(line.id, p.id);
+                                                                    setFocusedLineId(null);
+                                                                }}
+                                                                className="px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer flex flex-col transition-colors border-b border-slate-50 dark:border-white/5 last:border-0"
+                                                            >
+                                                                <span className="font-bold text-slate-800 dark:text-white text-[11px] leading-tight flex items-center justify-between">
+                                                                    <span className="truncate pr-2">{p.name}</span>
+                                                                    <span className="shrink-0 text-indigo-600 dark:text-indigo-400 font-black px-1.5 py-0.5 bg-indigo-50 dark:bg-indigo-500/10 rounded">₺{Number(p.price || 0).toLocaleString()}</span>
+                                                                </span>
+                                                                <span className="text-[9px] text-slate-500 mt-0.5">Stok: {p.stock} • KDV: %{p.vatRate}</span>
+                                                            </div>
+                                                        ))}
+                                                        {filteredProducts.length === 0 && (
+                                                            <div className="px-3 py-3 text-xs text-slate-500 text-center">Sonuç bulunamadı.</div>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="p-2 align-top pt-3">
@@ -257,11 +308,11 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                 </div>
 
                 {/* Footer Section (Calculations & Totals) - Compact */}
-                <div className="bg-slate-50 dark:bg-slate-900 border-t items-start border-slate-200 dark:border-white/10 p-4 lg:p-5 flex flex-col md:flex-row justify-between gap-6">
+                <div className="bg-slate-50 dark:bg-slate-900 border-t items-start border-slate-200 dark:border-white/10 p-5 lg:p-6 flex flex-col md:flex-row justify-between gap-6">
                     
-                    <div className="flex-1 max-w-md">
+                    <div className="flex-1 w-full lg:max-w-xl">
                         <label className="text-[10px] font-bold text-slate-400 block uppercase tracking-widest mb-1.5">Fatura Alt Notu</label>
-                        <textarea placeholder="Banka IBAN bilgileri, teslimat notu vb..." className="w-full h-24 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg p-3 text-xs font-medium resize-none outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm" />
+                        <textarea placeholder="Banka IBAN bilgileri, teslimat notu vb..." className="w-full h-32 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg p-3 text-sm font-medium resize-none outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm leading-relaxed" />
                     </div>
 
                     <div className="w-full md:w-[320px] shrink-0 bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/10 rounded-lg shadow-sm p-4 flex flex-col space-y-2">
@@ -288,17 +339,17 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                 </div>
 
                 {/* Final Action Bar */}
-                <div className="bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-white/10 p-4 shrink-0 flex flex-col sm:flex-row justify-end items-center gap-3 rounded-b-xl">
-                    <button className="w-full sm:w-auto px-5 py-2.5 rounded-lg font-bold bg-slate-100 text-slate-700 dark:bg-white/5 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-xs shadow-sm">
-                        <FileText size={14} /> TASLAK OLARAK KAYDET
+                <div className="bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-white/10 p-4 shrink-0 flex flex-row justify-end items-center gap-3 rounded-b-xl">
+                    <button className="px-5 py-2.5 rounded-lg font-bold bg-slate-100 text-slate-700 dark:bg-white/5 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-xs shadow-sm">
+                        <FileText size={14} className="hidden sm:inline" /> <span className="hidden sm:inline">TASLAK OLARAK KAYDET</span><span className="sm:hidden">TASLAK</span>
                     </button>
                     <button 
                         onClick={handleSendInvoice}
                         disabled={invoiceStatus === 'processing'}
-                        className="w-full sm:w-auto px-8 py-2.5 rounded-lg font-black bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 text-[13px] shadow-sm disabled:opacity-50 tracking-wide"
+                        className="px-8 py-2.5 rounded-lg font-black bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors flex items-center justify-center gap-2 text-[13px] shadow-sm disabled:opacity-50 tracking-wide"
                     >
                         {invoiceStatus === 'processing' ? <Calculator className="animate-spin" size={16} /> : <Send size={16} />} 
-                        {invoiceStatus === 'processing' ? 'GİB İLE HABERLEŞİLİYOR...' : 'E-FATURALAŞTIR VE GÖNDER'}
+                        {invoiceStatus === 'processing' ? 'BEKLEYİNİZ...' : 'E-FATURALAŞTIR VE GÖNDER'}
                     </button>
                 </div>
             </div>
