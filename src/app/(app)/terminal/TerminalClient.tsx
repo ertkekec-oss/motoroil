@@ -19,6 +19,7 @@ import CameraScanModal from '@/components/terminal/CameraScanModal';
 import OfflineBadge from '@/components/terminal/OfflineBadge';
 import B2BInvoiceWorkspace from '@/components/terminal/B2BInvoiceWorkspace';
 import EMustahsilWorkspace from '@/components/terminal/EMustahsilWorkspace';
+import ESMMWorkspace from '@/components/terminal/ESMMWorkspace';
 import { Clock, Tag, FileText, Gift, CreditCard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -41,7 +42,7 @@ export default function TerminalClient() {
     const [paymentMode, setPaymentMode] = useState<'cash' | 'card' | 'transfer' | 'account' | null>(null);
     const [selectedKasa, setSelectedKasa] = useState<string | number>('');
     const [selectedTaksit, setSelectedTaksit] = useState<any>(null);
-    const [terminalMode, setTerminalMode] = useState<'pos' | 'b2b' | 'emustahsil'>('pos');
+    const [terminalMode, setTerminalMode] = useState<'pos' | 'b2b' | 'emustahsil' | 'esmm'>('pos');
 
     const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
     const [customerSearch, setCustomerSearch] = useState('');
@@ -465,9 +466,10 @@ export default function TerminalClient() {
             {/* MODE SWITCHER TABS */}
             <div className="px-4 lg:px-6 pt-4 pb-0">
                 <div className="flex bg-[#EEF1F4] dark:bg-[#0f172a] p-1.5 rounded-xl border border-slate-200/60 dark:border-white/5 shadow-inner w-max gap-1">
-                    <button onClick={() => setTerminalMode('pos')} className={`px-6 py-2 rounded-lg text-[11px] uppercase tracking-widest font-black transition-all ${terminalMode==='pos' ? 'bg-white dark:bg-indigo-500/20 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}>Hızlı Satış (POS)</button>
-                    <button onClick={() => setTerminalMode('b2b')} className={`px-6 py-2 rounded-lg text-[11px] uppercase tracking-widest font-black transition-all ${terminalMode==='b2b' ? 'bg-white dark:bg-amber-500/20 shadow-sm text-amber-600 dark:text-amber-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}>Kurumsal (E-Fatura)</button>
-                    <button onClick={() => setTerminalMode('emustahsil')} className={`px-6 py-2 rounded-lg text-[11px] uppercase tracking-widest font-black transition-all ${terminalMode==='emustahsil' ? 'bg-white dark:bg-emerald-500/20 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}>E-Müstahsil</button>
+                    <button onClick={() => setTerminalMode('pos')} className={`px-5 py-2 rounded-lg text-[11px] uppercase tracking-widest font-black transition-all ${terminalMode==='pos' ? 'bg-white dark:bg-indigo-500/20 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}>Hızlı Satış</button>
+                    <button onClick={() => setTerminalMode('b2b')} className={`px-5 py-2 rounded-lg text-[11px] uppercase tracking-widest font-black transition-all ${terminalMode==='b2b' ? 'bg-white dark:bg-amber-500/20 shadow-sm text-amber-600 dark:text-amber-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}>E-Fatura</button>
+                    <button onClick={() => setTerminalMode('emustahsil')} className={`px-5 py-2 rounded-lg text-[11px] uppercase tracking-widest font-black transition-all ${terminalMode==='emustahsil' ? 'bg-white dark:bg-emerald-500/20 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}>E-Müstahsil</button>
+                    <button onClick={() => setTerminalMode('esmm')} className={`px-5 py-2 rounded-lg text-[11px] uppercase tracking-widest font-black transition-all ${terminalMode==='esmm' ? 'bg-white dark:bg-purple-500/20 shadow-sm text-purple-600 dark:text-purple-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}>E-SMM</button>
                 </div>
             </div>
 
@@ -531,9 +533,12 @@ export default function TerminalClient() {
             ) : terminalMode === 'b2b' ? (
                 /* B2B INVOICE SYSTEM */
                 <B2BInvoiceWorkspace products={products} customers={customers} />
-            ) : (
+            ) : terminalMode === 'emustahsil' ? (
                 /* E-MÜSTAHSİL SYSTEM */
                 <EMustahsilWorkspace products={products} customers={customers} />
+            ) : (
+                /* E-SMM SYSTEM */
+                <ESMMWorkspace products={products} customers={customers} />
             )}
 
             {/* MODALS */}
