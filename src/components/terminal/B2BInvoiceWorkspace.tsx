@@ -12,6 +12,9 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
     const [focusedLineId, setFocusedLineId] = useState<number | null>(null);
     const [productSearchStr, setProductSearchStr] = useState('');
 
+    const [invoiceType, setInvoiceType] = useState('SATIS');
+    const [invoiceScenario, setInvoiceScenario] = useState('TICARIFATURA');
+
     const [invoiceLines, setInvoiceLines] = useState<any[]>([
         { id: 1, product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, description: '' }
     ]);
@@ -167,10 +170,31 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                     {/* Metadata Block (Horizontal alignment) */}
                     <div className="flex flex-row items-center justify-end gap-4 sm:gap-6 text-left flex-wrap ml-auto">
                         <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fatura Tipi</label>
-                            <span className="font-black text-[11px] px-2 py-0.5 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 rounded border border-sky-200 dark:border-sky-500/20 w-max">SATIŞ E-FATURASI</span>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Fatura Tipi</label>
+                            <select 
+                                value={invoiceType}
+                                onChange={(e) => setInvoiceType(e.target.value)}
+                                className="font-black text-[11px] px-2 py-1 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 rounded border border-sky-200 dark:border-sky-500/20 w-max outline-none cursor-pointer focus:ring-2 focus:ring-sky-500/30 transition-shadow transition-colors"
+                            >
+                                <option value="SATIS">SATIŞ FATURASI</option>
+                                <option value="IADE">İADE FATURASI</option>
+                                <option value="TEVKIFAT">TEVKİFATLI FATURA</option>
+                                <option value="ISTISNA">İSTİSNA FATURASI</option>
+                            </select>
                         </div>
-                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10"></div>
+                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Senaryo</label>
+                            <select 
+                                value={invoiceScenario}
+                                onChange={(e) => setInvoiceScenario(e.target.value)}
+                                className="font-black text-[11px] px-2 py-1 bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-500/20 w-max outline-none cursor-pointer focus:ring-2 focus:ring-purple-500/30 transition-shadow transition-colors"
+                            >
+                                <option value="TICARIFATURA">TİCARİ FATURA</option>
+                                <option value="TEMELFATURA">TEMEL FATURA</option>
+                            </select>
+                        </div>
+                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Düzenlenme Tarihi</label>
                             <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">{new Date().toLocaleDateString('tr-TR')} {new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>
