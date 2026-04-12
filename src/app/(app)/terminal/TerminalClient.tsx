@@ -18,6 +18,7 @@ import AiCashierPanel from '@/components/terminal/AiCashierPanel';
 import CameraScanModal from '@/components/terminal/CameraScanModal';
 import OfflineBadge from '@/components/terminal/OfflineBadge';
 import B2BInvoiceWorkspace from '@/components/terminal/B2BInvoiceWorkspace';
+import EMustahsilWorkspace from '@/components/terminal/EMustahsilWorkspace';
 import { Clock, Tag, FileText, Gift, CreditCard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -40,7 +41,7 @@ export default function TerminalClient() {
     const [paymentMode, setPaymentMode] = useState<'cash' | 'card' | 'transfer' | 'account' | null>(null);
     const [selectedKasa, setSelectedKasa] = useState<string | number>('');
     const [selectedTaksit, setSelectedTaksit] = useState<any>(null);
-    const [terminalMode, setTerminalMode] = useState<'pos' | 'b2b'>('pos');
+    const [terminalMode, setTerminalMode] = useState<'pos' | 'b2b' | 'emustahsil'>('pos');
 
     const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
     const [customerSearch, setCustomerSearch] = useState('');
@@ -466,6 +467,7 @@ export default function TerminalClient() {
                 <div className="flex bg-[#EEF1F4] dark:bg-[#0f172a] p-1.5 rounded-xl border border-slate-200/60 dark:border-white/5 shadow-inner w-max gap-1">
                     <button onClick={() => setTerminalMode('pos')} className={`px-6 py-2 rounded-lg text-[11px] uppercase tracking-widest font-black transition-all ${terminalMode==='pos' ? 'bg-white dark:bg-indigo-500/20 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}>Hızlı Satış (POS)</button>
                     <button onClick={() => setTerminalMode('b2b')} className={`px-6 py-2 rounded-lg text-[11px] uppercase tracking-widest font-black transition-all ${terminalMode==='b2b' ? 'bg-white dark:bg-amber-500/20 shadow-sm text-amber-600 dark:text-amber-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}>Kurumsal (E-Fatura)</button>
+                    <button onClick={() => setTerminalMode('emustahsil')} className={`px-6 py-2 rounded-lg text-[11px] uppercase tracking-widest font-black transition-all ${terminalMode==='emustahsil' ? 'bg-white dark:bg-emerald-500/20 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}>E-Müstahsil</button>
                 </div>
             </div>
 
@@ -526,9 +528,12 @@ export default function TerminalClient() {
                     />
                 </div>
             </div>
-            ) : (
+            ) : terminalMode === 'b2b' ? (
                 /* B2B INVOICE SYSTEM */
                 <B2BInvoiceWorkspace products={products} customers={customers} />
+            ) : (
+                /* E-MÜSTAHSİL SYSTEM */
+                <EMustahsilWorkspace products={products} customers={customers} />
             )}
 
             {/* MODALS */}
