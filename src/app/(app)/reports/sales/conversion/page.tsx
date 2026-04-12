@@ -81,37 +81,6 @@ export default function QuoteConversionReportPage() {
                 </div>
             </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center gap-4 shadow-sm min-w-[260px]">
-                    <div className="w-9 h-9 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center">
-                        <ThumbsDown size={16} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">KAYBEDİLEN (LOST)</div>
-                        <div className="text-[18px] font-black leading-none text-red-600 dark:text-red-400">{totalLost}</div>
-                    </div>
-                </div>
-
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center gap-4 shadow-sm min-w-[260px]">
-                    <div className="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center">
-                        <TrendingUp size={16} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">ŞİRKET ÇEVRİM ORANI</div>
-                        <div className="text-[18px] font-black leading-none text-blue-600 dark:text-blue-400">%{avgConversion}</div>
-                    </div>
-                </div>
-
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center gap-4 shadow-sm min-w-[260px]">
-                    <div className="w-9 h-9 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center">
-                        <HandCoins size={16} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">KAYBOLAN CİRO RİSKİ</div>
-                        <div className="text-[18px] font-black leading-none text-orange-600 dark:text-orange-400">₺3.0M</div>
-                    </div>
-                </div>
-            </div>
-
             <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] overflow-hidden shadow-sm flex flex-col">
                 <div className="p-6 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 className="text-base font-black text-slate-900 dark:text-white">Ekip Conversion Karşılaştırması</h3>
