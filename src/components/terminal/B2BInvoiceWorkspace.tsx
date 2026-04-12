@@ -16,7 +16,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
     const [invoiceScenario, setInvoiceScenario] = useState('TICARIFATURA');
 
     const [invoiceLines, setInvoiceLines] = useState<any[]>([
-        { id: 1, product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, description: '' }
+        { id: 1, product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, description: '', tevkifatRate: 0, istisnaCode: '' }
     ]);
 
     const [invoiceStatus, setInvoiceStatus] = useState('draft');
@@ -24,7 +24,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
     const handleAddLine = () => {
         setInvoiceLines([
             ...invoiceLines, 
-            { id: Date.now(), product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, description: '' }
+            { id: Date.now(), product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, description: '', tevkifatRate: 0, istisnaCode: '' }
         ]);
     };
 
@@ -55,16 +55,30 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
         const rowGross = Number(line.qty) * Number(line.unitPrice);
         const rowDiscount = rowGross * (Number(line.discountRate) / 100);
         const rowNet = rowGross - rowDiscount;
-        const rowVat = rowNet * (Number(line.vatRate) / 100);
+        
+        let rowVat = 0;
+        // If invoice is ISTISNA, GIB says VAT must be 0 explicitly.
+        if (invoiceType === 'ISTISNA') {
+            rowVat = 0;
+        } else {
+            rowVat = rowNet * (Number(line.vatRate) / 100);
+        }
+        
+        let rowTevkifat = 0;
+        if (invoiceType === 'TEVKIFAT' && line.tevkifatRate > 0) {
+            // tevkifatRate is out of 10. (e.g. 5/10 => 0.5)
+            rowTevkifat = rowVat * (Number(line.tevkifatRate) / 10);
+        }
         
         return {
             subtotal: acc.subtotal + rowGross,
             discount: acc.discount + rowDiscount,
             netTotal: acc.netTotal + rowNet,
             vatTotal: acc.vatTotal + rowVat,
-            grandTotal: acc.grandTotal + rowNet + rowVat
+            tevkifatTotal: acc.tevkifatTotal + rowTevkifat,
+            grandTotal: acc.grandTotal + rowNet + rowVat - rowTevkifat
         };
-    }, { subtotal: 0, discount: 0, netTotal: 0, vatTotal: 0, grandTotal: 0 });
+    }, { subtotal: 0, discount: 0, netTotal: 0, vatTotal: 0, tevkifatTotal: 0, grandTotal: 0 });
 
     const filteredCustomers = customers?.filter((c: any) => c.name?.toLowerCase().includes(customerSearch.toLowerCase())) || [];
     
@@ -217,7 +231,9 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                 <th className="p-3 w-24">Miktar</th>
                                 <th className="p-3 w-28">Birim Fiyat</th>
                                 <th className="p-3 w-20">İsk.(%)</th>
-                                <th className="p-3 w-20">KDV(%)</th>
+                                {invoiceType === 'ISTISNA' && <th className="p-3 w-24">İstisna Kodu</th>}
+                                {invoiceType !== 'ISTISNA' && <th className="p-3 w-20">KDV(%)</th>}
+                                {invoiceType === 'TEVKIFAT' && <th className="p-3 w-20">Tevkifat</th>}
                                 <th className="p-3 w-28 text-right">Net Tutar</th>
                                 <th className="p-3 w-10 text-center"></th>
                             </tr>
@@ -301,14 +317,40 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                         <td className="p-2 align-top pt-3">
                                             <input type="number" min="0" max="100" value={line.discountRate || ''} onChange={(e) => updateLine(line.id, 'discountRate', Number(e.target.value))} className="w-full bg-transparent border-b border-slate-200 dark:border-white/20 py-1.5 text-xs font-bold text-center outline-none focus:border-indigo-500" />
                                         </td>
-                                        <td className="p-2 align-top pt-3">
-                                            <select value={line.vatRate} onChange={(e) => updateLine(line.id, 'vatRate', Number(e.target.value))} className="w-full bg-transparent border-b border-slate-200 dark:border-white/20 py-1.5 text-xs font-bold outline-none focus:border-indigo-500 cursor-pointer text-center">
-                                                <option value="20">%20</option>
-                                                <option value="10">%10</option>
-                                                <option value="1">%1</option>
-                                                <option value="0">%0</option>
-                                            </select>
-                                        </td>
+                                        
+                                        {invoiceType === 'ISTISNA' && (
+                                            <td className="p-2 align-top pt-3">
+                                                <input type="text" placeholder="Örn: 301" value={line.istisnaCode || ''} onChange={(e) => updateLine(line.id, 'istisnaCode', e.target.value)} className="w-full bg-transparent border-b border-slate-200 dark:border-white/20 py-1.5 text-xs font-bold text-center outline-none focus:border-indigo-500" />
+                                            </td>
+                                        )}
+
+                                        {invoiceType !== 'ISTISNA' && (
+                                            <td className="p-2 align-top pt-3">
+                                                <select value={line.vatRate} onChange={(e) => updateLine(line.id, 'vatRate', Number(e.target.value))} className="w-full bg-transparent border-b border-slate-200 dark:border-white/20 py-1.5 text-xs font-bold outline-none focus:border-indigo-500 cursor-pointer text-center">
+                                                    <option value="20">%20</option>
+                                                    <option value="10">%10</option>
+                                                    <option value="1">%1</option>
+                                                    <option value="0">%0</option>
+                                                </select>
+                                            </td>
+                                        )}
+
+                                        {invoiceType === 'TEVKIFAT' && (
+                                            <td className="p-2 align-top pt-3">
+                                                <select value={line.tevkifatRate} onChange={(e) => updateLine(line.id, 'tevkifatRate', Number(e.target.value))} className="w-full bg-transparent border-b border-slate-200 dark:border-white/20 py-1.5 text-[11px] font-bold outline-none focus:border-indigo-500 cursor-pointer text-center">
+                                                    <option value="0">Tevkifatsız</option>
+                                                    <option value="1">1/10</option>
+                                                    <option value="2">2/10</option>
+                                                    <option value="3">3/10</option>
+                                                    <option value="4">4/10</option>
+                                                    <option value="5">5/10</option>
+                                                    <option value="7">7/10</option>
+                                                    <option value="9">9/10</option>
+                                                    <option value="10">10/10 (Tam)</option>
+                                                </select>
+                                            </td>
+                                        )}
+
                                         <td className="p-2 text-right align-top pt-4 font-black text-slate-800 dark:text-white text-xs">
                                             {rowNet.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                                         </td>
@@ -352,8 +394,18 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                         )}
                         <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
                             <span>Hesaplanan KDV</span>
-                            <span>{totals.vatTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})} TL</span>
+                            {invoiceType === 'ISTISNA' ? (
+                                <span className="text-slate-400 font-medium line-through">0,00 TL</span>
+                            ) : (
+                                <span>{totals.vatTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})} TL</span>
+                            )}
                         </div>
+                        {invoiceType === 'TEVKIFAT' && totals.tevkifatTotal > 0 && (
+                            <div className="flex justify-between text-xs font-bold text-rose-500">
+                                <span>(-) Tevkif Edilen KDV</span>
+                                <span>-{totals.tevkifatTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})} TL</span>
+                            </div>
+                        )}
                         <div className="h-px w-full bg-slate-200 dark:bg-white/10 my-1"></div>
                         <div className="flex justify-between items-end">
                             <span className="font-black text-[11px] text-slate-800 dark:text-white uppercase pb-0.5">VERGİLER DAHİL TOPLAM</span>
