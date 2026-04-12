@@ -79,7 +79,7 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
         p.code?.toLowerCase().includes(productSearchStr.toLowerCase())
     ) || [];
 
-    const handleSendInvoice = () => {
+    const handleSendInvoice = async () => {
         if (!selectedCustomer) {
             return showWarning("Üretici Seçimi Eksik", "Makbuz düzenleyebilmek için lütfen Müstahsil (Çiftçi) seçiniz.");
         }
@@ -89,11 +89,31 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
         }
 
         setInvoiceStatus('processing');
-        // İleride Nilvera API /emustahsil/Send entegrasyonu buraya gelecek.
-        setTimeout(() => {
-            setInvoiceStatus('sent');
-            showSuccess("E-Müstahsil Makbuzu Başarıyla İletildi", `Belge Numarası: ${new Date().getFullYear()}${(Math.random().toString(36).substring(2, 8).toUpperCase())}`);
-        }, 1500);
+        
+        try {
+            const res = await fetch('/api/nilvera/emustahsil', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customer: selectedCustomer,
+                    lines: validLines,
+                    currency,
+                    exchangeRate
+                })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                setInvoiceStatus('sent');
+                showSuccess("E-Müstahsil Makbuzu Başarıyla İletildi", `Belge Numarası: ${new Date().getFullYear()}${(Math.random().toString(36).substring(2, 8).toUpperCase())}`);
+            } else {
+                setInvoiceStatus('draft');
+                showWarning("Hata Oluştu", data.error || "Makbuz oluşturulamadı.");
+            }
+        } catch (err: any) {
+            setInvoiceStatus('draft');
+            showWarning("Bağlantı Hatası", err.message);
+        }
     };
 
     if (invoiceStatus === 'sent') {
