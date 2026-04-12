@@ -69,7 +69,7 @@ export default function ESMMWorkspace({ products, customers }: any) {
     const filteredCustomers = customers?.filter((c: any) => c.name?.toLowerCase().includes(customerSearch.toLowerCase())) || [];
     const currSymbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '₺';
 
-    const handleSendInvoice = () => {
+    const handleSendInvoice = async () => {
         if (!selectedCustomer) {
             return showWarning("Müşteri Seçimi Eksik", "Makbuz düzenleyebilmek için lütfen alıcı seçiniz.");
         }
@@ -79,11 +79,31 @@ export default function ESMMWorkspace({ products, customers }: any) {
         }
 
         setInvoiceStatus('processing');
-        // Placeholder for Nilvera E-SMM API Call
-        setTimeout(() => {
-            setInvoiceStatus('sent');
-            showSuccess("E-SMM Başarıyla İletildi", `Belge Numarası: SMM${new Date().getFullYear()}${(Math.random().toString(36).substring(2, 8).toUpperCase())}`);
-        }, 1500);
+        
+        try {
+            const res = await fetch('/api/nilvera/esmm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customer: selectedCustomer,
+                    lines: validLines,
+                    currency,
+                    exchangeRate
+                })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                setInvoiceStatus('sent');
+                showSuccess("E-SMM Başarıyla İletildi", `Belge Numarası: SMM${new Date().getFullYear()}${(Math.random().toString(36).substring(2, 8).toUpperCase())}`);
+            } else {
+                setInvoiceStatus('draft');
+                showWarning("Hata Oluştu", data.error || "Makbuz oluşturulamadı.");
+            }
+        } catch (err: any) {
+            setInvoiceStatus('draft');
+            showWarning("Bağlantı Hatası", err.message);
+        }
     };
 
     if (invoiceStatus === 'sent') {
