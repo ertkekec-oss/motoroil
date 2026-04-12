@@ -25,6 +25,9 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
     const [dispatchNo, setDispatchNo] = useState('');
     const [dispatchDate, setDispatchDate] = useState('');
 
+    const [currency, setCurrency] = useState('TRY');
+    const [exchangeRate, setExchangeRate] = useState<number>(1);
+
     const handleAddLine = () => {
         setInvoiceLines([
             ...invoiceLines, 
@@ -86,6 +89,8 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
 
     const filteredCustomers = customers?.filter((c: any) => c.name?.toLowerCase().includes(customerSearch.toLowerCase())) || [];
     
+    const currSymbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '₺';
+
     // Product Search Logic
     const filteredProducts = products?.filter((p: any) => 
         p.name?.toLowerCase().includes(productSearchStr.toLowerCase()) || 
@@ -214,6 +219,44 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                 </select>
                             </div>
                             <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
+                            
+                            {/* Currency & Rate Selector */}
+                            <div className="flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Döviz</label>
+                                <select 
+                                    value={currency}
+                                    onChange={(e) => {
+                                        setCurrency(e.target.value);
+                                        // Auto-fetch dummy rate if not TRY
+                                        if (e.target.value === 'USD') setExchangeRate(32.4501);
+                                        else if (e.target.value === 'EUR') setExchangeRate(35.1240);
+                                        else if (e.target.value === 'GBP') setExchangeRate(41.0520);
+                                        else setExchangeRate(1);
+                                    }}
+                                    className="font-black text-[11px] px-2 py-1 bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 rounded border border-amber-200 dark:border-amber-500/20 w-max outline-none cursor-pointer focus:ring-2 focus:ring-amber-500/30 transition-shadow transition-colors"
+                                >
+                                    <option value="TRY">TRY</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="GBP">GBP</option>
+                                </select>
+                            </div>
+                            {currency !== 'TRY' && (
+                                <>
+                                    <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1 hidden sm:block"></div>
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">TCMB Kuru</label>
+                                        <input 
+                                            type="number" step="0.0001" 
+                                            value={exchangeRate} 
+                                            onChange={(e) => setExchangeRate(Number(e.target.value))}
+                                            className="w-20 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded px-1.5 py-1 text-[11px] font-bold outline-none focus:ring-1 focus:ring-indigo-500 text-center" 
+                                        />
+                                    </div>
+                                </>
+                            )}
+                            <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
+
                             <div className="flex flex-col gap-1">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Düzenlenme Tarihi</label>
                                 <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">{new Date().toLocaleDateString('tr-TR')} {new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>
@@ -424,33 +467,39 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                     <div className="w-[320px] shrink-0 bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/10 rounded-lg shadow-sm p-4 flex flex-col space-y-2 ml-auto">
                         <div className="flex justify-between text-xs font-bold text-slate-500">
                             <span>Mal / Hizmet Toplam Tutar</span>
-                            <span>{totals.subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})} TL</span>
+                            <span>{currSymbol}{totals.subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                         </div>
                         {totals.discount > 0 && (
                             <div className="flex justify-between text-xs font-bold text-rose-500">
                                 <span>Toplam İskonto</span>
-                                <span>-{totals.discount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})} TL</span>
+                                <span>-{currSymbol}{totals.discount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                             </div>
                         )}
                         <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
                             <span>Hesaplanan KDV</span>
                             {invoiceType === 'ISTISNA' ? (
-                                <span className="text-slate-400 font-medium line-through">0,00 TL</span>
+                                <span className="text-slate-400 font-medium line-through">{currSymbol}0,00</span>
                             ) : (
-                                <span>{totals.vatTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})} TL</span>
+                                <span>{currSymbol}{totals.vatTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                             )}
                         </div>
                         {invoiceType === 'TEVKIFAT' && totals.tevkifatTotal > 0 && (
                             <div className="flex justify-between text-xs font-bold text-rose-500">
                                 <span>(-) Tevkif Edilen KDV</span>
-                                <span>-{totals.tevkifatTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})} TL</span>
+                                <span>-{currSymbol}{totals.tevkifatTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                             </div>
                         )}
                         <div className="h-px w-full bg-slate-200 dark:bg-white/10 my-1"></div>
                         <div className="flex justify-between items-end">
                             <span className="font-black text-[11px] text-slate-800 dark:text-white uppercase pb-0.5">VERGİLER DAHİL TOPLAM</span>
-                            <span className="text-2xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 leading-none">₺{totals.grandTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                            <span className="text-2xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 leading-none">{currSymbol}{totals.grandTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
                         </div>
+                        {currency !== 'TRY' && (
+                            <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-2 rounded -mx-2 mt-2 border border-slate-100 dark:border-white/5">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">Sistem (TL) Karşılığı</span>
+                                <span className="text-xs font-black text-slate-700 dark:text-slate-300">₺{(totals.grandTotal * exchangeRate).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
