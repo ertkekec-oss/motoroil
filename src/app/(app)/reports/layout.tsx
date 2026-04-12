@@ -48,7 +48,7 @@ export default function ReportsLayout({ children }: { children: React.ReactNode 
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1700px] mx-auto w-full min-h-screen animate-in fade-in flex flex-col">
             
             {/* Mobile Nav Select Dropdown */}
-            <div className="lg:hidden w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between shadow-sm mb-4 gap-4">
+            <div className="md:hidden w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between shadow-sm mb-4 gap-4">
                 <div className="text-[14px] font-black text-slate-900 dark:text-white flex items-center gap-2">
                     <BarChart3 size={18} className="text-blue-600" /> Mobil Rapor Gezgini
                 </div>
@@ -64,10 +64,10 @@ export default function ReportsLayout({ children }: { children: React.ReactNode 
             </div>
 
             {/* Desktop Grid Architecture */}
-            <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] xl:grid-cols-[280px_1fr] items-start gap-4 lg:gap-8 w-full flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] lg:grid-cols-[260px_1fr] xl:grid-cols-[280px_1fr] items-start gap-4 md:gap-6 lg:gap-8 w-full flex-1">
                 
                 {/* Left Vertical Sub-Navigation Sidebar */}
-                <aside className="w-full shrink-0 sticky top-6 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm hidden lg:flex flex-col overflow-hidden max-h-[calc(100vh-3rem)]">
+                <aside className="w-full shrink-0 sticky top-6 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm hidden md:flex flex-col overflow-hidden max-h-[calc(100vh-3rem)]">
                     
                     {/* Branding Header */}
                     <div className="p-5 flex items-center gap-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50">
