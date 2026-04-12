@@ -308,14 +308,14 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                 </div>
 
                 {/* Footer Section (Calculations & Totals) - Compact */}
-                <div className="bg-slate-50 dark:bg-slate-900 border-t items-start border-slate-200 dark:border-white/10 p-5 lg:p-6 flex flex-col md:flex-row justify-between gap-6">
+                <div className="bg-slate-50 dark:bg-slate-900 border-t items-start border-slate-200 dark:border-white/10 p-5 lg:p-6 flex flex-row justify-between gap-6 w-full min-w-min">
                     
-                    <div className="flex-1 w-full lg:max-w-xl">
+                    <div className="flex-1 max-w-xl">
                         <label className="text-[10px] font-bold text-slate-400 block uppercase tracking-widest mb-1.5">Fatura Alt Notu</label>
                         <textarea placeholder="Banka IBAN bilgileri, teslimat notu vb..." className="w-full h-32 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg p-3 text-sm font-medium resize-none outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm leading-relaxed" />
                     </div>
 
-                    <div className="w-full md:w-[320px] shrink-0 bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/10 rounded-lg shadow-sm p-4 flex flex-col space-y-2">
+                    <div className="w-[320px] shrink-0 bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/10 rounded-lg shadow-sm p-4 flex flex-col space-y-2 ml-auto">
                         <div className="flex justify-between text-xs font-bold text-slate-500">
                             <span>Mal / Hizmet Toplam Tutar</span>
                             <span>{totals.subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})} TL</span>
