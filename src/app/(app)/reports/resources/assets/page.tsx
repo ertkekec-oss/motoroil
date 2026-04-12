@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import GlobalReportHeader from '@/components/reports/GlobalReportHeader';
-import { Laptop, TrendingDown, Tool, Settings } from 'lucide-react';
+import { Laptop, TrendingDown, Wrench, Settings } from 'lucide-react';
 
 const ASSETS_DATA = [
     { id: '1', assetName: 'Ford Transit Panelvan 2022', category: 'ARAÇ', assignedTo: 'Ahmet Yılmaz', purchasePrice: 450000, currentValue: 380000, condition: 'GOOD', depreciation: 15.5 },
@@ -65,7 +65,7 @@ export default function AssetsReportPage() {
 
                 <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm flex flex-col justify-between">
                     <div className="flex items-center gap-3 text-blue-500 mb-3">
-                        <Tool className="w-5 h-5" />
+                        <Wrench className="w-5 h-5" />
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">BAKIMDAKİ VARLIKLAR</div>
                     </div>
                     <div className="text-3xl font-black text-slate-900 dark:text-white">4 Adet</div>

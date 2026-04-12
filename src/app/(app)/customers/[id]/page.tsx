@@ -63,10 +63,6 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 serviceOrders: {
                     where: { deletedAt: null },
                     orderBy: { createdAt: 'desc' }
-                },
-                serviceOrders: {
-                    where: { deletedAt: null },
-                    orderBy: { createdAt: 'desc' }
                 }
             }
         });

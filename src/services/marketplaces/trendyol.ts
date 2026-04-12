@@ -410,7 +410,7 @@ export class TrendyolService implements IMarketplaceService {
             const fetchUrl1 = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url1)}` : url1;
             const response1 = await this.safeFetchJson(fetchUrl1, { headers: this.getHeaders() });
             
-            let data = response1.data?.content || response1.content || [];
+            let data = response1.data?.content || (response1 as any).content || [];
             if (data.length === 0 && orderDate) {
                 const range2Start = orderDate.getTime() - 24 * 60 * 60 * 1000; // 1 day before
                 const range2End = range2Start + 14 * 24 * 60 * 60 * 1000;
@@ -420,7 +420,7 @@ export class TrendyolService implements IMarketplaceService {
                     const url2 = `${this.baseUrl}/integration/finance/che/sellers/${this.config.supplierId}/settlements?startDate=${range2Start}&endDate=${range2End}&transactionType=Sale&orderNumber=${encodeURIComponent(orderNumber)}`;
                     const fetchUrl2 = effectiveProxy ? `${effectiveProxy}?url=${encodeURIComponent(url2)}` : url2;
                     const response2 = await this.safeFetchJson(fetchUrl2, { headers: this.getHeaders() });
-                    data = response2.data?.content || response2.content || [];
+                    data = response2.data?.content || (response2 as any).content || [];
                 }
             }
 

@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     }
 
     try {
-        const order = await prisma.marketplaceOrder.findFirst({
+        const order = await (prisma as any).salesOrder.findFirst({
             where: { orderNumber },
             include: { company: true }
         });

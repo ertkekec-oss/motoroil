@@ -120,19 +120,25 @@ export default function NewTicketPage() {
                                     label="Departman / Kategori"
                                     name="category"
                                     required
-                                    options={categoryOptions}
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                />
+                                >
+                                    {categoryOptions.map(opt => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </EnterpriseSelect>
                                 
                                 <EnterpriseSelect
                                     label="Öncelik Derecesi"
                                     name="priority"
                                     required
-                                    options={priorityOptions}
                                     value={formData.priority}
                                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                                />
+                                >
+                                    {priorityOptions.map(opt => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </EnterpriseSelect>
                             </div>
 
                             <EnterpriseInput
