@@ -39,6 +39,7 @@ export default function TerminalClient() {
     const [paymentMode, setPaymentMode] = useState<'cash' | 'card' | 'transfer' | 'account' | null>(null);
     const [selectedKasa, setSelectedKasa] = useState<string | number>('');
     const [selectedTaksit, setSelectedTaksit] = useState<any>(null);
+    const [terminalMode, setTerminalMode] = useState<'pos' | 'b2b'>('pos');
 
     const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
     const [customerSearch, setCustomerSearch] = useState('');
@@ -279,6 +280,9 @@ export default function TerminalClient() {
     const handleFinalize = async () => {
         if (cart.length === 0 || isProcessing) return;
         if (!paymentMode) return showWarning("Hata", "Lütfen bir ödeme yöntemi seçiniz.");
+        if (terminalMode === 'b2b' && selectedCustomer === 'Perakende Müşteri') {
+            return showWarning("Cari Seçimi Zorunlu", "Fatura kesebilmek için lütfen geçerli bir Kurumsal/Bireysel Müşteri seçiniz.");
+        }
 
         // Auto-select first matching kasa if none selected to save clicks
         if (!selectedKasa && kasalar?.length > 0 && paymentMode !== 'account') {
@@ -406,14 +410,18 @@ export default function TerminalClient() {
             {/* TOP KPI STRIP (110px max) */}
             <div className="h-[110px] shrink-0 border-b border-default dark:border-white/5 bg-surface dark:bg-[#0B1220] flex items-center px-6 gap-6 shadow-enterprise z-10">
                 <div className="flex flex-col">
-                    <h1 className="text-xl font-black text-primary dark:text-white tracking-tight flex items-center gap-2">
+                    <h1 className="text-xl font-black text-primary dark:text-white tracking-tight flex items-center gap-4">
                         <span className="text-primary dark:text-indigo-400 shrink-0">Terminal Workspace</span>
+                        <div className="flex bg-[#EEF1F4] dark:bg-[#0f172a] p-1.5 rounded-xl border border-default dark:border-white/5 shadow-inner">
+                            <button onClick={() => setTerminalMode('pos')} className={`px-4 py-1.5 rounded-lg text-[10px] uppercase tracking-widest font-black transition-all ${terminalMode==='pos' ? 'bg-white dark:bg-indigo-500/20 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>Hızlı Satış (POS)</button>
+                            <button onClick={() => setTerminalMode('b2b')} className={`px-4 py-1.5 rounded-lg text-[10px] uppercase tracking-widest font-black transition-all ${terminalMode==='b2b' ? 'bg-white dark:bg-amber-500/20 shadow-sm text-amber-600 dark:text-amber-400' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>Kurumsal (E-Fatura)</button>
+                        </div>
                     </h1>
                     <p className="text-xs font-semibold text-secondary dark:text-slate-400 mt-1 flex items-center gap-2">
-                        Cari: <span className="text-primary dark:text-slate-300">{selectedCustomer}</span>
+                        {terminalMode === 'pos' ? 'Perakende Kasa Modu - ' : 'Toptan / Kurumsal Fatura Sistemi - '} Cari: <span className="text-primary dark:text-slate-300">{selectedCustomer}</span>
                     </p>
                 </div>
-                <div className="h-10 w-px bg-slate-200 dark:bg-white/10 mx-2 hidden md:block"></div>
+                <div className="h-10 w-px bg-slate-200 dark:bg-white/10 mx-2 hidden xl:block"></div>
 
                 <div className="flex gap-4">
                     <div className="px-4 border-l border-[#EEF1F4] dark:border-white/5">
@@ -497,6 +505,7 @@ export default function TerminalClient() {
                         setIsCustomerModalOpen={setIsCustomerModalOpen}
                         paymentMode={paymentMode}
                         setPaymentMode={setPaymentMode}
+                        terminalMode={terminalMode}
                         handleFinalize={handleFinalize}
                         handleSuspend={() => {
                             if (cart.length === 0) return;

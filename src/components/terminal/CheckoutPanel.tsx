@@ -4,7 +4,7 @@ import { CreditCard, Banknote, Landmark, ArrowRight, User, Clock, Gift } from 'l
 export default function CheckoutPanel({
     cart, subtotal, finalTotal, vatExcludedTotal, totalDiscount,
     selectedCustomer, customers, activePriceListName, setIsCustomerModalOpen,
-    paymentMode, setPaymentMode, handleFinalize, handleSuspend, isProcessing, isOnline,
+    paymentMode, setPaymentMode, terminalMode, handleFinalize, handleSuspend, isProcessing, isOnline,
     applicableCampaigns, computedCampaignDiscount, computedPromoItems, computedEarnedPoints
 }: any) {
 
@@ -15,7 +15,9 @@ export default function CheckoutPanel({
             <div className="flex-1 overflow-y-auto space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {/* Customer Select */}
                 <div>
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block mb-1.5 uppercase tracking-widest px-1">Müşteri / Cari</label>
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block mb-1.5 uppercase tracking-widest px-1">
+                        Müşteri / Cari {terminalMode === 'b2b' && <span className="text-rose-500">* (Zorunlu)</span>}
+                    </label>
                     <div
                         onClick={() => setIsCustomerModalOpen(true)}
                         className="flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-3 lg:p-4 rounded-xl cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group"
@@ -97,43 +99,43 @@ export default function CheckoutPanel({
                     <div className="grid grid-cols-2 gap-2">
                         <button
                             onClick={() => setPaymentMode('cash')}
-                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'cash'
+                            className={`px-3 py-2.5 rounded-xl flex flex-col sm:flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'cash'
                                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
                                 : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
                         >
-                            <Banknote size={14} /> Nakit
+                            <Banknote size={14} /> <span className="truncate">{terminalMode === 'b2b' ? 'PeşinKasa' : 'Nakit'}</span>
                         </button>
                         <button
                             onClick={() => setPaymentMode('card')}
-                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'card'
+                            className={`px-3 py-2.5 rounded-xl flex flex-col sm:flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'card'
                                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
                                 : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
                         >
-                            <CreditCard size={14} /> Kredi Kartı
+                            <CreditCard size={14} /> <span className="truncate">{terminalMode === 'b2b' ? 'Kart / Link' : 'Kredi Kartı'}</span>
                         </button>
                         <button
                             onClick={() => setPaymentMode('transfer')}
-                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'transfer'
+                            className={`px-3 py-2.5 rounded-xl flex flex-col sm:flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${paymentMode === 'transfer'
                                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
                                 : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
                         >
-                            <Landmark size={14} /> Havale
+                            <Landmark size={14} /> <span className="truncate">{terminalMode === 'b2b' ? 'Havale/EFT' : 'Havale'}</span>
                         </button>
                         <button
-                            disabled={selectedCustomer === 'Perakende Müşteri'}
+                            disabled={terminalMode === 'b2b' && selectedCustomer === 'Perakende Müşteri'}
                             onClick={() => setPaymentMode('account')}
-                            className={`px-3 py-2.5 rounded-xl flex flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${selectedCustomer === 'Perakende Müşteri'
+                            className={`px-3 py-2.5 rounded-xl flex flex-col sm:flex-row items-center justify-center gap-2 transition-all text-[11px] font-bold outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 dark:focus:ring-offset-[#0f172a] ${(terminalMode === 'b2b' && selectedCustomer === 'Perakende Müşteri')
                                 ? 'bg-slate-50/50 dark:bg-slate-900/50 text-slate-400 dark:text-slate-700 cursor-not-allowed'
                                 : paymentMode === 'account'
                                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
                                     : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
-                            title={selectedCustomer === 'Perakende Müşteri' ? 'Müşteri seçilmeli' : ''}
+                            title={terminalMode === 'b2b' && selectedCustomer === 'Perakende Müşteri' ? 'Müşteri seçilmeli' : ''}
                         >
-                            Açık Hesap
+                            <span className="truncate">{terminalMode === 'b2b' ? 'Vadeli Cari' : 'Açık Hesap'}</span>
                         </button>
                     </div>
                 </div>
@@ -166,7 +168,11 @@ export default function CheckoutPanel({
                         </>
                     ) : (
                         <>
-                            <span>{isOnline ? 'ÖDEMEYİ TAMAMLA' : 'OFFLINE İŞLEME AL'}</span>
+                            <span>
+                                {isOnline 
+                                    ? (terminalMode === 'b2b' ? 'FATURA OLUŞTUR VE KES' : 'ÖDEMEYİ TAMAMLA') 
+                                    : 'OFFLINE İŞLEME AL'}
+                            </span>
                             <ArrowRight size={20} strokeWidth={2.5} />
                         </>
                     )}
