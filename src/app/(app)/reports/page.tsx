@@ -68,18 +68,19 @@ export default function ReportsCatalogPage() {
             <div className="mb-10">
                 <button 
                     onClick={() => router.push('/reports/ceo')} 
-                    className="w-full  dark:from-blue-600 dark:to-blue-800 text-white p-6 rounded-[20px] shadow-xl flex items-center justify-between transition-all hover:scale-[1.01]"
+                    className="w-full bg-white dark:bg-[#0f172a] text-slate-800 dark:text-white p-6 rounded-[20px] shadow-sm border border-slate-200 dark:border-white/5 flex flex-col md:flex-row items-start md:items-center justify-between transition-all hover:shadow-md group relative overflow-hidden"
                 >
-                    <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center">
-                            <Activity className="w-8 h-8 text-blue-300 dark:text-white" />
+                    <div className="absolute right-0 top-0 w-[400px] h-[400px] bg-blue-500/5 blur-[80px] rounded-full group-hover:bg-blue-400/10 transition-all pointer-events-none"></div>
+                    <div className="flex items-center gap-5 relative z-10">
+                        <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-100 dark:border-blue-500/20">
+                            <Activity className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div className="text-left">
-                            <h2 className="text-xl font-black mb-1">Strateji Merkezi (Executive Dashboard)</h2>
-                            <p className="text-sm font-semibold text-slate-300 dark:text-blue-100">C-Level yöneticiler için şirketin finans, nakit ve büyüme özetini tek bir panelde birleştiren kokpit ekranı.</p>
+                            <h2 className="text-[20px] font-black mb-1 tracking-tight">Strateji Merkezi (Executive Dashboard)</h2>
+                            <p className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">C-Level yöneticiler için şirketin finans, nakit ve büyüme özetini tek bir panelde birleştiren kokpit ekranı.</p>
                         </div>
                     </div>
-                    <div className="hidden sm:flex px-6 py-2 bg-white/10 rounded-xl text-sm font-bold uppercase tracking-widest border border-white/20">
+                    <div className="hidden sm:flex mt-4 md:mt-0 px-8 py-3 bg-slate-50 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-900 dark:text-white rounded-full text-[11px] font-black uppercase tracking-widest shadow-sm relative z-10 transition-transform group-hover:scale-105">
                         PANOYA GİT →
                     </div>
                 </button>

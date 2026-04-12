@@ -44,24 +44,29 @@ export default function ProfitabilityReportPage() {
             />
 
             {/* 2. Executive Summaries */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">TOPLAM CİRO</div>
-                    <div className="text-3xl font-black text-slate-900 dark:text-white">₺825,000</div>
-                    <div className="text-xs font-semibold text-emerald-500 mt-2 block">+14% geçen periyoda göre</div>
-                </div>
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">SATILAN MALİYET (COGS)</div>
-                    <div className="text-3xl font-black text-red-600 dark:text-red-400">₺487,000</div>
-                    <div className="text-xs font-semibold text-red-500 mt-2 block">+5% geçen periyoda göre</div>
-                </div>
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[20px] p-6 shadow-sm">
-                    
-                    <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">BRÜT KAR (Gross Profit)</div>
-                    <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400">₺338,000</div>
-                    <div className="text-xs font-black text-emerald-500 mt-2 block border border-emerald-200 dark:border-slate-200 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded inline-block">
-                        Marj: %40.9
+            <div className="flex flex-wrap items-center gap-4 mb-8">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center justify-between shadow-sm min-w-[280px]">
+                    <div>
+                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">TOPLAM CİRO</div>
+                        <div className="text-[18px] font-black leading-none text-slate-900 dark:text-white">₺825,000</div>
                     </div>
+                    <div className="text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full">+14%</div>
+                </div>
+
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center justify-between shadow-sm min-w-[280px]">
+                    <div>
+                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">SATILAN MALİYET (COGS)</div>
+                        <div className="text-[18px] font-black leading-none text-red-600 dark:text-red-400">₺487,000</div>
+                    </div>
+                    <div className="text-[11px] font-bold text-red-600 bg-red-50 dark:bg-red-500/10 px-3 py-1 rounded-full">+5%</div>
+                </div>
+
+                <div className="bg-white dark:bg-[#0f172a] border border-emerald-200/50 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center justify-between shadow-sm min-w-[300px]">
+                    <div>
+                        <div className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none mb-1">BRÜT KAR (Gross Profit)</div>
+                        <div className="text-[18px] font-black leading-none text-emerald-600 dark:text-emerald-400">₺338,000</div>
+                    </div>
+                    <div className="text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full">Marj: %40.9</div>
                 </div>
             </div>
 

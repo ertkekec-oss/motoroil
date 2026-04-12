@@ -1,30 +1,39 @@
-"use client";
-
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { RefreshCw, Calendar, MapPin, User } from 'lucide-react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { Calendar, MapPin, User, SlidersHorizontal, RefreshCw } from 'lucide-react';
 
-export default function GlobalReportHeader({ title, description }: { title: string, description: string }) {
+export default function GlobalReportHeader({ 
+    title, 
+    description,
+}: {
+    title: string;
+    description: string;
+}) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    // Init state from URL
-    const [dateRange, setDateRange] = useState(searchParams.get('range') || 'this_month');
-    const [customStart, setCustomStart] = useState(searchParams.get('start') || '');
-    const [customEnd, setCustomEnd] = useState(searchParams.get('end') || '');
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    
+    // States matching URL params
+    const [dateRange, setDateRange] = useState(searchParams.get('period') || 'this_month');
     const [branchId, setBranchId] = useState(searchParams.get('branch') || 'all');
     const [personnelId, setPersonnelId] = useState(searchParams.get('staff') || 'all');
-    const [isRefreshing, setIsRefreshing] = useState(false);
+    
+    // Custom Date Range
+    const [customStart, setCustomStart] = useState('');
+    const [customEnd, setCustomEnd] = useState('');
 
     const applyFilters = () => {
         setIsRefreshing(true);
         const params = new URLSearchParams(searchParams.toString());
-        params.set('range', dateRange);
+        
         if (dateRange === 'custom') {
             params.set('start', customStart);
             params.set('end', customEnd);
+            params.set('period', 'custom');
         } else {
+            params.set('period', dateRange);
             params.delete('start');
             params.delete('end');
         }
@@ -41,11 +50,11 @@ export default function GlobalReportHeader({ title, description }: { title: stri
     };
 
     return (
-        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm rounded-[20px] p-5 mb-8 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+        <div className="mb-8 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
             
             {/* Title & Context */}
             <div className="flex flex-col">
-                <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                <h1 className="text-[22px] font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                     {title}
                 </h1>
                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">
@@ -54,10 +63,10 @@ export default function GlobalReportHeader({ title, description }: { title: stri
             </div>
 
             {/* Universal Filters */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto bg-slate-50 dark:bg-slate-800/40 p-2 rounded-2xl border border-slate-100 dark:border-white/5">
+            <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
                 
                 {/* Date Dropdown */}
-                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-3 py-2 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
+                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-5 py-2.5 rounded-full border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
                     <Calendar className="w-4 h-4 text-slate-400" />
                     <select 
                         value={dateRange}
@@ -79,14 +88,14 @@ export default function GlobalReportHeader({ title, description }: { title: stri
                 {/* Custom Dates */}
                 {dateRange === 'custom' && (
                     <div className="flex items-center gap-2">
-                        <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} className="bg-white dark:bg-[#0f172a] px-3 py-2 rounded-xl border border-slate-200 dark:border-white/5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none" />
+                        <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} className="bg-white dark:bg-[#0f172a] px-4 py-2.5 rounded-full border border-slate-200 dark:border-white/5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none shadow-sm" />
                         <span className="text-slate-400 font-bold">-</span>
-                        <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} className="bg-white dark:bg-[#0f172a] px-3 py-2 rounded-xl border border-slate-200 dark:border-white/5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none" />
+                        <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} className="bg-white dark:bg-[#0f172a] px-4 py-2.5 rounded-full border border-slate-200 dark:border-white/5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none shadow-sm" />
                     </div>
                 )}
 
                 {/* Branch Selection */}
-                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-3 py-2 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
+                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-5 py-2.5 rounded-full border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
                     <MapPin className="w-4 h-4 text-slate-400" />
                     <select 
                         value={branchId}
@@ -100,7 +109,7 @@ export default function GlobalReportHeader({ title, description }: { title: stri
                 </div>
 
                 {/* Personnel Selection */}
-                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-3 py-2 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
+                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-5 py-2.5 rounded-full border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
                     <User className="w-4 h-4 text-slate-400" />
                     <select 
                         value={personnelId}
@@ -116,7 +125,7 @@ export default function GlobalReportHeader({ title, description }: { title: stri
                 <button 
                     onClick={applyFilters}
                     disabled={isRefreshing}
-                    className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md px-4 py-2 transition-all group disabled:opacity-50"
+                    className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md px-5 py-2.5 transition-all group disabled:opacity-50"
                 >
                     <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                 </button>
