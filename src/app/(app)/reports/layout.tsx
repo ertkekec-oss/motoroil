@@ -1,138 +1,125 @@
 "use client";
 
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { BarChart3 } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { 
+    BarChart3, LayoutDashboard, WalletCards, Activity, 
+    Map, Users, PhoneCall, ShieldAlert, Package, Search, ChevronRight
+} from 'lucide-react';
 
 const REPORT_TABS = [
     {
-        name: "Genel",
+        name: "Genel Ağ",
         items: [
-            { id: 'overview', title: 'Genel Özet Dashboard', path: '/reports' },
-            { id: 'ceo', title: 'Strateji Merkezi', path: '/reports/ceo' }
+            { id: 'overview', title: 'Özet Panosu', path: '/reports', icon: <LayoutDashboard size={16} /> },
+            { id: 'ceo', title: 'Strateji Merkezi', path: '/reports/ceo', icon: <Activity size={16} /> }
         ]
     },
     {
-        name: "Finans",
+        name: "Finans & Risk",
         items: [
-            { id: 'profitability', title: 'Kârlılık Analizi', path: '/reports/finance/profitability' },
-            { id: 'aging', title: 'Oto Adisyon & Yaşlandırma', path: '/reports/finance/aging' },
-            { id: 'reconciliation', title: 'Mutabakat Performansı', path: '/reports/finance/reconciliation' },
-            { id: 'anomalies', title: 'Sistem Anomalileri', path: '/reports/finance/anomalies' }
+            { id: 'profitability', title: 'Kârlılık Analizi', path: '/reports/finance/profitability', icon: <WalletCards size={16} /> },
+            { id: 'aging', title: 'Oto Adisyon & Risk', path: '/reports/finance/aging', icon: <ShieldAlert size={16} /> },
+            { id: 'reconciliation', title: 'Mutabakat Performansı', path: '/reports/finance/reconciliation', icon: <Search size={16} /> }
         ]
     },
     {
-        name: "Satış",
+        name: "Operasyon & Satış",
         items: [
-            { id: 'personnel', title: 'Personel Satış Performansı', path: '/reports/sales/personnel' },
-            { id: 'conversion', title: 'Teklif Dönüşüm Oranları', path: '/reports/sales/conversion' },
-            { id: 'salesx', title: 'Saha (SalesX) Rotaları', path: '/reports/sales/salesx' },
-            { id: 'campaigns', title: 'Kampanya Etkililiği', path: '/reports/sales/campaigns' }
+            { id: 'personnel', title: 'Personel Performansı', path: '/reports/sales/personnel', icon: <Users size={16} /> },
+            { id: 'salesx', title: 'Saha (SalesX) Rotaları', path: '/reports/sales/salesx', icon: <Map size={16} /> }
         ]
     },
     {
-        name: "Servis",
+        name: "Servis & Çağrı",
         items: [
-            { id: 'service', title: 'Servis Masası & SLA', path: '/reports/service/sla' },
-            { id: 'calls', title: 'Çağrı Metrikleri', path: '/reports/service/calls' },
-            { id: 'mailing', title: 'Toplu İletişim', path: '/reports/service/mailing' }
-        ]
-    },
-    {
-        name: "Kaynak",
-        items: [
-            { id: 'inventory', title: 'Stok Devir Hızı', path: '/reports/resources/inventory' },
-            { id: 'bom', title: 'BOM Üretim Maliyet', path: '/reports/resources/bom' },
-            { id: 'assets', title: 'Demirbaş Zimmet', path: '/reports/resources/assets' },
-            { id: 'hr', title: 'IK Puantaj', path: '/reports/resources/hr' }
+            { id: 'service', title: 'Servis Masası SLA', path: '/reports/service/sla', icon: <Package size={16} /> },
+            { id: 'calls', title: 'Çağrı Metrikleri', path: '/reports/service/calls', icon: <PhoneCall size={16} /> }
         ]
     }
 ];
 
 export default function ReportsLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-    // Auto-scroll to active tab logic
-    useEffect(() => {
-        if (!scrollContainerRef.current) return;
-        const activeLink = scrollContainerRef.current.querySelector('a[data-active="true"]');
-        if (activeLink) {
-            activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }
-    }, [pathname]);
+    const router = useRouter();
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B1220] flex flex-col relative w-full overflow-hidden">
-            {/* Global Report Navigation Header */}
-            <div className="bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-white/5 sticky top-0 z-40 w-full shadow-sm">
-                <div className="max-w-[1600px] mx-auto w-full flex flex-row items-center justify-start gap-4 p-2 px-3 sm:px-6">
-                    
-                    {/* Module Title */}
-                    <div className="flex items-center gap-3 shrink-0">
-                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-sm">
-                            <BarChart3 strokeWidth={2.5} size={16} />
-                        </div>
-                        <div className="hidden md:block">
-                            <h1 className="text-[14px] font-black text-slate-900 dark:text-white leading-none tracking-tight">
-                                Raporlama Panosu
-                            </h1>
-                            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
-                                Analitik Motoru
-                            </p>
-                        </div>
+        <div className="p-4 sm:p-6 lg:p-8 max-w-[1700px] mx-auto w-full min-h-screen animate-in fade-in flex flex-col md:flex-row gap-6 items-start">
+            
+            {/* Left Vertical Sub-Navigation Sidebar */}
+            <aside className="w-full md:w-[280px] shrink-0 sticky top-6 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm hidden md:flex flex-col overflow-hidden max-h-[calc(100vh-3rem)]">
+                
+                {/* Branding Header */}
+                <div className="p-5 flex items-center gap-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50">
+                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
+                        <BarChart3 strokeWidth={2.5} size={20} />
                     </div>
-
-                    {/* Horizontal Pill Navigation Menu */}
-                    <div 
-                        ref={scrollContainerRef}
-                        className="flex-1 w-full overflow-x-auto scrollbar-hide flex items-center gap-2 pb-0.5"
-                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                    >
-                        {REPORT_TABS.map((group, groupIdx) => (
-                            <React.Fragment key={group.name}>
-                                <div className="bg-slate-50 dark:bg-slate-800/40 p-[3px] rounded-full border border-slate-200/60 dark:border-white/5 flex items-center shrink-0">
-                                    <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2 pr-1.5 select-none hidden sm:block">
-                                        {group.name}
-                                    </div>
-                                    <div className="flex items-center gap-0.5">
-                                        {group.items.map((tab) => {
-                                            const isActive = tab.path === '/reports' 
-                                                ? pathname === '/reports'
-                                                : pathname.startsWith(tab.path);
-                                            
-                                            return (
-                                                <Link 
-                                                    key={tab.id}
-                                                    href={tab.path}
-                                                    data-active={isActive}
-                                                    className={`px-3 py-1 rounded-full text-[12px] transition-all whitespace-nowrap outline-none ${
-                                                        isActive 
-                                                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm ring-1 ring-slate-900/5 dark:ring-white/10 font-bold' 
-                                                        : 'text-slate-600 dark:text-slate-400 font-semibold hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'
-                                                    }`}
-                                                >
-                                                    {tab.title}
-                                                </Link>
-                                            )
-                                        })}
-                                    </div>
-                                </div>
-                                {groupIdx < REPORT_TABS.length - 1 && (
-                                    <div className="w-[1px] h-4 bg-slate-200 dark:bg-slate-800 shrink-0 mx-0.5"></div>
-                                )}
-                            </React.Fragment>
-                        ))}
+                    <div>
+                        <h1 className="text-[15px] font-black text-slate-900 dark:text-white leading-tight tracking-tight">Rapor Merkezi</h1>
+                        <p className="text-[11px] font-bold text-slate-500">18 Modül Entegrasyonu</p>
                     </div>
-
                 </div>
+
+                {/* Vertical Nav Links */}
+                <div className="flex-1 overflow-y-auto w-full p-4 space-y-6 scrollbar-hide">
+                    {REPORT_TABS.map((group, idx) => (
+                        <div key={idx}>
+                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2 mb-3">
+                                {group.name}
+                            </h3>
+                            <div className="flex flex-col gap-1">
+                                {group.items.map((tab) => {
+                                    const isActive = tab.path === '/reports' 
+                                        ? pathname === '/reports'
+                                        : pathname.startsWith(tab.path);
+
+                                    return (
+                                        <Link 
+                                            key={tab.id} 
+                                            href={tab.path}
+                                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${
+                                                isActive
+                                                ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold'
+                                                : 'text-slate-600 dark:text-slate-400 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800'
+                                            }`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className={`${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'} transition-colors`}>
+                                                    {tab.icon}
+                                                </div>
+                                                <span className="text-[12px]">{tab.title}</span>
+                                            </div>
+                                            {isActive && <ChevronRight size={14} className="opacity-50" strokeWidth={3} />}
+                                        </Link>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </aside>
+
+            {/* Mobile Nav Select Dropdown */}
+            <div className="md:hidden w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-center justify-between shadow-sm">
+                <div className="text-[13px] font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <BarChart3 size={16} className="text-blue-600" /> Mobil Rapor Gezgini
+                </div>
+                <select 
+                    onChange={(e) => router.push(e.target.value)}
+                    value={pathname}
+                    className="text-[12px] font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 flex-1 ml-4 outline-none"
+                >
+                    {REPORT_TABS.flatMap(g => g.items).map(item => (
+                        <option key={item.id} value={item.path}>{item.title}</option>
+                    ))}
+                </select>
             </div>
 
-            {/* Page Content Render Area */}
-            <div className="flex-1 w-full relative">
+            {/* Main Content Render Area */}
+            <main className="flex-1 w-full min-w-0 bg-white/50 dark:bg-slate-900/20 md:bg-transparent rounded-2xl">
                 {children}
-            </div>
+            </main>
         </div>
     );
 }

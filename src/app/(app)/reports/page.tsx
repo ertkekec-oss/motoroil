@@ -33,13 +33,13 @@ export default function ReportsDashboardPage() {
     const [timeRange, setTimeRange] = useState('Bu Hafta');
 
     return (
-        <div className="p-3 sm:p-4 animate-in fade-in duration-300 w-full max-w-[1600px] mx-auto space-y-4">
+        <div className="w-full flex-1 animate-in fade-in duration-300 space-y-4">
             
             {/* Context Header */}
-            <div className="flex flex-row items-center justify-between gap-4">
+            <div className="flex flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm mb-4">
                 <div>
-                    <h2 className="text-[16px] font-black text-slate-900 dark:text-white leading-none">Özet Panosu</h2>
-                    <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1">
+                    <h2 className="text-[16px] font-black text-slate-900 dark:text-white leading-none tracking-tight">Genel Özet Dashboard</h2>
+                    <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1.5">
                         Şirketin güncel KPI ve özet analizleri
                     </p>
                 </div>
