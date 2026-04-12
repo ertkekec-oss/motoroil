@@ -21,6 +21,10 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
 
     const [invoiceStatus, setInvoiceStatus] = useState('draft');
 
+    const [hasDispatchRef, setHasDispatchRef] = useState(false);
+    const [dispatchNo, setDispatchNo] = useState('');
+    const [dispatchDate, setDispatchDate] = useState('');
+
     const handleAddLine = () => {
         setInvoiceLines([
             ...invoiceLines, 
@@ -182,41 +186,77 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                     </div>
 
                     {/* Metadata Block (Horizontal alignment) */}
-                    <div className="flex flex-row items-center justify-end gap-4 sm:gap-6 text-left flex-wrap ml-auto">
-                        <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Fatura Tipi</label>
-                            <select 
-                                value={invoiceType}
-                                onChange={(e) => setInvoiceType(e.target.value)}
-                                className="font-black text-[11px] px-2 py-1 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 rounded border border-sky-200 dark:border-sky-500/20 w-max outline-none cursor-pointer focus:ring-2 focus:ring-sky-500/30 transition-shadow transition-colors"
-                            >
-                                <option value="SATIS">SATIŞ FATURASI</option>
-                                <option value="IADE">İADE FATURASI</option>
-                                <option value="TEVKIFAT">TEVKİFATLI FATURA</option>
-                                <option value="ISTISNA">İSTİSNA FATURASI</option>
-                            </select>
+                    <div className="flex flex-col items-end gap-4 ml-auto w-full lg:w-auto mt-4 lg:mt-0">
+                        <div className="flex flex-row items-center justify-end gap-3 sm:gap-6 text-left flex-wrap">
+                            <div className="flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Fatura Tipi</label>
+                                <select 
+                                    value={invoiceType}
+                                    onChange={(e) => setInvoiceType(e.target.value)}
+                                    className="font-black text-[11px] px-2 py-1 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 rounded border border-sky-200 dark:border-sky-500/20 w-max outline-none cursor-pointer focus:ring-2 focus:ring-sky-500/30 transition-shadow transition-colors"
+                                >
+                                    <option value="SATIS">SATIŞ FATURASI</option>
+                                    <option value="IADE">İADE FATURASI</option>
+                                    <option value="TEVKIFAT">TEVKİFATLI FATURA</option>
+                                    <option value="ISTISNA">İSTİSNA FATURASI</option>
+                                </select>
+                            </div>
+                            <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Senaryo</label>
+                                <select 
+                                    value={invoiceScenario}
+                                    onChange={(e) => setInvoiceScenario(e.target.value)}
+                                    className="font-black text-[11px] px-2 py-1 bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-500/20 w-max outline-none cursor-pointer focus:ring-2 focus:ring-purple-500/30 transition-shadow transition-colors"
+                                >
+                                    <option value="TICARIFATURA">TİCARİ FATURA</option>
+                                    <option value="TEMELFATURA">TEMEL FATURA</option>
+                                </select>
+                            </div>
+                            <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Düzenlenme Tarihi</label>
+                                <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">{new Date().toLocaleDateString('tr-TR')} {new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <div className="h-8 w-px bg-slate-200 dark:bg-white/10 hidden sm:block"></div>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Şube / Kasa</label>
+                                <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">Merkez (Online)</span>
+                            </div>
                         </div>
-                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
-                        <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Senaryo</label>
-                            <select 
-                                value={invoiceScenario}
-                                onChange={(e) => setInvoiceScenario(e.target.value)}
-                                className="font-black text-[11px] px-2 py-1 bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-500/20 w-max outline-none cursor-pointer focus:ring-2 focus:ring-purple-500/30 transition-shadow transition-colors"
-                            >
-                                <option value="TICARIFATURA">TİCARİ FATURA</option>
-                                <option value="TEMELFATURA">TEMEL FATURA</option>
-                            </select>
-                        </div>
-                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
-                        <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Düzenlenme Tarihi</label>
-                            <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">{new Date().toLocaleDateString('tr-TR')} {new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>
-                        </div>
-                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10"></div>
-                        <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Şube / Kasa</label>
-                            <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">Merkez (Online)</span>
+
+                        {/* Dispatch Documents Info */}
+                        <div className="flex flex-col items-end w-full border-t border-slate-100 dark:border-white/5 pt-3">
+                            {!hasDispatchRef ? (
+                                <button onClick={() => setHasDispatchRef(true)} className="text-[10px] uppercase font-bold text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+                                    <Plus size={12} strokeWidth={3} /> E-İRSALİYE / REFERANS EKLE
+                                </button>
+                            ) : (
+                                <div className="flex flex-row items-center gap-3 animate-in fade-in zoom-in duration-200 text-left w-full justify-end flex-wrap">
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">İrsaliye Numarası</label>
+                                        <input 
+                                            type="text" 
+                                            value={dispatchNo} 
+                                            onChange={(e) => setDispatchNo(e.target.value)} 
+                                            placeholder="16 Haneli Belge No" 
+                                            className="w-36 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded px-2 py-1 text-[11px] font-bold outline-none focus:ring-1 focus:ring-indigo-500 uppercase" 
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">İrsaliye Tarihi</label>
+                                        <input 
+                                            type="date" 
+                                            value={dispatchDate} 
+                                            onChange={(e) => setDispatchDate(e.target.value)} 
+                                            className="w-32 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded px-2 py-1 text-[11px] font-bold outline-none focus:ring-1 focus:ring-indigo-500 text-slate-600 dark:text-slate-300" 
+                                        />
+                                    </div>
+                                    <button onClick={() => { setHasDispatchRef(false); setDispatchNo(''); setDispatchDate(''); }} className="mt-4 p-1 text-slate-300 hover:text-rose-500 transition-colors bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded shadow-sm">
+                                        <Trash2 size={12} strokeWidth={2.5}/>
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
