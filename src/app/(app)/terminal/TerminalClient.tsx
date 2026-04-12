@@ -17,6 +17,7 @@ import CheckoutPanel from '@/components/terminal/CheckoutPanel';
 import AiCashierPanel from '@/components/terminal/AiCashierPanel';
 import CameraScanModal from '@/components/terminal/CameraScanModal';
 import OfflineBadge from '@/components/terminal/OfflineBadge';
+import B2BInvoiceWorkspace from '@/components/terminal/B2BInvoiceWorkspace';
 import { Clock, Tag, FileText, Gift, CreditCard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -464,10 +465,11 @@ export default function TerminalClient() {
                 </div>
             </div>
 
-            {/* MAIN GRID */}
-            <div className="flex-1 flex flex-row gap-4 lg:gap-6 p-4 lg:p-6 min-h-0 overflow-hidden">
+            {terminalMode === 'pos' ? (
+                /* MAIN GRID - POS System */
+                <div className="flex-1 flex flex-row gap-4 lg:gap-6 p-4 lg:p-6 min-h-0 overflow-hidden">
 
-                {/* TERMINAL WORKSPACE (Left) */}
+                    {/* TERMINAL WORKSPACE (Left) */}
                 <div className="flex-1 min-w-0 flex flex-col gap-4">
                     <div className="w-full">
                         <PosSearchBar
@@ -520,6 +522,10 @@ export default function TerminalClient() {
                     />
                 </div>
             </div>
+            ) : (
+                /* B2B INVOICE SYSTEM */
+                <B2BInvoiceWorkspace products={products} customers={customers} />
+            )}
 
             {/* MODALS */}
             {isCustomerModalOpen && (
