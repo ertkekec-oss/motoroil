@@ -45,28 +45,28 @@ export default function ProfitabilityReportPage() {
 
             {/* 2. Executive Summaries */}
             <div className="flex flex-wrap items-center gap-4 mb-8">
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center justify-between shadow-sm min-w-[280px]">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm min-w-[240px]">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center text-[14px]">💰</div>
                     <div>
-                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">TOPLAM CİRO</div>
-                        <div className="text-[18px] font-black leading-none text-slate-900 dark:text-white">₺825,000</div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">TOPLAM CİRO</div>
+                        <div className="text-[16px] font-black leading-none text-slate-900 dark:text-white mt-0.5">₺825,000</div>
                     </div>
-                    <div className="text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full">+14%</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center justify-between shadow-sm min-w-[280px]">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm min-w-[240px]">
+                    <div className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-500/10 text-rose-500 flex items-center justify-center text-[14px]">📉</div>
                     <div>
-                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">SATILAN MALİYET (COGS)</div>
-                        <div className="text-[18px] font-black leading-none text-red-600 dark:text-red-400">₺487,000</div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">SATILAN MALİYET (COGS)</div>
+                        <div className="text-[16px] font-black leading-none text-red-600 dark:text-red-400 mt-0.5">₺487,000</div>
                     </div>
-                    <div className="text-[11px] font-bold text-red-600 bg-red-50 dark:bg-red-500/10 px-3 py-1 rounded-full">+5%</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0f172a] border border-emerald-200/50 dark:border-white/5 py-2.5 px-6 rounded-full flex items-center justify-between shadow-sm min-w-[300px]">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 px-4 py-2 rounded-[10px] flex items-center gap-3 shadow-sm min-w-[240px]">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-[14px]">📈</div>
                     <div>
-                        <div className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none mb-1">BRÜT KAR (Gross Profit)</div>
-                        <div className="text-[18px] font-black leading-none text-emerald-600 dark:text-emerald-400">₺338,000</div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">BRÜT KAR (Gross Profit)</div>
+                        <div className="text-[16px] font-black leading-none text-emerald-600 dark:text-emerald-400 mt-0.5">₺338,000</div>
                     </div>
-                    <div className="text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full">Marj: %40.9</div>
                 </div>
             </div>
 

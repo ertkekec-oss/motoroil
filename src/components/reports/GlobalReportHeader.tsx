@@ -66,7 +66,7 @@ export default function GlobalReportHeader({
             <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
                 
                 {/* Date Dropdown */}
-                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-5 py-2.5 rounded-full border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
+                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-3 h-[36px] rounded-[8px] border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
                     <Calendar className="w-4 h-4 text-slate-400" />
                     <select 
                         value={dateRange}
@@ -88,14 +88,14 @@ export default function GlobalReportHeader({
                 {/* Custom Dates */}
                 {dateRange === 'custom' && (
                     <div className="flex items-center gap-2">
-                        <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} className="bg-white dark:bg-[#0f172a] px-4 py-2.5 rounded-full border border-slate-200 dark:border-white/5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none shadow-sm" />
+                        <input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} className="bg-white dark:bg-[#0f172a] px-3 h-[36px] rounded-[8px] border border-slate-200 dark:border-white/5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none shadow-sm" />
                         <span className="text-slate-400 font-bold">-</span>
-                        <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} className="bg-white dark:bg-[#0f172a] px-4 py-2.5 rounded-full border border-slate-200 dark:border-white/5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none shadow-sm" />
+                        <input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} className="bg-white dark:bg-[#0f172a] px-3 h-[36px] rounded-[8px] border border-slate-200 dark:border-white/5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none shadow-sm" />
                     </div>
                 )}
 
                 {/* Branch Selection */}
-                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-5 py-2.5 rounded-full border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
+                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-3 h-[36px] rounded-[8px] border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
                     <MapPin className="w-4 h-4 text-slate-400" />
                     <select 
                         value={branchId}
@@ -109,7 +109,7 @@ export default function GlobalReportHeader({
                 </div>
 
                 {/* Personnel Selection */}
-                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-5 py-2.5 rounded-full border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
+                <div className="flex items-center gap-2 bg-white dark:bg-[#0f172a] px-3 h-[36px] rounded-[8px] border border-slate-200 dark:border-white/5 shadow-sm min-w-[160px]">
                     <User className="w-4 h-4 text-slate-400" />
                     <select 
                         value={personnelId}
@@ -125,7 +125,7 @@ export default function GlobalReportHeader({
                 <button 
                     onClick={applyFilters}
                     disabled={isRefreshing}
-                    className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md px-5 py-2.5 transition-all group disabled:opacity-50"
+                    className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-[8px] font-bold shadow-sm px-4 h-[36px] transition-all group disabled:opacity-50"
                 >
                     <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                 </button>
