@@ -165,20 +165,20 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                     </div>
 
                     {/* Metadata Block (Horizontal alignment) */}
-                    <div className="flex flex-col lg:flex-row items-start lg:items-center justify-start lg:justify-end gap-4 lg:gap-8 text-left">
+                    <div className="flex flex-row items-center justify-end gap-4 sm:gap-6 text-left flex-wrap ml-auto">
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fatura Tipi</label>
                             <span className="font-black text-[11px] px-2 py-0.5 bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400 rounded border border-sky-200 dark:border-sky-500/20 w-max">SATIŞ E-FATURASI</span>
                         </div>
-                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10 hidden lg:block"></div>
+                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10"></div>
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Düzenlenme Tarihi</label>
-                            <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">{new Date().toLocaleDateString('tr-TR')} <br className="hidden lg:block"/> {new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>
+                            <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">{new Date().toLocaleDateString('tr-TR')} {new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>
                         </div>
-                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10 hidden lg:block"></div>
+                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10"></div>
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Şube / Kasa</label>
-                            <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">Merkez<br className="hidden lg:block"/>(Online)</span>
+                            <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">Merkez (Online)</span>
                         </div>
                     </div>
                 </div>
