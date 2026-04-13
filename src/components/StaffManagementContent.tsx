@@ -212,6 +212,7 @@ export default function StaffManagementContent() {
     const allPermissions = [
         // --- SATIŞ & OPERASYON ---
         { id: 'pos_access', label: 'Hızlı Satış (POS) Erişimi', category: 'Satış & Operasyon' },
+        { id: 'waiter_access', label: 'Mobil Garson İstasyonu Erişimi', category: 'Satış & Operasyon' },
         { id: 'sales_archive', label: 'Geçmiş Satışları Görüntüleme', category: 'Satış & Operasyon' },
         { id: 'discount_auth', label: 'İskonto ve Fiyat Düşürme Yetkisi', category: 'Satış & Operasyon' },
         { id: 'price_override', label: '💸 Anlık Fiyat Değiştirme / İnsiyatif', category: 'Satış & Operasyon' },
@@ -223,6 +224,7 @@ export default function StaffManagementContent() {
         { id: 'ecommerce_manage', label: 'E-Ticaret Sipariş Yönetimi', category: 'Satış & Operasyon' },
         { id: 'field_sales_access', label: '📍 Saha Satış Modülü Erişimi (Mobil)', category: 'Satış & Operasyon' },
         { id: 'field_sales_admin', label: '🗺️ Saha Satış Yönetimi (Rota Planlama)', category: 'Satış & Operasyon' },
+        { id: 'network_manage', label: '🌐 Dealer Network / Bayi Ağı Yönetimi', category: 'Satış & Operasyon' },
 
         // --- STOK & ÜRETİM ---
         { id: 'inventory_view', label: 'Depo ve Stok Görüntüleme', category: 'Stok & Üretim' },
@@ -231,6 +233,8 @@ export default function StaffManagementContent() {
         { id: 'stock_correction', label: 'Stok Sayım ve Miktar Düzeltme', category: 'Stok & Üretim' },
         { id: 'approve_products', label: '🔴 Ürün Kartı Kesin Onayı', category: 'Stok & Üretim' },
         { id: 'approve_transfers', label: '🔴 Sistem İçi Transfer Onaylama', category: 'Stok & Üretim' },
+        { id: 'production_view', label: 'Üretim ve Reçete (BOM) Görüntüleme', category: 'Stok & Üretim' },
+        { id: 'production_manage', label: 'Üretim Süreci ve Fire Yönetimi', category: 'Stok & Üretim' },
 
         // --- FİNANS & MUHASEBE ---
         { id: 'finance_view', label: 'Finansal Gösterge Paneli ve Özetler', category: 'Finans & Muhasebe' },
@@ -274,14 +278,20 @@ export default function StaffManagementContent() {
     ];
 
     const roleTemplates: Record<string, string[]> = {
-        'Sistem Yöneticisi': allPermissions.map(p => p.id),
-        'Şube Yöneticisi': ['pos_access', 'sales_archive', 'discount_auth', 'inventory_view', 'customer_view', 'customer_edit', 'service_view', 'service_create', 'branch_isolation', 'hr_view', 'finance_view', 'expense_create'],
-        'Saha Satış': ['field_sales_access', 'field_sales_admin', 'customer_view', 'customer_edit', 'inventory_view', 'pos_access', 'sales_archive', 'branch_isolation'],
+        'Şirket Yöneticisi': allPermissions.map(p => p.id), // Super Admin
+        'Finans Yöneticisi': ['finance_view', 'finance_transactions', 'accounting_manage', 'finance_reports', 'tax_manage', 'mizan_export', 'e_invoice', 'create_bank', 'customer_view', 'supplier_view'],
+        'Muhasebe': ['e_invoice', 'finance_view', 'finance_transactions', 'expense_create', 'customer_view', 'customer_edit', 'supplier_view', 'supplier_edit'],
+        'Şube Yöneticisi': ['pos_access', 'sales_archive', 'discount_auth', 'inventory_view', 'customer_view', 'service_view', 'hr_view', 'finance_view', 'expense_create', 'branch_isolation'],
+        'İnsan Kaynakları Uzmanı': ['hr_view', 'hr_manage', 'payroll_manage', 'shift_manage', 'staff_manage', 'create_staff', 'branch_isolation'],
         'E-Ticaret Uzmanı': ['ecommerce_view', 'ecommerce_manage', 'inventory_view', 'inventory_edit', 'sales_archive', 'branch_isolation'],
-        'Servis Personeli': ['service_view', 'service_create', 'service_complete', 'inventory_view', 'branch_isolation'],
-        'İnsan Kaynakları': ['hr_view', 'hr_manage', 'payroll_manage', 'shift_manage', 'staff_manage', 'create_staff', 'branch_isolation'],
-        'Mali Müşavir': ['tax_manage', 'mizan_export', 'e_invoice', 'finance_view', 'finance_transactions', 'finance_reports', 'accounting_manage'],
-        'Kasiyer / Standart Personel': ['pos_access', 'branch_isolation']
+        'Dealer Network Yöneticisi': ['network_manage', 'customer_view', 'customer_edit', 'sales_archive', 'offer_create', 'offer_approve'],
+        'Depo Sorumlusu': ['inventory_view', 'inventory_edit', 'inventory_transfer', 'stock_correction', 'approve_transfers', 'branch_isolation'],
+        'Üretim Sorumlusu': ['production_view', 'production_manage', 'inventory_view', 'inventory_transfer', 'branch_isolation'],
+        'Servis Yöneticisi': ['service_view', 'service_create', 'service_complete', 'inventory_view', 'customer_view', 'branch_isolation'],
+        'Saha Servis Personeli': ['field_sales_access', 'customer_view', 'inventory_view', 'branch_isolation'],
+        'Güvenlik / Anomali Kontrol': ['security_access', 'admin_view', 'hr_view', 'finance_view'],
+        'Kasiyer': ['pos_access', 'branch_isolation'],
+        'Garson': ['waiter_access', 'branch_isolation']
     };
 
     const filteredStaff = useMemo(() => {
