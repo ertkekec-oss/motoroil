@@ -91,7 +91,10 @@ export async function GET(req: NextRequest) {
             { key: 'assets', name: '💻 Varlık & Demirbaş Yönetimi', description: 'Personellere donanım, araç, ve değerli varlık zimmetleme.' },
             { key: 'hr_management', name: '👥 İnsan Kaynakları (İK)', description: 'Personel özlük işlemleri, maaş planlama ve liderlik hedefleri.' },
             { key: 'task_management', name: '📋 Görev Yönetim Merkezi', description: 'İç operasyonlar, ajanda ve ekipler arası görev atama.' },
-            { key: 'field_service', name: '📍 Saha Servis & Planlama', description: 'Canlı harita tabanlı servis rotalama ve müşteri randevu planlama.' }
+            { key: 'field_service', name: '📍 Saha Servis & Planlama', description: 'Canlı harita tabanlı servis rotalama ve müşteri randevu planlama.' },
+            { key: 'periodya_hub', name: '🌍 Periodya Hub Ağı', description: 'Global tedarikçi ve b2b alıcı ağına katılım.' },
+            { key: 'calendar_scheduling', name: '📅 Global Takvim & Ajanda', description: 'Gelişmiş vardiya, randevu ve teslimat takvimi.' },
+            { key: 'marketing_campaigns', name: '🎁 Kampanya Yönetimi', description: 'Dinamik indirim, kupon ve pazarlama senaryoları kurgulama.' }
         ];
 
         // Sync features (Upsert all)
