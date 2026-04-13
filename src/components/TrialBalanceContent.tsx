@@ -126,11 +126,6 @@ export default function TrialBalanceContent() {
                         placeholder="Mizan hesaplarında hızlı ara..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                    <input
-                        type="text"
-                        placeholder="Mizan hesaplarında hızlı ara..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full bg-slate-50 dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/5 rounded-[14px] px-4 py-3 text-[13px] font-semibold h-[48px] pl-11 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-slate-900 dark:text-white"
                     />
                 </div>
