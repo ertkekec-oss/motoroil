@@ -1,19 +1,20 @@
 import { NetworkJobPayload } from './jobTypes';
+import { unstable_after as after } from 'next/server';
 
 export async function dispatchNetworkJob(payload: NetworkJobPayload) {
     // Current foundation for async background queue execution
-    // Right now, simulating execution via detached setTimeout to unblock main thread
+    // Serverless ortamlarda (Vercel) setTimeout HTTP response dönünce öldüğü için Next.js 'after' kullanılır.
     // In future phases, this will push to a strict BullMQ or SQS queue
 
     console.log(`[NETWORK_JOB_DISPATCHED] Type: ${payload.type}`, payload);
 
-    setTimeout(async () => {
+    after(async () => {
         try {
             await executeNetworkJob(payload);
         } catch (error) {
             console.error(`[NETWORK_JOB_FAILED] Type: ${payload.type}`, error);
         }
-    }, 0);
+    });
 }
 
 export async function executeNetworkJob(payload: NetworkJobPayload) {
