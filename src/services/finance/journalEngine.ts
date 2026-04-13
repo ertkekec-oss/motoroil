@@ -1,11 +1,11 @@
 import prisma from '@/lib/prisma';
-import { Decimal } from 'decimal.js';
+import { Prisma } from '@prisma/client';
 import { createAccountingSlip } from '@/lib/accounting';
 
 export interface JournalLineInput {
   accountCode: string;
-  debit: number | Decimal;
-  credit: number | Decimal;
+  debit: number | Prisma.Decimal;
+  credit: number | Prisma.Decimal;
   externalReference?: string;
 }
 
@@ -35,12 +35,12 @@ export class OtonomYevmiyeMotoru {
       throw new Error("Yevmiye fişi en az 2 satır (Borç/Alacak) içermelidir.");
     }
 
-    let totalDebit = new Decimal(0);
-    let totalCredit = new Decimal(0);
+    let totalDebit = new Prisma.Decimal(0);
+    let totalCredit = new Prisma.Decimal(0);
 
     const safeLines = input.lines.map(line => {
-      const d = new Decimal(line.debit || 0);
-      const c = new Decimal(line.credit || 0);
+      const d = new Prisma.Decimal(line.debit || 0);
+      const c = new Prisma.Decimal(line.credit || 0);
 
       if (d.lessThan(0) || c.lessThan(0)) {
         throw new Error("Borç/Alacak tutarları negatif olamaz.");
