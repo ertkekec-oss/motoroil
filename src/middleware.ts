@@ -202,7 +202,52 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
-        await jwtVerify(sessionToken, getJWTAscii());
+        const { payload } = await jwtVerify(sessionToken, getJWTAscii());
+        
+        // --- 6. ENTERPRISE ROLE-BASED ACCESS CONTROL (RBAC) ---
+        const userRole = String(payload?.role || '').toUpperCase('tr-TR');
+        const role = userRole.trim();
+        
+        const hasRole = (roles: string[]) => {
+            if (role.includes('ADMIN') || role === 'SİSTEM YÖNETİCİSİ' || role === 'ŞİRKET YÖNETİCİSİ') return true;
+            return roles.some(r => role.includes(r.toUpperCase('tr-TR')));
+        };
+
+        // Module URL Path -> Permitted Role Keywords
+        const rolePermissions: Record<string, string[]> = {
+            '/financials': ['FİNANS', 'MUHASEBE', 'MÜŞAVİR', 'ŞUBE YÖNETİCİSİ'],
+            '/accounting': ['FİNANS', 'MUHASEBE', 'MÜŞAVİR'],
+            '/terminal': ['KASİYER', 'ŞUBE YÖNETİCİSİ'],
+            '/garson': ['GARSON'],
+            '/field-mobile': ['SAHA'],
+            '/service-mobile': ['SERVİS', 'TEKNİK'],
+            '/hr': ['İNSAN KAYNAKLARI', 'HR'],
+            '/inventory': ['DEPO', 'ÜRETİM', 'ŞUBE'],
+            '/warehouse': ['DEPO', 'ÜRETİM'],
+            '/network': ['DEALER', 'HUB'],
+            '/ecommerce': ['TİCARET', 'E-TİCARET']
+        };
+
+        // 1. Check all modules except /staff
+        for (const [restrictedPath, allowedRoles] of Object.entries(rolePermissions)) {
+            if (pathname.startsWith(restrictedPath)) {
+                if (!hasRole(allowedRoles)) {
+                    console.warn(`[RBAC GUARD] BLOCKED: role='${role}' accessing '${pathname}'`);
+                    if (pathname.startsWith('/api')) return NextResponse.json({ error: 'Yetki Sınırı' }, { status: 403 });
+                    return NextResponse.redirect(new URL('/staff/me', request.url));
+                }
+            }
+        }
+
+        // 2. Special check for /staff (Block access to HR panel but allow /staff/me for personal dashboard)
+        if (pathname.startsWith('/staff') && !pathname.startsWith('/staff/me')) {
+            if (!hasRole(['İNSAN KAYNAKLARI', 'HR', 'GÜVENLİK', 'ŞUBE', 'ANOMALİ'])) {
+                console.warn(`[RBAC GUARD] BLOCKED STAFF PANEL: role='${role}' accessing '${pathname}'`);
+                if (pathname.startsWith('/api')) return NextResponse.json({ error: 'Yetki Sınırı' }, { status: 403 });
+                return NextResponse.redirect(new URL('/staff/me', request.url));
+            }
+        }
+
         return NextResponse.next();
     } catch (err) {
         console.error('Middleware global session error:', err);
