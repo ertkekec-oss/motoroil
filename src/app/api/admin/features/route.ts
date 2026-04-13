@@ -81,7 +81,11 @@ export async function GET(req: NextRequest) {
             { key: 'team_management', name: '👥 Ekip & Yetki', description: 'Gelişmiş kullanıcı rolleri ve granular yetkilendirme sistemi.' },
             { key: 'e_invoice', name: '🧾 E-Fatura Entegrasyonu', description: 'GİB uyumlu E-Fatura ve E-Arşiv fatura entegrasyonu.' },
             { key: 'marketplaces', name: '🏪 Pazaryeri Entegrasyonu', description: 'Trendyol, Hepsiburada, Amazon pazaryeri yönetimi.' },
-            { key: 'ecommerce', name: '🌐 E-Ticaret Entegrasyonu', description: 'Web sitesi siparişleri ve stok senkronizasyonu.' }
+            { key: 'ecommerce', name: '🌐 E-Ticaret Entegrasyonu', description: 'Web sitesi siparişleri ve stok senkronizasyonu.' },
+            { key: 'kitchen_system', name: '🍳 Mutfak & KDS Ekranı', description: 'Canlı mutfak aşçı ekranı ve sipariş sıralama.' },
+            { key: 'q_commerce', name: '📱 Q-Commerce QR Sipariş', description: 'Doğrudan tüketici (D2C) masa ve online sipariş altyapısı.' },
+            { key: 'courier_dispatch', name: '🛵 Kurye Dağıtım & Takip', description: 'Canlı harita tabanlı kurye zimmet paneli ve mobil uygulama.' },
+            { key: 'inter_company_billing', name: '🏢 Grup Şirket Otonom Entegrasyon', description: 'Şirketler arası otomatik alım-satım fatura köprüsü (Holding Yönetimi).' }
         ];
 
         // Sync features (Upsert all)
