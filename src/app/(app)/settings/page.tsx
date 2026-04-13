@@ -36,7 +36,6 @@ import InvoiceSettingsPanel from './_components/forms/InvoiceSettingsPanel';
 import AccountPanel from './_components/forms/AccountPanel';
 import RestaurantSettingsPanel from './_components/forms/RestaurantSettingsPanel';
 import BranchesPanel from './_components/forms/BranchesPanel';
-import RestaurantSettingsPanel from './_components/forms/RestaurantSettingsPanel';
 import CompanyProfileForm from './_components/forms/CompanyProfileForm';
 import IntegrationsPanel from './_components/forms/IntegrationsPanel';
 import AuthorizedSignersPanel from './_components/forms/AuthorizedSignersPanel';
@@ -1343,5 +1342,6 @@ export default function SettingsPage() {
         </div>
     );
 }
+
 
 

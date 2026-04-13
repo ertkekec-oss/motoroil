@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, FileText, Send, User, Search, Calculator, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, FileText, Send, User, Search, Calculator, CheckCircle2, RefreshCw, Clock, Tag } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
 
 export default function ESMMWorkspace({ products, customers }: any) {
