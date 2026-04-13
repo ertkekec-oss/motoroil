@@ -90,7 +90,8 @@ export async function GET(req: NextRequest) {
             { key: 'reconciliation', name: '🤝 e-Mutabakat (BA/BS)', description: 'Tedarikçi ve Müşterilerle dijital onaylı finansal mutabakat.' },
             { key: 'assets', name: '💻 Varlık & Demirbaş Yönetimi', description: 'Personellere donanım, araç, ve değerli varlık zimmetleme.' },
             { key: 'hr_management', name: '👥 İnsan Kaynakları (İK)', description: 'Personel özlük işlemleri, maaş planlama ve liderlik hedefleri.' },
-            { key: 'task_management', name: '📋 Görev Yönetim Merkezi', description: 'İç operasyonlar, ajanda ve ekipler arası görev atama.' }
+            { key: 'task_management', name: '📋 Görev Yönetim Merkezi', description: 'İç operasyonlar, ajanda ve ekipler arası görev atama.' },
+            { key: 'field_service', name: '📍 Saha Servis & Planlama', description: 'Canlı harita tabanlı servis rotalama ve müşteri randevu planlama.' }
         ];
 
         // Sync features (Upsert all)
