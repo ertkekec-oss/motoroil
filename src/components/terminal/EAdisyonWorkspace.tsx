@@ -372,7 +372,7 @@ export default function EAdisyonWorkspace({ products }: any) {
                                 >
                                     {invoiceStatus === 'processing' ? 'KAPATILIYOR...' : <><Send size={16} strokeWidth={2.5}/> HESABI KAPAT</>}
                                 </button>
-                            </div>>
+                            </div>
                         </div>
                     </div>
                 ) : (
