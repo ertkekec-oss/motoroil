@@ -179,7 +179,17 @@ export default function Sidebar() {
                 group: "Workspace",
                 items: [
                     { name: 'POS Terminal', href: '/terminal', icon: Terminal },
-                    { name: 'Kitchen System', href: '/kitchen', icon: UtensilsCrossed },
+                    {
+                        name: 'Restoran & KDS',
+                        icon: UtensilsCrossed,
+                        isParent: true,
+                        id: 'kitchen-system-parent',
+                        subItems: [
+                            { name: 'Mutfak Ekranı (KDS)', href: '/kitchen' },
+                            { name: 'QR Sipariş & Menü', href: '/qmenu' },
+                            { name: 'Kurye Operasyonu', href: '/kitchen/courier' }
+                        ]
+                    },
                     {
                         name: 'Periodya Hub',
                         icon: Globe,
