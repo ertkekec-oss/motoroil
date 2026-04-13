@@ -87,9 +87,8 @@ export async function POST(req: Request) {
         };
 
         // ADIM 1: TASLAK OLUŞTUR
-        // Note: Replace ebill/Draft/Create based on Nilvera's e-adisyon documentation if different.
-        // Standard API url is usually https://api.nilvera.com/ebill/Draft/Create
-        const draftEndpoint = BASE_URL.replace('/v1', '') + '/ebill/Draft/Create';
+        // Note: Replace eadisyon/Draft/Create based on Nilvera's e-adisyon documentation if different.
+        const draftEndpoint = BASE_URL.replace('/v1', '') + '/eadisyon/Draft/Create';
 
         const draftRes = await fetch(draftEndpoint, {
             method: 'POST',
