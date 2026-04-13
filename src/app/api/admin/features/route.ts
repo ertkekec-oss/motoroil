@@ -84,8 +84,13 @@ export async function GET(req: NextRequest) {
             { key: 'ecommerce', name: '🌐 E-Ticaret Entegrasyonu', description: 'Web sitesi siparişleri ve stok senkronizasyonu.' },
             { key: 'kitchen_system', name: '🍳 Mutfak & KDS Ekranı', description: 'Canlı mutfak aşçı ekranı ve sipariş sıralama.' },
             { key: 'q_commerce', name: '📱 Q-Commerce QR Sipariş', description: 'Doğrudan tüketici (D2C) masa ve online sipariş altyapısı.' },
-            { key: 'courier_dispatch', name: '🛵 Kurye Dağıtım & Takip', description: 'Canlı harita tabanlı kurye zimmet paneli ve mobil uygulama.' },
-            { key: 'inter_company_billing', name: '🏢 Grup Şirket Otonom Entegrasyon', description: 'Şirketler arası otomatik alım-satım fatura köprüsü (Holding Yönetimi).' }
+            { key: 'inter_company_billing', name: '🏢 Grup Şirket Otonom Entegrasyon', description: 'Şirketler arası otomatik alım-satım fatura köprüsü (Holding Yönetimi).' },
+            { key: 'dealer_network', name: '🏢 Bayi & Toptancı Ağı', description: 'Alt bayilerden sipariş ve tahsilat toplama, risk takibi.' },
+            { key: 'signatures', name: '✒️ Dijital İmza & Sözleşmeler', description: 'Merkezi Elektronik Belge onay ve imzalama altyapısı.' },
+            { key: 'reconciliation', name: '🤝 e-Mutabakat (BA/BS)', description: 'Tedarikçi ve Müşterilerle dijital onaylı finansal mutabakat.' },
+            { key: 'assets', name: '💻 Varlık & Demirbaş Yönetimi', description: 'Personellere donanım, araç, ve değerli varlık zimmetleme.' },
+            { key: 'hr_management', name: '👥 İnsan Kaynakları (İK)', description: 'Personel özlük işlemleri, maaş planlama ve liderlik hedefleri.' },
+            { key: 'task_management', name: '📋 Görev Yönetim Merkezi', description: 'İç operasyonlar, ajanda ve ekipler arası görev atama.' }
         ];
 
         // Sync features (Upsert all)
