@@ -123,8 +123,31 @@ export async function POST(request: Request) {
         // Create Accounting Journal Entry (in background)
         (async () => {
             try {
-                const { createJournalFromTransaction } = await import('@/lib/accounting');
-                await createJournalFromTransaction(result.transaction);
+                const { OtonomYevmiyeMotoru } = await import('@/services/finance/journalEngine');
+                
+                // Calculate Net and Vat Amount
+                let netAmount = 0;
+                let vatAmount = 0;
+                let otvAmount = 0;
+                
+                for (const item of items) {
+                  const lineTotal = Number(item.qty) * Number(item.price);
+                  const vatRate = Number(item.vat || 20);
+                  const lineNet = lineTotal / (1 + vatRate / 100);
+                  const lineVat = lineTotal - lineNet;
+                  netAmount += lineNet;
+                  vatAmount += lineVat;
+                  // If item has otv, add here
+                }
+                
+                await OtonomYevmiyeMotoru.bookPurchaseInvoice({
+                    companyId: companyId,
+                    documentId: result.invoice.id,
+                    netAmount: netAmount,
+                    vatAmount: vatAmount,
+                    totalAmount: totalAmount,
+                    vendorId: supplierId
+                });
             } catch (err) {
                 console.error('[Muhasebe Entegrasyon Hatası - Alış]:', err);
             }

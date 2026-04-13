@@ -80,7 +80,7 @@ export default function TrialBalanceContent() {
 
     return (
         <div className="animate-in fade-in duration-500 space-y-6">
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-6">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm p-6 overflow-hidden flex flex-col">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
@@ -96,23 +96,23 @@ export default function TrialBalanceContent() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <label className="flex items-center gap-2 cursor-pointer select-none text-[13px] font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors bg-slate-50 dark:bg-slate-800/50 px-3 h-11 rounded-xl border border-slate-200 dark:border-white/5">
+                        <label className="flex items-center gap-2 cursor-pointer select-none text-[13px] font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors bg-slate-50 dark:bg-[#1e293b]/50 px-3 h-[44px] rounded-[14px] border border-slate-200 dark:border-white/5">
                             <input
                                 type="checkbox"
                                 checked={hideZero}
                                 onChange={e => setHideZero(e.target.checked)}
-                                className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600"
+                                className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600 outline-none"
                             />
                             <span>Hareketsizleri Gizle</span>
                         </label>
                         <button 
                             onClick={fetchReport} 
-                            className="px-4 h-11 rounded-xl font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 transition-all bg-white dark:bg-[#1e293b] shadow-sm text-[13px]"
+                            className="px-5 h-[44px] rounded-[14px] font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 transition-all bg-white dark:bg-[#1e293b] shadow-sm text-[13px]"
                         >
                             <RefreshCw className="w-4 h-4" /> 
                             <span className="hidden sm:inline">Yenile</span>
                         </button>
-                        <button className="px-4 h-11 rounded-xl font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 transition-all bg-white dark:bg-[#1e293b] shadow-sm text-[13px]">
+                        <button className="px-5 h-[44px] rounded-[14px] font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 transition-all bg-white dark:bg-[#1e293b] shadow-sm text-[13px]">
                             <Printer className="w-4 h-4" /> 
                             <span className="hidden sm:inline">Yazdır</span>
                         </button>
@@ -126,22 +126,27 @@ export default function TrialBalanceContent() {
                         placeholder="Mizan hesaplarında hızlı ara..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-[13px] font-semibold h-[48px] pl-11 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-slate-900 dark:text-white"
+                    <input
+                        type="text"
+                        placeholder="Mizan hesaplarında hızlı ara..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/5 rounded-[14px] px-4 py-3 text-[13px] font-semibold h-[48px] pl-11 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-slate-900 dark:text-white"
                     />
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden p-0">
-                <div className="overflow-x-auto">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden p-0 flex flex-col">
+                <div className="overflow-x-auto custom-scroll w-full">
                     <table className="w-full text-left border-collapse text-sm">
-                        <thead className="bg-[#F6F8FB] dark:bg-[#0F172A] border-b border-slate-200 dark:border-white/10 font-bold sticky top-0 z-10">
+                        <thead className="bg-slate-50 dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/5 font-bold sticky top-0 z-10">
                             <tr>
-                                <th className="p-4 w-32 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">KOD</th>
-                                <th className="p-4 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">HESAP ADI</th>
-                                <th className="p-4 text-right w-36 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">TOPLAM BORÇ</th>
-                                <th className="p-4 text-right w-36 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">TOPLAM ALACAK</th>
-                                <th className="p-4 text-right w-36 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">BORÇ BAKİYESİ</th>
-                                <th className="p-4 text-right w-36 tracking-wider uppercase text-[10px] font-black text-slate-500 dark:text-slate-400">ALACAK BAKİYESİ</th>
+                                <th className="p-4 w-32 tracking-widest uppercase text-[10px] font-bold text-slate-500 dark:text-slate-400">KOD</th>
+                                <th className="p-4 tracking-widest uppercase text-[10px] font-bold text-slate-500 dark:text-slate-400">HESAP ADI</th>
+                                <th className="p-4 text-right w-36 tracking-widest uppercase text-[10px] font-bold text-slate-500 dark:text-slate-400">TOPLAM BORÇ</th>
+                                <th className="p-4 text-right w-36 tracking-widest uppercase text-[10px] font-bold text-slate-500 dark:text-slate-400">TOPLAM ALACAK</th>
+                                <th className="p-4 text-right w-36 tracking-widest uppercase text-[10px] font-bold text-slate-500 dark:text-slate-400">BORÇ BAKİYESİ</th>
+                                <th className="p-4 text-right w-36 tracking-widest uppercase text-[10px] font-bold text-slate-500 dark:text-slate-400">ALACAK BAKİYESİ</th>
                             </tr>
                         </thead>
                         <tbody>

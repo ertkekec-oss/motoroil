@@ -315,7 +315,10 @@ export async function createAccountingSlip(params: {
 
 /**
  * İşlemden Otomatik Muhasebe Fişi Üretir (Ders Modu-1)
+ * NOTE: Collection ve Sales işlemleri artık OtonomYevmiyeMotoru üzerinden geçiyor.
  */
+import { OtonomYevmiyeMotoru } from '@/services/finance/journalEngine';
+
 export async function createJournalFromTransaction(trx: any, prismaClient: any = globalPrisma) {
     const items: EntryLine[] = [];
     const amount = Number(trx.amount);
@@ -334,39 +337,46 @@ export async function createJournalFromTransaction(trx: any, prismaClient: any =
     const mainName = (mainAcc as any)?.name || 'MERKEZ KASA';
 
     if (trx.type === 'Collection') { // Tahsilat (Giren)
-        items.push({ accountCode: mainCode, accountName: mainName, type: 'Borç', amount, documentType: 'MAKBUZ' });
-        items.push({ accountCode: ACCOUNTS.ALICILAR + '.01', accountName: 'ALICILAR', type: 'Alacak', amount, documentType: 'MAKBUZ' });
+        // Yeni Otonom Yevmiye Motoru
+        let paymentMethod: 'CASH' | 'CREDIT_CARD' | 'TRANSFER' = 'TRANSFER';
+        if (trx.kasaId) {
+            if (mainName.includes('KASA') || mainName.includes('NAKİT')) paymentMethod = 'CASH';
+            else if (mainName.includes('POS') || mainName.includes('KREDİ KARTI') || mainName.includes('KK')) paymentMethod = 'CREDIT_CARD';
+        }
+
+        const customer = trx.customerId ? await prismaClient.customer.findUnique({ where: { id: trx.customerId } }) : null;
+
+        await OtonomYevmiyeMotoru.bookCollection({
+            companyId: companyId,
+            paymentId: trx.id,
+            customerName: customer ? customer.name : 'Belirsiz Cari',
+            amount: amount,
+            method: paymentMethod,
+            date: trx.date
+        });
+        return; // İşlemi Otonom yaptı, eski sisteme düşme
 
     } else if (trx.type === 'Payment') { // Ödeme (Çıkan)
-        items.push({ accountCode: ACCOUNTS.SATICILAR + '.01', accountName: 'SATICILAR', type: 'Borç', amount, documentType: 'MAKBUZ' });
-        items.push({ accountCode: mainCode, accountName: mainName, type: 'Alacak', amount, documentType: 'MAKBUZ' });
+        let paymentMethod: 'CASH' | 'CREDIT_CARD' | 'BANK' = 'BANK';
+        if (trx.kasaId) {
+            if (mainName.includes('KASA') || mainName.includes('NAKIT')) paymentMethod = 'CASH';
+            else if (mainName.includes('KREDI') || mainName.includes('POS')) paymentMethod = 'CREDIT_CARD';
+        }
 
-    } else if (trx.type === 'Sales') { // Satış
-        // Kasa/POS Borçlanıyor
-        items.push({ accountCode: mainCode, accountName: mainName, type: 'Borç', amount, documentType: 'FATURA' });
-
-        // Gelir ve KDV Alacaklanıyor (Varsayılan %20, Satış API'den dinamik gelirse daha iyi olur)
-        const vatRate = 20;
-        const vatAmount = amount - (amount / (1 + vatRate / 100));
-        const baseAmount = amount - vatAmount;
-
-        items.push({ accountCode: ACCOUNTS.YURT_ICI_SATIS + '.01', accountName: 'YURT İÇİ SATIŞLAR', type: 'Alacak', amount: baseAmount, documentType: 'FATURA' });
-        items.push({ accountCode: ACCOUNTS.HESAPLANAN_KDV + '.01', accountName: 'HESAPLANAN KDV', type: 'Alacak', amount: vatAmount, documentType: 'FATURA' });
-
-    } else if (trx.type === 'Expense') { // Gider
         const isCommission = trx.description?.toLowerCase().includes('komisyon');
-        const expenseCode = isCommission ? (ACCOUNTS.FINANSMAN_GIDER + '.01') : (ACCOUNTS.GENEL_GIDER + '.01');
         const expenseName = isCommission ? 'FİNANSMAN GİDERLERİ' : 'GENEL GİDERLER';
 
-        items.push({ accountCode: expenseCode, accountName: expenseName, type: 'Borç', amount, documentType: 'MAKBUZ' });
-        items.push({ accountCode: mainCode, accountName: mainName, type: 'Alacak', amount, documentType: 'MAKBUZ' });
+        await OtonomYevmiyeMotoru.bookExpense({
+            companyId: companyId,
+            expenseId: trx.id,
+            amount: amount,
+            paymentMethod: paymentMethod,
+            description: trx.description || expenseName
+        });
+        return;
 
-    } else if (trx.type === 'Purchase') { // Alış (Stok Girişi)
-        // Ticari Mallar Borçlanıyor (Stok artışı)
-        items.push({ accountCode: ACCOUNTS.TICARI_MALLAR + '.01', accountName: 'TİCARİ MALLAR', type: 'Borç', amount, documentType: 'FATURA' });
-
-        // Satıcılar Alacaklanıyor (Tedarikçi borcu)
-        items.push({ accountCode: ACCOUNTS.SATICILAR + '.01', accountName: 'SATICILAR', type: 'Alacak', amount, documentType: 'FATURA' });
+    } else if (trx.type === 'Purchase') { // Alış (Stok Girişi) Artık purchasing route doğrudan yapıyor
+        return; // purchasing/create/route.ts handles this directly now using OtonomYevmiyeMotoru
 
     } else if (trx.type === 'Transfer' && trx.targetKasaId) { // İki Aşamalı POS veya Virman
         const targetAcc = await getAccountForKasa(trx.targetKasaId, branch, prismaClient);

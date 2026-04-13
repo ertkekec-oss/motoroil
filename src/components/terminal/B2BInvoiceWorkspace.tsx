@@ -16,7 +16,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
     const [invoiceScenario, setInvoiceScenario] = useState('TICARIFATURA');
 
     const [invoiceLines, setInvoiceLines] = useState<any[]>([
-        { id: 1, product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, description: '', tevkifatRate: 0, istisnaCode: '' }
+        { id: 1, product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, otvType: 'Ö.T.V yok', otvRate: 0, oivRate: 0, description: '', tevkifatRate: 0, istisnaCode: '' }
     ]);
 
     const [invoiceStatus, setInvoiceStatus] = useState('draft');
@@ -31,7 +31,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
     const handleAddLine = () => {
         setInvoiceLines([
             ...invoiceLines, 
-            { id: Date.now(), product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, description: '', tevkifatRate: 0, istisnaCode: '' }
+            { id: Date.now(), product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, otvType: 'Ö.T.V yok', otvRate: 0, oivRate: 0, description: '', tevkifatRate: 0, istisnaCode: '' }
         ]);
     };
 
@@ -52,7 +52,10 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                 product: prod, 
                 name: prod.name, 
                 unitPrice: Number(prod.price || 0),
-                vatRate: prod.vatRate || 20
+                vatRate: prod.vatRate || 20,
+                otvType: prod.otvType || 'Ö.T.V yok',
+                otvRate: prod.otvRate || 0,
+                oivRate: prod.oivRate || 0
             } : l));
         }
     };
@@ -63,17 +66,27 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
         const rowDiscount = rowGross * (Number(line.discountRate) / 100);
         const rowNet = rowGross - rowDiscount;
         
+        let rowOtv = 0;
+        if (line.otvType === 'Birim Başına') {
+            rowOtv = Number(line.qty) * Number(line.otvRate);
+        } else if (line.otvType === 'Yüzdesel') {
+            rowOtv = rowNet * (Number(line.otvRate) / 100);
+        }
+
+        const rowVatBase = rowNet + rowOtv; // ÖTV KDV matrahına dahildir.
+
+        let rowOiv = rowVatBase * (Number(line.oivRate) / 100); // OIV de hesaplanır
+
         let rowVat = 0;
         // If invoice is ISTISNA, GIB says VAT must be 0 explicitly.
         if (invoiceType === 'ISTISNA') {
             rowVat = 0;
         } else {
-            rowVat = rowNet * (Number(line.vatRate) / 100);
+            rowVat = rowVatBase * (Number(line.vatRate) / 100);
         }
         
         let rowTevkifat = 0;
         if (invoiceType === 'TEVKIFAT' && line.tevkifatRate > 0) {
-            // tevkifatRate is out of 10. (e.g. 5/10 => 0.5)
             rowTevkifat = rowVat * (Number(line.tevkifatRate) / 10);
         }
         
@@ -81,11 +94,13 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
             subtotal: acc.subtotal + rowGross,
             discount: acc.discount + rowDiscount,
             netTotal: acc.netTotal + rowNet,
+            otvTotal: acc.otvTotal + rowOtv,
+            oivTotal: acc.oivTotal + rowOiv,
             vatTotal: acc.vatTotal + rowVat,
             tevkifatTotal: acc.tevkifatTotal + rowTevkifat,
-            grandTotal: acc.grandTotal + rowNet + rowVat - rowTevkifat
+            grandTotal: acc.grandTotal + rowNet + rowOtv + rowOiv + rowVat - rowTevkifat
         };
-    }, { subtotal: 0, discount: 0, netTotal: 0, vatTotal: 0, tevkifatTotal: 0, grandTotal: 0 });
+    }, { subtotal: 0, discount: 0, netTotal: 0, otvTotal: 0, oivTotal: 0, vatTotal: 0, tevkifatTotal: 0, grandTotal: 0 });
 
     const filteredCustomers = customers?.filter((c: any) => c.name?.toLowerCase().includes(customerSearch.toLowerCase())) || [];
     
@@ -120,7 +135,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                 <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">E-Fatura Kesildi</h2>
                 <p className="text-slate-500 font-medium mb-8 text-center max-w-md">Belge GİB kuyruğuna başarıyla eklendi. Müşteriye e-posta olarak otomatik iletilmiştir.</p>
                 <div className="space-x-4">
-                    <button className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold shadow-sm" onClick={() => { setInvoiceStatus('draft'); setInvoiceLines([{ id: 1, product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, description: '' }]); setSelectedCustomer(null); }}>YENİ FATURA</button>
+                    <button className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold shadow-sm" onClick={() => { setInvoiceStatus('draft'); setInvoiceLines([{ id: 1, product: null, name: '', qty: 1, unitPrice: 0, discountRate: 0, vatRate: 20, otvType: 'Ö.T.V yok', otvRate: 0, oivRate: 0, description: '' }]); setSelectedCustomer(null); }}>YENİ FATURA</button>
                     <button className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-md hover:bg-indigo-700">PDF OLARAK İNDİR</button>
                 </div>
             </div>
@@ -315,6 +330,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                 <th className="p-3 w-28">Birim Fiyat</th>
                                 <th className="p-3 w-20">İsk.(%)</th>
                                 {invoiceType === 'ISTISNA' && <th className="p-3 w-24">İstisna Kodu</th>}
+                                <th className="p-3 w-[140px]">Diğer Vergiler</th>
                                 {invoiceType !== 'ISTISNA' && <th className="p-3 w-20">KDV(%)</th>}
                                 {invoiceType === 'TEVKIFAT' && <th className="p-3 w-20">Tevkifat</th>}
                                 <th className="p-3 w-28 text-right">Net Tutar</th>
@@ -407,8 +423,44 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                             </td>
                                         )}
 
+                                        <td className="p-2 align-top pt-2">
+                                            <div className="flex flex-col gap-1.5 w-full items-start justify-center">
+                                                <select 
+                                                    value={line.otvType} 
+                                                    onChange={(e) => updateLine(line.id, 'otvType', e.target.value)} 
+                                                    className="w-full bg-slate-50 dark:bg-slate-800 text-[10px] font-bold border border-slate-200 dark:border-white/10 rounded px-1.5 py-1 text-slate-600 dark:text-slate-300 outline-none"
+                                                >
+                                                    <option value="Ö.T.V yok">Ö.T.V Yok</option>
+                                                    <option value="Yüzdesel">Yüzdesel ÖTV</option>
+                                                    <option value="Birim Başına">Maktu (Birim)</option>
+                                                </select>
+                                                {line.otvType !== 'Ö.T.V yok' && (
+                                                    <div className="flex gap-1 items-center w-full">
+                                                        <span className="text-[10px] font-bold text-slate-400">Tutar/Oran:</span>
+                                                        <input 
+                                                            type="number" 
+                                                            min="0" 
+                                                            value={line.otvRate || ''} 
+                                                            onChange={(e) => updateLine(line.id, 'otvRate', Number(e.target.value))} 
+                                                            className="flex-1 min-w-0 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded px-1 py-0.5 text-[10px] font-bold text-right outline-none focus:border-indigo-500" 
+                                                        />
+                                                    </div>
+                                                )}
+                                                <div className="flex gap-1 items-center w-full mt-0.5">
+                                                    <span className="text-[10px] font-bold text-slate-400">OİV (%):</span>
+                                                    <input 
+                                                        type="number" 
+                                                        min="0" 
+                                                        value={line.oivRate || ''} 
+                                                        onChange={(e) => updateLine(line.id, 'oivRate', Number(e.target.value))} 
+                                                        className="flex-1 min-w-0 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded px-1 py-0.5 text-[10px] font-bold text-right outline-none focus:border-indigo-500" 
+                                                    />
+                                                </div>
+                                            </div>
+                                        </td>
+
                                         {invoiceType !== 'ISTISNA' && (
-                                            <td className="p-2 align-top pt-3">
+                                            <td className="p-2 align-top pt-4">
                                                 <select value={line.vatRate} onChange={(e) => updateLine(line.id, 'vatRate', Number(e.target.value))} className="w-full bg-transparent border-b border-slate-200 dark:border-white/20 py-1.5 text-xs font-bold outline-none focus:border-indigo-500 cursor-pointer text-center">
                                                     <option value="20">%20</option>
                                                     <option value="10">%10</option>
@@ -419,7 +471,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                         )}
 
                                         {invoiceType === 'TEVKIFAT' && (
-                                            <td className="p-2 align-top pt-3">
+                                            <td className="p-2 align-top pt-4">
                                                 <select value={line.tevkifatRate} onChange={(e) => updateLine(line.id, 'tevkifatRate', Number(e.target.value))} className="w-full bg-transparent border-b border-slate-200 dark:border-white/20 py-1.5 text-[11px] font-bold outline-none focus:border-indigo-500 cursor-pointer text-center">
                                                     <option value="0">Tevkifatsız</option>
                                                     <option value="1">1/10</option>
@@ -483,6 +535,18 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                 <span>{currSymbol}{totals.vatTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                             )}
                         </div>
+                        {totals.otvTotal > 0 && (
+                            <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
+                                <span>Hesaplanan ÖTV</span>
+                                <span>{currSymbol}{totals.otvTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
+                            </div>
+                        )}
+                        {totals.oivTotal > 0 && (
+                            <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
+                                <span>Hesaplanan OİV</span>
+                                <span>{currSymbol}{totals.oivTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
+                            </div>
+                        )}
                         {invoiceType === 'TEVKIFAT' && totals.tevkifatTotal > 0 && (
                             <div className="flex justify-between text-xs font-bold text-rose-500">
                                 <span>(-) Tevkif Edilen KDV</span>

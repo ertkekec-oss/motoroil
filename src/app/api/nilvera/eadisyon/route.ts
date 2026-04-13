@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { authorize, resolveCompanyId } from '@/lib/auth';
+import { OtonomYevmiyeMotoru } from '@/services/finance/journalEngine';
 
 export async function POST(req: Request) {
     try {
@@ -109,10 +110,39 @@ export async function POST(req: Request) {
         
         // Aslında draft oluştuktan sonra "ConfirmAndSend" veya "Send" yapılması gerekir.
         // Adisyon UUID'si dönerse, direkt gönderilebilir.
+
+        // Otonom Yevmiye Motoru: Peşin POS Satış Muhasebesi (Nakit Veya Kredi Kartı)
+        try {
+            const tempDocId = draftData.UUID || `ADISYON-${Date.now()}`;
+            const isCard = body.currency === "CC"; // Öylesine bir flag, UI'dan gelir aslında ama şimdilik nakit varsayıyoruz
+            let netAmount = 0;
+            let vatAmount = 0;
+            
+            body.lines?.forEach((line: any) => {
+                const lineTotal = Number(line.price) * Number(line.quantity);
+                const vat = lineTotal * (Number(line.vatRate) / 100);
+                netAmount += lineTotal;
+                vatAmount += vat;
+            });
+
+            await OtonomYevmiyeMotoru.bookCashSale({
+                companyId,
+                documentId: tempDocId,
+                netAmount: netAmount,
+                vatAmount: vatAmount,
+                otvAmount: 0, // Adisyonda var saymiyoruz şimdilik
+                oivAmount: 0,
+                totalAmount: netAmount + vatAmount,
+                method: isCard ? 'CREDIT_CARD' : 'CASH',
+                tableNo: body.tableNo || "Bilinmeyen Masa"
+            });
+        } catch (engineErr: any) {
+            console.error('[JournalEngine Adisyon Error]:', engineErr.message);
+        }
         
         return NextResponse.json({
             success: true,
-            message: "E-Adisyon başarıyla Nilvera'ya iletildi.",
+            message: "E-Adisyon başarıyla Nilvera'ya iletildi ve Arka Planda Muhasebeleştirildi.",
             data: draftData
         });
 

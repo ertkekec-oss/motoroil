@@ -79,7 +79,7 @@ export default function VatSimulationContent() {
 
     return (
         <div className="animate-in fade-in duration-500 space-y-6">
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-6">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm p-6 overflow-hidden flex flex-col">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
                         <Calculator className="w-6 h-6" />
@@ -97,8 +97,8 @@ export default function VatSimulationContent() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* SOL TARAFI: GİRİŞLER */}
-                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-6 space-y-6">
-                    <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/10 pb-4">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm p-6 space-y-6 flex flex-col">
+                    <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
                         <PlusCircle className="w-5 h-5 text-indigo-500" />
                         <h3 className="text-[16px] font-black text-slate-900 dark:text-white tracking-tight">KDV Alacakları (+)</h3>
                     </div>
@@ -126,8 +126,8 @@ export default function VatSimulationContent() {
                 </div>
 
                 {/* SAĞ TARAFI: ÇIKIŞLAR */}
-                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-6 space-y-6">
-                    <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/10 pb-4">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm p-6 space-y-6 flex flex-col">
+                    <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
                         <MinusCircle className="w-5 h-5 text-rose-500" />
                         <h3 className="text-[16px] font-black text-slate-900 dark:text-white tracking-tight">KDV Borçları (-)</h3>
                     </div>
@@ -158,7 +158,7 @@ export default function VatSimulationContent() {
             {/* SONUÇ KARTI */}
             <div className="mt-8 relative animate-in slide-in-from-bottom-4 duration-700">
                 {kdvData.odenecek > 0 ? (
-                    <div className="bg-rose-50 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/30 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden shadow-sm">
+                    <div className="bg-rose-50 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/30 rounded-[32px] p-8 md:p-12 text-center relative overflow-hidden shadow-sm">
                         <div className="absolute top-0 left-0 w-full h-1 bg-rose-500"></div>
                         <AlertCircle className="w-12 h-12 text-rose-500 mx-auto mb-6 opacity-80 animate-pulse" />
                         <div className="text-[13px] font-black text-rose-600/80 dark:text-rose-400/80 uppercase tracking-[0.2em] mb-4">BU AY ÖDENECEK KDV VAR</div>
@@ -166,7 +166,7 @@ export default function VatSimulationContent() {
                         <p className="mt-6 text-rose-600/80 dark:text-rose-400/80 text-[15px] font-medium max-w-lg mx-auto">Dikkat: Bu tutar tahmini olup, resmi beyanname ile kesinleşecektir.</p>
                     </div>
                 ) : (
-                    <div className="bg-emerald-50 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden shadow-sm">
+                    <div className="bg-emerald-50 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 rounded-[32px] p-8 md:p-12 text-center relative overflow-hidden shadow-sm">
                         <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
                         <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-6 opacity-80" />
                         <div className="text-[13px] font-black text-emerald-600/80 dark:text-emerald-400/80 uppercase tracking-[0.2em] mb-4">SONRAKİ AYA DEVREDEN KDV</div>

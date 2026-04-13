@@ -36,8 +36,8 @@ const RatioCard = ({ title, value, unit, status, description, color, ideal, icon
     const theme = themes[status as keyof typeof themes] || themes.bad;
 
     return (
-        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-5 relative overflow-hidden group hover:shadow-md transition-all duration-300 flex flex-col h-full">
-            <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-[0.03] dark:opacity-[0.05] group-hover:scale-110 transition-transform ${theme.bg.split(' ')[0]}`} />
+        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm p-5 relative overflow-hidden group hover:shadow-md transition-all duration-300 flex flex-col h-full">
+            <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-[32px] opacity-[0.03] dark:opacity-[0.05] group-hover:scale-110 transition-transform ${theme.bg.split(' ')[0]}`} />
             
             <div className="flex justify-between items-start mb-4 relative z-10">
                 <div className="flex items-center gap-2">
@@ -148,8 +148,8 @@ export default function FinancialHealthContent() {
 
     return (
         <div className="animate-in fade-in duration-500 space-y-6">
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-6 flex flex-col md:flex-row md:items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm p-6 flex flex-col md:flex-row md:items-center gap-4">
+                <div className="w-12 h-12 rounded-[16px] bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                     <Activity className="w-6 h-6" />
                 </div>
                 <div>
@@ -208,8 +208,8 @@ export default function FinancialHealthContent() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 {/* VARLIK YAPISI */}
-                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-                    <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#0f172a]/50 flex items-center gap-2">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col">
+                    <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b]/50 flex items-center gap-2">
                         <Building2 className="w-4 h-4 text-slate-400" />
                         <h4 className="text-slate-700 dark:text-slate-300 text-[11px] font-black uppercase tracking-widest">VARLIK YAPISI
                         </h4>
@@ -231,8 +231,8 @@ export default function FinancialHealthContent() {
                 </div>
 
                 {/* KAYNAK YAPISI */}
-                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-                    <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#0f172a]/50 flex items-center gap-2">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col">
+                    <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e293b]/50 flex items-center gap-2">
                         <Briefcase className="w-4 h-4 text-slate-400" />
                         <h4 className="text-slate-700 dark:text-slate-300 text-[11px] font-black uppercase tracking-widest">KAYNAK YAPISI
                         </h4>
@@ -258,8 +258,8 @@ export default function FinancialHealthContent() {
                 </div>
 
                 {/* PERFORMANS ÖZETİ */}
-                <div className="bg-gradient-to-br from-blue-900 to-slate-900 border border-blue-800/50 rounded-2xl shadow-lg shadow-blue-900/10 overflow-hidden flex flex-col relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-bl-full blur-2xl" />
+                <div className="bg-gradient-to-br from-blue-900 to-slate-900 border border-blue-800/50 rounded-[24px] shadow-lg shadow-blue-900/10 overflow-hidden flex flex-col relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-[32px] blur-2xl" />
                     
                     <div className="p-4 border-b border-white/10 bg-white/5 flex items-center gap-2 relative z-10">
                         <PieChart className="w-4 h-4 text-blue-300" />

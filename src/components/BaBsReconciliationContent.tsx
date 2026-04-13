@@ -39,8 +39,8 @@ export default function BaBsReconciliationContent() {
     ];
 
     const TableSection = ({ title, icon: Icon, items, colorClass, borderClass, emptyText }: any) => (
-        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full">
-            <div className={`p-5 border-b border-slate-100 dark:border-white/10 flex items-center justify-between ${colorClass.replace('text-', 'bg-').replace('600', '50')} dark:bg-slate-800/30`}>
+        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm overflow-hidden flex flex-col h-full">
+            <div className={`p-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between ${colorClass.replace('text-', 'bg-').replace('600', '50')} dark:bg-[#1e293b]/50`}>
                 <h3 className={`text-[16px] font-black tracking-tight flex items-center gap-2 ${colorClass}`}>
                     <Icon className="w-5 h-5" />
                     {title}
@@ -92,7 +92,7 @@ export default function BaBsReconciliationContent() {
 
     return (
         <div className="animate-in fade-in duration-500 space-y-6">
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-6">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm p-6 overflow-hidden flex flex-col">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-pink-50 dark:bg-pink-500/10 border border-pink-100 dark:border-pink-500/20 flex items-center justify-center text-pink-600 dark:text-pink-400 shrink-0">
@@ -108,18 +108,18 @@ export default function BaBsReconciliationContent() {
                         </div>
                     </div>
 
-                    <div className="flex gap-2 items-center bg-slate-50 dark:bg-slate-800/80 p-1.5 rounded-xl border border-slate-200 dark:border-white/5">
+                    <div className="flex gap-2 items-center bg-slate-50 dark:bg-[#1e293b]/50 p-1.5 rounded-[16px] border border-slate-200 dark:border-white/5">
                         <select
                             value={filters.month}
                             onChange={(e) => setFilters(prev => ({ ...prev, month: Number(e.target.value) }))}
-                            className="bg-transparent text-[13px] font-bold px-3 py-2 outline-none text-center appearance-auto text-slate-900 dark:text-white cursor-pointer hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg transition-colors border-r border-slate-200 dark:border-white/10"
+                            className="bg-transparent text-[13px] font-bold px-3 py-2 outline-none text-center appearance-auto text-slate-900 dark:text-white cursor-pointer hover:bg-white dark:hover:bg-[#0f172a] rounded-[10px] transition-colors border-r border-slate-200 dark:border-white/10 shadow-sm"
                         >
                             {months?.map((m, i) => <option key={i} value={i + 1} className="dark:bg-[#1e293b]">{m}</option>)}
                         </select>
                         <select
                             value={filters.year}
                             onChange={(e) => setFilters(prev => ({ ...prev, year: Number(e.target.value) }))}
-                            className="bg-transparent text-[13px] font-bold px-3 py-2 outline-none text-center appearance-auto text-slate-900 dark:text-white cursor-pointer hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-lg transition-colors border-r border-slate-200 dark:border-white/10"
+                            className="bg-transparent text-[13px] font-bold px-3 py-2 outline-none text-center appearance-auto text-slate-900 dark:text-white cursor-pointer hover:bg-white dark:hover:bg-[#0f172a] rounded-[10px] transition-colors border-r border-slate-200 dark:border-white/10 shadow-sm"
                         >
                             {[2024, 2025, 2026, 2027]?.map(y => <option key={y} value={y} className="dark:bg-[#1e293b]">{y}</option>)}
                         </select>

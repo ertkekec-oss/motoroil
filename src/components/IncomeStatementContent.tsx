@@ -75,7 +75,7 @@ export default function IncomeStatementContent() {
 
     return (
         <div className="animate-in fade-in duration-500 max-w-4xl mx-auto space-y-6">
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-6">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm p-6 overflow-hidden flex flex-col">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-500/10 border border-violet-100 dark:border-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400 shrink-0">
@@ -90,10 +90,10 @@ export default function IncomeStatementContent() {
                             </p>
                         </div>
                     </div>
-                    <div className="flex bg-slate-100 dark:bg-slate-800/80 rounded-xl p-1 gap-1 border border-slate-200 dark:border-white/5">
-                        <button onClick={() => setPeriod('this_month')} className={`px-4 h-9 rounded-lg text-[13px] font-bold transition-all ${period === 'this_month' ? 'bg-white dark:bg-[#1e293b] text-violet-600 dark:text-violet-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>Bu Ay</button>
-                        <button onClick={() => setPeriod('this_year')} className={`px-4 h-9 rounded-lg text-[13px] font-bold transition-all ${period === 'this_year' ? 'bg-white dark:bg-[#1e293b] text-violet-600 dark:text-violet-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>Bu Yıl</button>
-                        <button onClick={() => setPeriod('all')} className={`px-4 h-9 rounded-lg text-[13px] font-bold transition-all ${period === 'all' ? 'bg-white dark:bg-[#1e293b] text-violet-600 dark:text-violet-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>Tümü</button>
+                    <div className="flex bg-slate-50 dark:bg-[#1e293b]/50 rounded-[16px] p-1.5 gap-1 border border-slate-200 dark:border-white/5">
+                        <button onClick={() => setPeriod('this_month')} className={`px-5 h-[38px] rounded-[12px] text-[13px] font-bold transition-all ${period === 'this_month' ? 'bg-white dark:bg-[#0f172a] text-violet-600 dark:text-violet-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>Bu Ay</button>
+                        <button onClick={() => setPeriod('this_year')} className={`px-5 h-[38px] rounded-[12px] text-[13px] font-bold transition-all ${period === 'this_year' ? 'bg-white dark:bg-[#0f172a] text-violet-600 dark:text-violet-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>Bu Yıl</button>
+                        <button onClick={() => setPeriod('all')} className={`px-5 h-[38px] rounded-[12px] text-[13px] font-bold transition-all ${period === 'all' ? 'bg-white dark:bg-[#0f172a] text-violet-600 dark:text-violet-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>Tümü</button>
                     </div>
                 </div>
             </div>
@@ -104,7 +104,7 @@ export default function IncomeStatementContent() {
                     <span>Gelir tablosu hesaplanıyor...</span>
                 </div>
             ) : data ? (
-                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-8 font-sans mt-0">
+                <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm p-8 font-sans mt-0 flex flex-col overflow-hidden">
                     {/* A. BRÜT SATIŞLAR */}
                     <SectionRow title="A. BRÜT SATIŞLAR" amount={data.grossSales} isSubTotal color="text-slate-900 dark:text-white font-bold" />
                     <DetailRows section="grossSales" />

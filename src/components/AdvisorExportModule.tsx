@@ -38,7 +38,7 @@ export default function AdvisorExportModule() {
     };
 
     return (
-        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm flex flex-col gap-8 min-h-[600px]">
+        <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] p-6 shadow-sm flex flex-col gap-8 min-h-[600px]">
             {/* Header Area */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100 dark:border-white/5">
                 <div>
@@ -95,8 +95,8 @@ export default function AdvisorExportModule() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* 1. FATURALAR */}
-                <div className="flex flex-col p-6 rounded-2xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-bl-[100px] -z-10 group-hover:bg-emerald-500/10 transition-colors"></div>
+                <div className="flex flex-col p-6 rounded-[24px] bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-[32px] -z-10 group-hover:bg-emerald-500/10 transition-colors"></div>
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 border border-emerald-100 dark:border-emerald-500/20"><FileSpreadsheet className="w-5 h-5" /></div>
                         <div>
@@ -112,15 +112,15 @@ export default function AdvisorExportModule() {
                     <button 
                         onClick={() => handleExport('INVOICES')}
                         disabled={isExporting}
-                        className="w-full h-11 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-[13px] border border-emerald-200 dark:border-emerald-500/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="w-full h-11 rounded-[16px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-[13px] border border-emerald-200 dark:border-emerald-500/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         <Download className="w-4 h-4" /> XML DIŞA AKTAR
                     </button>
                 </div>
 
                 {/* 2. BORDRO VE ÖZLÜK */}
-                <div className="flex flex-col p-6 rounded-2xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-bl-[100px] -z-10 group-hover:bg-blue-500/10 transition-colors"></div>
+                <div className="flex flex-col p-6 rounded-[24px] bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-[32px] -z-10 group-hover:bg-blue-500/10 transition-colors"></div>
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 border border-blue-100 dark:border-blue-500/20"><Briefcase className="w-5 h-5" /></div>
                         <div>
@@ -136,15 +136,15 @@ export default function AdvisorExportModule() {
                     <button 
                          onClick={() => handleExport('PAYROLL')}
                          disabled={isExporting}
-                        className="w-full h-11 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 font-bold text-[13px] border border-blue-200 dark:border-blue-500/20 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="w-full h-11 rounded-[16px] bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 font-bold text-[13px] border border-blue-200 dark:border-blue-500/20 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                          <Download className="w-4 h-4" /> XML DIŞA AKTAR
                     </button>
                 </div>
 
                 {/* 3. KASA & BANKA (FİNANS) */}
-                <div className="flex flex-col p-6 rounded-2xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-                     <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-bl-[100px] -z-10 group-hover:bg-amber-500/10 transition-colors"></div>
+                <div className="flex flex-col p-6 rounded-[24px] bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-[32px] -z-10 group-hover:bg-amber-500/10 transition-colors"></div>
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center text-amber-600 border border-amber-100 dark:border-amber-500/20"><Building2 className="w-5 h-5" /></div>
                         <div>
@@ -160,15 +160,15 @@ export default function AdvisorExportModule() {
                     <button 
                          onClick={() => handleExport('FINANCE')}
                          disabled={isExporting}
-                        className="w-full h-11 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-500 font-bold text-[13px] border border-amber-200 dark:border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="w-full h-11 rounded-[16px] bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-500 font-bold text-[13px] border border-amber-200 dark:border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                          <Download className="w-4 h-4" /> XML DIŞA AKTAR
                     </button>
                 </div>
 
                 {/* 4. ÇEK & SENET */}
-                <div className="flex flex-col p-6 rounded-2xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-bl-[100px] -z-10 group-hover:bg-purple-500/10 transition-colors"></div>
+                <div className="flex flex-col p-6 rounded-[24px] bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-[32px] -z-10 group-hover:bg-purple-500/10 transition-colors"></div>
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 border border-purple-100 dark:border-purple-500/20"><Ticket className="w-5 h-5" /></div>
                         <div>
@@ -184,7 +184,7 @@ export default function AdvisorExportModule() {
                     <button 
                          onClick={() => handleExport('CHECKS')}
                          disabled={isExporting}
-                        className="w-full h-11 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 font-bold text-[13px] border border-purple-200 dark:border-purple-500/20 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="w-full h-11 rounded-[16px] bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 font-bold text-[13px] border border-purple-200 dark:border-purple-500/20 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                          <Download className="w-4 h-4" /> XML DIŞA AKTAR
                     </button>
@@ -199,7 +199,7 @@ export default function AdvisorExportModule() {
                 <button 
                     onClick={handleExportAll}
                     disabled={isExporting}
-                    className="h-12 px-6 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black text-[13px] tracking-widest hover:opacity-90 transition-opacity shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="h-[52px] px-8 rounded-[16px] bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black text-[13px] tracking-widest hover:opacity-90 transition-opacity shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                    {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <PackageOpen className="w-5 h-5" />}
                    {isExporting ? 'İŞLENİYOR...' : `TÜMÜNÜ İNDİR (${selectedSoftware})`} 

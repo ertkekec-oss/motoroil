@@ -46,7 +46,7 @@ export default function FinancialAuditContent() {
 
     return (
         <div className="animate-in fade-in duration-500 space-y-6">
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm p-6">
+            <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/5 rounded-[24px] shadow-sm p-6 flex flex-col">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0">
                         <ShieldCheck className="w-6 h-6" />
@@ -68,7 +68,7 @@ export default function FinancialAuditContent() {
                     <p className="text-[13px] font-semibold text-slate-400 animate-pulse">Kayıtlarınız derinlemesine denetleniyor...</p>
                 </div>
             ) : issues.length === 0 ? (
-                <div className="bg-white dark:bg-[#1e293b] border border-emerald-200 dark:border-emerald-500/30 rounded-3xl shadow-sm p-12 text-center text-emerald-600 dark:text-emerald-400 animate-in zoom-in relative overflow-hidden">
+                <div className="bg-white dark:bg-[#0f172a] border border-emerald-200 dark:border-emerald-500/30 rounded-[32px] shadow-sm p-12 text-center text-emerald-600 dark:text-emerald-400 animate-in zoom-in relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
                     <Shield className="w-16 h-16 mx-auto mb-6 text-emerald-500" />
                     <h3 className="text-2xl font-black tracking-tight">Harika! Hiçbir Sorun Bulunamadı.</h3>
@@ -78,7 +78,7 @@ export default function FinancialAuditContent() {
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {issues.slice((currentPage - 1) * ISSUES_PER_PAGE, currentPage * ISSUES_PER_PAGE).map((issue, idx) => (
-                            <div key={idx} className={`p-6 rounded-[20px] flex flex-col justify-between ${getColor(issue.type)} border border-slate-200 dark:border-white/5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 group min-h-[220px] relative overflow-hidden bg-white/60 dark:bg-white/[0.02] backdrop-blur-xl`}>
+                            <div key={idx} className={`p-6 rounded-[24px] flex flex-col justify-between ${getColor(issue.type)} border border-slate-200 dark:border-white/5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 group min-h-[220px] relative overflow-hidden bg-white/60 dark:bg-[#0f172a]/60 backdrop-blur-xl`}>
                                 <div>
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="flex gap-3">
@@ -114,7 +114,7 @@ export default function FinancialAuditContent() {
 
                     {/* Pagination */}
                     {issues.length > ISSUES_PER_PAGE && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-[#1e293b] p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-[#0f172a] p-4 rounded-[24px] border border-slate-200 dark:border-white/5 shadow-sm">
                             <span className="text-[13px] font-bold text-slate-500 dark:text-slate-400">
                                 Toplam <span className="text-slate-900 dark:text-white">{issues.length}</span> bulgudan <span className="text-slate-900 dark:text-white">{(currentPage - 1) * ISSUES_PER_PAGE + 1}-{Math.min(currentPage * ISSUES_PER_PAGE, issues.length)}</span> arası gösteriliyor
                             </span>

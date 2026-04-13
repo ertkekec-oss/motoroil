@@ -307,8 +307,41 @@ export async function PUT(req: Request) {
                 netPay: newNetPay,
                 isLocked,
                 paidAt
-            }
+            },
+            include: { staff: true }
         });
+
+        // Trigger autonomous accounting hook if the payroll is now locked and 'İşlendi'/'Ödendi'
+        if (isLocked && (status === 'İşlendi' || status === 'Ödendi') && !existing.isLocked) {
+           try {
+               const { OtonomYevmiyeMotoru } = await import('@/services/finance/journalEngine');
+               
+               const gross = Number(updated.grossSalary);
+               const advance = Number(updated.deductions); // Assuming deductions are mostly advance/kesinti.
+               const taxes = Number(updated.sgkDeduction) + Number(updated.incomeTax) + Number(updated.stampTax);
+               
+               // We need the companyId. Let's pull from the session's tenantId if possible, or from the first company.
+               const auth = await authorize();
+               const company = await prisma.company.findFirst({
+                 where: { tenantId: (auth.user.user || auth.user).tenantId || 'PLATFORM_ADMIN' }
+               });
+
+               if (company) {
+                   await OtonomYevmiyeMotoru.bookPayroll({
+                       companyId: company.id,
+                       payrollId: updated.id,
+                       grossSalary: gross,
+                       advancePayment: advance,
+                       taxes: taxes,
+                       netToPay: Number(updated.netPay),
+                       month: updated.period
+                   });
+               }
+           } catch (err) {
+               console.error('[Muhasebe Entegrasyon Hatası - Bordro]:', err);
+               // Still succeed the payroll update, just warn.
+           }
+        }
 
         return NextResponse.json({ success: true, payroll: updated });
     } catch (error: any) {

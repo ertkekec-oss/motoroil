@@ -5,6 +5,7 @@ import { logActivity } from '@/lib/audit';
 import { NilveraService } from '@/lib/nilvera';
 import { trackOnboardingStep } from '@/lib/onboarding';
 import { NilveraInvoiceService } from '@/services/nilveraService';
+import { OtonomYevmiyeMotoru } from '@/services/finance/journalEngine';
 import crypto from 'crypto';
 import axios from 'axios';
 
@@ -672,6 +673,54 @@ export async function POST(request: Request) {
         trackOnboardingStep((session as any).tenantId, 'firstInvoice');
         // We also trigger firstOrder here since some flows consider them equivalent 
         trackOnboardingStep((session as any).tenantId, 'firstOrder');
+
+        // Yevmiye Fişi Oluştur (Otonom)
+        if (createResult && (isFormal || status === 'Onaylandı')) {
+            try {
+                let otvTotal = 0;
+                let oivTotal = 0;
+                
+                // Müşteri bilgisi isim olarak bulalım
+                const customer = await prisma.customer.findUnique({ where: { id: customerId } });
+                const customerName = customer ? customer.name : "Bilinmeyen Müşteri";
+
+                items.forEach((item: any) => {
+                    const qty = parseFloat(item.qty?.toString() || "1");
+                    const price = parseFloat(item.price?.toString() || "0");
+                    const otvRate = parseFloat(item.otv?.toString() || "0");
+                    const oivRate = parseFloat(item.oiv?.toString() || "0");
+                    const otvType = item.otvType || 'Ö.T.V yok';
+                    
+                    const lineNet = Number((qty * price).toFixed(2));
+                    let lineOtv = 0;
+                    if (otvType === 'Birim Başına') {
+                        lineOtv = Number((qty * otvRate).toFixed(2));
+                    } else if (otvType === 'Yüzdesel') {
+                        lineOtv = Number((lineNet * (otvRate / 100)).toFixed(2));
+                    }
+                    otvTotal += lineOtv;
+                    
+                    const lineVatBase = lineNet + lineOtv;
+                    const lineOiv = Number((lineVatBase * (oivRate / 100)).toFixed(2));
+                    oivTotal += lineOiv;
+                });
+
+                await OtonomYevmiyeMotoru.bookSalesInvoice({
+                    companyId: (session as any).companyId,
+                    invoiceId: createResult.id,
+                    invoiceNo: createResult.invoiceNo,
+                    customerName: customerName,
+                    netAmount: parseFloat(amount?.toString() || "0"),
+                    vatAmount: parseFloat(taxAmount?.toString() || "0"),
+                    otvAmount: Number(otvTotal.toFixed(2)),
+                    oivAmount: Number(oivTotal.toFixed(2)),
+                    totalAmount: parseFloat(totalAmount?.toString() || "0")
+                });
+            } catch (engineError: any) {
+                console.error('[JournalEngine Error API]:', engineError.message);
+                // Engine hatası faturanın kesilmesini engellememeli, sadece loglanmalı.
+            }
+        }
 
         return NextResponse.json({ success: true, invoice: createResult });
 

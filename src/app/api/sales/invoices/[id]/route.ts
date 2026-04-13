@@ -495,32 +495,33 @@ export async function DELETE(
                         }
                     }
 
-                    // 4. Accounting Reversal (Storno)
+                    // 4. Accounting Reversal (İade Kaydı)
                     try {
-                        const { stornoJournalEntry } = await import('@/lib/accounting');
+                        const { OtonomYevmiyeMotoru } = await import('@/services/finance/journalEngine');
                         
-                        // Check for journals tied to the invoice itself
-                        const invJournal = await tx.journal.findFirst({
-                            where: { sourceId: invoice.id, sourceType: { in: ['Invoice', 'SalesInvoice'] } }
-                        });
-                        if (invJournal) {
-                            await stornoJournalEntry(invJournal.id, `Fatura İptal Edildi (${invoice.invoiceNo})`);
-                        }
-
-                        // Check for journals tied to related transactions
-                        const relatedTrxs = await tx.transaction.findMany({
-                            where: { description: { contains: invoice.invoiceNo }, companyId: invoice.companyId }
-                        });
-                        for (const tr of relatedTrxs) {
-                            const trJournal = await tx.journal.findFirst({
-                                where: { sourceId: tr.id, sourceType: 'Transaction' }
-                            });
-                            if (trJournal) {
-                                await stornoJournalEntry(trJournal.id, `Fatura İptal Edildi REF:${invoice.invoiceNo}`);
+                        let netAmount = 0;
+                        let vatAmount = 0;
+                        if (items && Array.isArray(items)) {
+                            for (const item of items) {
+                                const lineTotal = Number(item.qty) * Number(item.price);
+                                const vatRate = Number(item.vat || 20);
+                                const lineNet = lineTotal / (1 + vatRate / 100);
+                                const lineVat = lineTotal - lineNet;
+                                netAmount += lineNet;
+                                vatAmount += lineVat;
                             }
                         }
+
+                        await OtonomYevmiyeMotoru.bookSalesReturn({
+                            companyId: invoice.companyId,
+                            documentId: invoice.id,
+                            netAmount,
+                            vatAmount,
+                            totalAmount: invoice.totalAmount
+                        });
+
                     } catch (err) {
-                        console.error('[Standalone Accounting Reversal Error]:', err);
+                        console.error('[Standalone Accounting Return Error]:', err);
                     }
                 }
             }
