@@ -102,7 +102,7 @@ export async function POST(req: Request) {
         if (!draftRes.ok) {
              const errorText = await draftRes.text();
              console.error("Nilvera E-Adisyon Draft Error:", errorText);
-             return NextResponse.json({ success: false, error: `Nilvera Hatası: ${draftRes.statusText}` }, { status: 400 });
+             return NextResponse.json({ success: false, error: `Nilvera Hatası (${draftRes.status}): ${errorText || draftRes.statusText}` }, { status: 400 });
         }
 
         const draftData = await draftRes.json();

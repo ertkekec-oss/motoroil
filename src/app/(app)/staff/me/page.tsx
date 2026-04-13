@@ -184,17 +184,46 @@ const DashboardView = ({
                                 </button>
                             </div>
                         ) : (
-                                <div className="flex justify-between items-center w-full px-2">
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-emerald-600 font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md w-max border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-                                            <div className="w-1 h-1 rounded-full bg-emerald-500"></div> DOĞRULANDI
-                                        </p>
-                                        <div className="text-2xl font-black text-slate-800">
-                                            {pdksStatus.activeSession?.checkIn ? new Date(pdksStatus.activeSession.checkIn).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) : '--:--'}
+                                <div className="flex flex-col gap-6 w-full">
+                                    <div className="flex justify-between items-center w-full px-2">
+                                        <div className="flex flex-col gap-1">
+                                            <p className="text-emerald-600 font-bold uppercase tracking-widest text-[10px] flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md w-max border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                                                <div className="w-1 h-1 rounded-full bg-emerald-500"></div> DOĞRULANDI
+                                            </p>
+                                            <div className="text-2xl font-black text-slate-800 dark:text-white">
+                                                {pdksStatus.activeSession?.checkIn ? new Date(pdksStatus.activeSession.checkIn).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}) : '--:--'}
+                                            </div>
                                         </div>
+                                        <button onClick={handleCheckout} className="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-white rounded-lg font-bold text-[11px] uppercase tracking-widest shadow-sm outline-none transition-colors">
+                                            🏁 Çıkış Yap
+                                        </button>
                                     </div>
-                                    <button onClick={handleCheckout} className="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-white rounded-lg font-bold text-[11px] uppercase tracking-widest shadow-sm outline-none transition-colors">
-                                        🏁 Çıkış Yap
+                                    
+                                    {/* ROLE BASED WORKSPACE REDIRECT */}
+                                    <button 
+                                        onClick={() => {
+                                            const role = (user?.role || '').toLowerCase();
+                                            if (role.includes('saha') || role.includes('satış')) window.location.href = '/field-mobile';
+                                            else if (role.includes('garson') || role.includes('waiter')) window.location.href = '/garson';
+                                            else if (role.includes('kasiyer') || role.includes('cashier') || role.includes('kasa')) window.location.href = '/terminal';
+                                            else if (role.includes('servis') || role.includes('teknik')) window.location.href = '/service-mobile';
+                                            else window.location.href = '/portal';
+                                        }}
+                                        className="w-full relative overflow-hidden group bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-4 flex items-center justify-between shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+                                    >
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mt-10 -mr-10 pointer-events-none group-hover:bg-white/20 transition-all"></div>
+                                        <div className="flex items-center gap-4 relative z-10">
+                                            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white backdrop-blur-md">
+                                                <TrendingUp className="w-5 h-5" />
+                                            </div>
+                                            <div className="text-left">
+                                                <div className="text-[10px] font-bold text-blue-100 uppercase tracking-widest mb-0.5">MESAİ BAŞLADI</div>
+                                                <div className="text-sm font-black text-white uppercase tracking-wider">
+                                                    GÖREV UYGULAMASINI AÇ
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ChevronRight className="w-6 h-6 text-white/50 group-hover:text-white transition-colors relative z-10" />
                                     </button>
                                 </div>
                         )}
