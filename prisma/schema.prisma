@@ -371,6 +371,9 @@ model Product {
   salesOtv                          Decimal?                     @default(0) @db.Decimal(10, 2)
   otvType                           String?                      @default("Ã–.T.V yok")
   gtip                              String?
+  // POS & Adisyon Ayarları
+  isPosItem                         Boolean                      @default(false)
+  posCategory                       String?                      // Örn: "Sıcak İçecekler", "Ana Yemekler"
   purchaseDiscount                  Decimal?                     @default(0) @db.Decimal(5, 2)
   purchaseOtv                       Decimal?                     @default(0) @db.Decimal(10, 2)
   otvCode                           String?                      @default("7")
@@ -9489,4 +9492,35 @@ model CmsAbTest {
   updatedAt DateTime @updatedAt
 
   @@index([blockId])
+}
+
+// --------------------------------------------------------------------------
+// HORECA (Otel, Restoran, Kafe) - POS & Adisyon Modülleri
+// --------------------------------------------------------------------------
+
+model RestaurantZone {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String   // "Teras", "Bahçe", "İç Keman"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tables    RestaurantTable[]
+
+  @@index([companyId])
+}
+
+model RestaurantTable {
+  id        String   @id @default(cuid())
+  zoneId    String  
+  name      String   // "Teras-1", "Bahçe-5", "VIP-1"
+  status    String   @default("AVAILABLE") // AVAILABLE, BUSY, RESERVED
+  capacity  Int      @default(4)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  zone      RestaurantZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@index([zoneId])
 }
