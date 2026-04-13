@@ -168,17 +168,32 @@ export default function AccountPlanContent() {
     const buildTree = (flatList: Account[]) => {
         const tree: Account[] = [];
         const lookup: Record<string, Account> = {};
+        const uniqueAccounts: Record<string, Account> = {};
+
+        // 0. Aggregate by code (sum balances for duplicate codes if any multi-branch etc)
+        flatList.forEach(a => {
+            if (!uniqueAccounts[a.code]) {
+                uniqueAccounts[a.code] = { ...a, children: [] };
+            } else {
+                uniqueAccounts[a.code].debitBalance += a.debitBalance;
+                uniqueAccounts[a.code].creditBalance += a.creditBalance;
+                if (a.warnings && a.warnings.length > 0) {
+                     uniqueAccounts[a.code].warnings = [...(uniqueAccounts[a.code].warnings || []), ...a.warnings];
+                }
+            }
+        });
+
+        const dedupedList = Object.values(uniqueAccounts);
 
         // 1. Initialize lookup
-        flatList.forEach(a => {
-            lookup[a.code] = { ...a, children: [] };
+        dedupedList.forEach(a => {
+            lookup[a.code] = a;
         });
 
         // 2. Build linkages
-        flatList.forEach(a => {
-            const node = lookup[a.code];
-            if (a.parentCode && lookup[a.parentCode]) {
-                lookup[a.parentCode].children!.push(node);
+        dedupedList.forEach(node => {
+            if (node.parentCode && lookup[node.parentCode]) {
+                lookup[node.parentCode].children!.push(node);
             } else {
                 tree.push(node);
             }

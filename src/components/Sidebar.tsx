@@ -9,7 +9,7 @@ import {
     Terminal, Globe, ShoppingCart, Package, Briefcase, TrendingUp, Handshake,
     UserCircle, Landmark, Receipt, Users, Truck, Activity, Box, Map, FileText,
     Wrench, BarChart2, Clock, Search, ShieldAlert, LifeBuoy, Settings, CreditCard,
-    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool, Gift, Plug, CalendarDays
+    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool, Gift, Plug, CalendarDays, UtensilsCrossed
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -110,6 +110,7 @@ export default function Sidebar() {
         const permMap: Record<string, { perm?: string, feature?: string, platformOnly?: boolean, customCheck?: () => boolean }> = {
             '/': { perm: 'pos_access', feature: 'pos' },
             '/terminal': { perm: 'pos_access', feature: 'pos' },
+            '/kitchen': { perm: 'pos_access', feature: 'pos' },
             '/accounting': { perm: 'finance_view', feature: 'financials' },
             '/customers': { perm: 'customer_view', feature: 'current_accounts' },
             '/suppliers': { perm: 'supplier_view', feature: 'suppliers' },
@@ -178,6 +179,7 @@ export default function Sidebar() {
                 group: "Workspace",
                 items: [
                     { name: 'POS Terminal', href: '/terminal', icon: Terminal },
+                    { name: 'Kitchen System', href: '/kitchen', icon: UtensilsCrossed },
                     {
                         name: 'Periodya Hub',
                         icon: Globe,
@@ -503,6 +505,23 @@ export default function Sidebar() {
                             {availableTenants?.map(t => (
                                 <option key={t.id} value={t.id}>{t.name?.toUpperCase()}</option>
                             ))}
+                        </select>
+                    </div>
+                )}
+
+                {/* GRUP ŞİRKET (HOLDİNG) GEÇİŞ KÖPRÜSÜ */}
+                {!isDesktopSidebarCollapsed && !isPlatformAdmin && (
+                    <div className="flex flex-col pt-1">
+                        <span className="text-[10px] uppercase font-bold tracking-wider mb-1.5 px-0.5" style={{ color: 'var(--sb-accent)' }}>Grup Şirket (Konsolide)</span>
+                        <select
+                            defaultValue="current"
+                            className="w-full px-3 py-2.5 rounded-[14px] font-bold text-[13px] outline-none cursor-pointer transition-colors"
+                            style={{ background: 'var(--sb-active)', color: 'var(--sb-text)', borderColor: 'var(--sb-accent)', borderWidth: '1px' }}
+                            title="Farklı TCKN/VKN'li iştiraklere geçiş yapın"
+                        >
+                            <option value="current">Motor Oil Distribütör</option>
+                            <option value="sub1">Market Şubesi A.Ş. (VKN: 123...)</option>
+                            <option value="sub2">Restoran Şubesi A.Ş. (VKN: 456...)</option>
                         </select>
                     </div>
                 )}

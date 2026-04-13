@@ -10,14 +10,16 @@ export default function EAdisyonWorkspace({ products }: any) {
     const [invoiceStatus, setInvoiceStatus] = useState<'idle'|'processing'|'sent'>('idle');
     const [activeCategory, setActiveCategory] = useState('hot'); // Selected category in quick menu
 
+    const [kitchenStatus, setKitchenStatus] = useState<'idle' | 'printing'>('idle');
+
     // MOCK TABLES
     const [tables, setTables] = useState([
-        { id: 'S-01', name: 'Masa 1', zone: 'salon', capacity: 4, waiter: 'Ali', status: 'occupied', openTime: new Date(Date.now() - 45*60000), items: [{ id: 1, name: 'Karışık Izgara', quantity: 2, price: 350, vatRate: 10 }, { id: 2, name: 'Ayran', quantity: 2, price: 50, vatRate: 10 }] },
+        { id: 'S-01', name: 'Masa 1', zone: 'salon', capacity: 4, waiter: 'Ali', status: 'occupied', openTime: new Date(Date.now() - 45*60000), items: [{ id: 1, name: 'Karışık Izgara', quantity: 2, price: 350, vatRate: 10, sent: true }, { id: 2, name: 'Ayran', quantity: 2, price: 50, vatRate: 10, sent: true }] },
         { id: 'S-02', name: 'Masa 2', zone: 'salon', capacity: 2, waiter: null, status: 'empty', openTime: null, items: [] },
-        { id: 'S-03', name: 'Masa 3', zone: 'salon', capacity: 6, waiter: 'Ayşe', status: 'occupied', openTime: new Date(Date.now() - 15*60000), items: [{ id: 3, name: 'Künefe', quantity: 1, price: 200, vatRate: 10 }] },
+        { id: 'S-03', name: 'Masa 3', zone: 'salon', capacity: 6, waiter: 'Ayşe', status: 'occupied', openTime: new Date(Date.now() - 15*60000), items: [{ id: 3, name: 'Künefe', quantity: 1, price: 200, vatRate: 10, sent: true }] },
         { id: 'S-04', name: 'VIP 1', zone: 'salon', capacity: 8, waiter: null, status: 'empty', openTime: null, items: [] },
         { id: 'T-01', name: 'Teras 1', zone: 'teras', capacity: 4, waiter: null, status: 'empty', openTime: null, items: [] },
-        { id: 'T-02', name: 'Teras 2', zone: 'teras', capacity: 4, waiter: 'Ali', status: 'occupied', openTime: new Date(Date.now() - 120*60000), items: [{ id: 4, name: 'Türk Kahvesi', quantity: 4, price: 70, vatRate: 10 }] },
+        { id: 'T-02', name: 'Teras 2', zone: 'teras', capacity: 4, waiter: 'Ali', status: 'occupied', openTime: new Date(Date.now() - 120*60000), items: [{ id: 4, name: 'Türk Kahvesi', quantity: 4, price: 70, vatRate: 10, sent: true }] },
         { id: 'B-01', name: 'Bahçe 1', zone: 'bahce', capacity: 10, waiter: null, status: 'empty', openTime: null, items: [] },
     ]);
 
@@ -85,6 +87,29 @@ export default function EAdisyonWorkspace({ products }: any) {
         }
     };
 
+    const handleSendToKitchen = () => {
+        if (!activeTable) return;
+        const unsentItems = activeTable.items.filter((i: any) => !i.sent);
+        if (unsentItems.length === 0) {
+            return showWarning("Uyarı", "Mutfağa iletilecek yeni bir ürün yok.");
+        }
+        
+        setKitchenStatus('printing');
+        
+        // Şimule edilmiş yazıcı bağlantı gecikmesi
+        setTimeout(() => {
+            const updatedTable = { ...activeTable };
+            // Tüm yeni ürünlerin "sent" (gönderildi) durumunu true yapıyoruz
+            updatedTable.items = updatedTable.items.map((i: any) => ({ ...i, sent: true }));
+            
+            setActiveTable(updatedTable);
+            setTables(tables.map(t => t.id === updatedTable.id ? updatedTable : t));
+            
+            setKitchenStatus('idle');
+            showSuccess("Mutfağa İletildi", `${unsentItems.length} yeni ürün/istek IP mutfak yazıcısına başarıyla gönderildi.`);
+        }, 800);
+    };
+
     const handleAddItem = (prod: any) => {
         if (!activeTable) return;
         
@@ -95,11 +120,11 @@ export default function EAdisyonWorkspace({ products }: any) {
             updatedTable.waiter = 'Kasiyer M.';
         }
 
-        const existingItem = updatedTable.items.find((i: any) => i.id === prod.id);
+        const existingItem = updatedTable.items.find((i: any) => i.id === prod.id && !i.sent);
         if (existingItem) {
             existingItem.quantity += 1;
         } else {
-            updatedTable.items.push({ id: prod.id, name: prod.name, price: prod.price, quantity: 1, vatRate: 10 });
+            updatedTable.items.push({ id: prod.id, name: prod.name, price: prod.price, quantity: 1, vatRate: 10, sent: false });
         }
         
         setActiveTable(updatedTable);
@@ -264,10 +289,13 @@ export default function EAdisyonWorkspace({ products }: any) {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-50 dark:divide-white/5">
-                                        {activeTable.items.map((item: any) => (
-                                            <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] group">
-                                                <td className="px-4 py-2.5 font-bold text-xs text-slate-700 dark:text-slate-200">{item.name}</td>
-                                                <td className="px-4 py-2.5 text-center font-bold text-blue-600 dark:text-blue-400 text-xs">{item.quantity}</td>
+                                        {activeTable.items.map((item: any, index: number) => (
+                                            <tr key={`${item.id}-${index}`} className={`hover:bg-slate-50 dark:hover:bg-white/[0.02] group transition-all ${item.sent ? 'opacity-80' : 'bg-amber-50/50 dark:bg-amber-900/10'}`}>
+                                                <td className="px-4 py-2.5 font-bold text-xs text-slate-700 dark:text-slate-200">
+                                                    {item.name}
+                                                    {!item.sent && <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">Yeni</span>}
+                                                </td>
+                                                <td className={`px-4 py-2.5 text-center font-bold text-xs ${item.sent ? 'text-slate-500 dark:text-slate-400' : 'text-blue-600 dark:text-blue-400'}`}>{item.quantity}</td>
                                                 <td className="px-4 py-2.5 text-right font-black text-xs text-slate-800 dark:text-white">{(item.price * item.quantity).toLocaleString()} ₺</td>
                                                 <td className="px-4 py-2.5 text-center">
                                                     <button onClick={() => handleRemoveItem(item.id)} className="text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={14}/></button>
@@ -328,17 +356,23 @@ export default function EAdisyonWorkspace({ products }: any) {
                                 </span>
                             </div>
                             
-                            <button 
-                                onClick={handleSendAdisyon}
-                                disabled={invoiceStatus === 'processing' || activeTable.items.length === 0}
-                                className="w-full py-3 rounded-lg font-black bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-50"
-                            >
-                                {invoiceStatus === 'processing' ? (
-                                    <>İŞLEM YAPILIYOR...</>
-                                ) : (
-                                    <><Send size={16} strokeWidth={2.5}/> ADİSYONU GÖNDER</>
-                                )}
-                            </button>
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={handleSendToKitchen}
+                                    disabled={kitchenStatus === 'printing' || !activeTable.items.some((i: any) => !i.sent)}
+                                    className="flex-1 py-3 rounded-lg font-black bg-amber-500 text-white hover:bg-amber-600 transition-colors flex items-center justify-center gap-1.5 text-sm disabled:opacity-50 disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-800"
+                                >
+                                    {kitchenStatus === 'printing' ? 'YAZDIRILIYOR...' : <><Printer size={16} strokeWidth={2.5}/> MUTFAK / BAR</>}
+                                </button>
+                                
+                                <button 
+                                    onClick={handleSendAdisyon}
+                                    disabled={invoiceStatus === 'processing' || activeTable.items.length === 0}
+                                    className="flex-1 py-3 rounded-lg font-black bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-1.5 text-sm disabled:opacity-50"
+                                >
+                                    {invoiceStatus === 'processing' ? 'KAPATILIYOR...' : <><Send size={16} strokeWidth={2.5}/> HESABI KAPAT</>}
+                                </button>
+                            </div>>
                         </div>
                     </div>
                 ) : (

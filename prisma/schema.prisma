@@ -55,6 +55,13 @@ model Company {
   status                     CompanyStatus                  @default(ACTIVE)
   taxNumber                  String
   type                       CompanyType                    @default(BUYER)
+  
+  // HOLDING / GROUP COMPANY ARCHITECTURE
+  groupId                    String?
+  parentCompanyId            String?
+  parentCompany              Company?                       @relation("HoldingStructure", fields: [parentCompanyId], references: [id])
+  subCompanies               Company[]                      @relation("HoldingStructure")
+
   accounts                   Account[]
   appSettings                AppSettings[]
   decisionLogs               AutomationDecisionLog[]
