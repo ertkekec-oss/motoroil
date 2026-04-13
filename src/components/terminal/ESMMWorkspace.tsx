@@ -360,19 +360,42 @@ export default function ESMMWorkspace({ products, customers }: any) {
                     </div>
                 </div>
 
-                {/* Final Action Bar */}
-                <div className="bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-white/10 p-4 shrink-0 flex flex-row justify-end items-center gap-3 rounded-b-xl">
-                    <button className="px-5 py-2.5 rounded-lg font-bold bg-slate-100 text-slate-700 dark:bg-white/5 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-xs shadow-sm">
-                        <FileText size={14} className="hidden sm:inline" /> <span className="hidden sm:inline">TASLAK OLARAK KAYDET</span><span className="sm:hidden">TASLAK</span>
-                    </button>
-                    <button 
-                        onClick={handleSendInvoice}
-                        disabled={invoiceStatus === 'processing'}
-                        className="px-8 py-2.5 rounded-lg font-black bg-purple-600 text-white hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 text-[13px] shadow-sm disabled:opacity-50 tracking-wide"
-                    >
-                        {invoiceStatus === 'processing' ? <Calculator className="animate-spin" size={16} /> : <Send size={16} />} 
-                        {invoiceStatus === 'processing' ? 'BEKLEYİNİZ...' : 'E-SMM OLUŞTUR'}
-                    </button>
+                {/* Final Action Bar with Payment Methods */}
+                <div className="bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-white/10 p-4 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-4 rounded-b-xl relative z-10 w-full overflow-visible">
+                    
+                    {/* Payment Method Selector for ESMM */}
+                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                        <div className="flex flex-col text-left">
+                            <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest leading-none">Para Giriş Yönü</span>
+                            <span className="text-sm font-black text-purple-700 dark:text-purple-400 mt-1">Makbuz Tahsilatı</span>
+                        </div>
+                        <div className="h-8 w-px bg-slate-200 dark:bg-white/10 hidden sm:block mx-1"></div>
+                        <div className="flex bg-purple-50/50 dark:bg-purple-900/10 p-1.5 rounded-xl border border-purple-100 dark:border-purple-900/30 gap-1.5 w-full sm:w-auto overflow-x-auto">
+                            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-transparent text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 hover:shadow-sm font-bold text-xs transition-colors min-w-max">
+                                <FileText size={14} /> Nakit
+                            </button>
+                            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-500 text-white shadow-sm font-bold text-xs min-w-max">
+                                <Tag size={14} /> Havale
+                            </button>
+                            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-transparent text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 hover:shadow-sm font-bold text-xs transition-colors min-w-max">
+                                <Clock size={14} /> CariHesap
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-row gap-3 w-full sm:w-auto justify-end">
+                        <button className="px-5 py-2.5 rounded-lg font-bold bg-slate-100 text-slate-700 dark:bg-white/5 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-xs shadow-sm">
+                            <FileText size={14} className="hidden sm:inline" /> <span className="hidden sm:inline">TASLAK OLARAK KAYDET</span><span className="sm:hidden">TASLAK</span>
+                        </button>
+                        <button 
+                            onClick={handleSendInvoice}
+                            disabled={invoiceStatus === 'processing'}
+                            className="px-8 py-2.5 rounded-lg font-black bg-purple-600 text-white hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 text-[13px] shadow-sm disabled:opacity-50 tracking-wide"
+                        >
+                            {invoiceStatus === 'processing' ? <Calculator className="animate-spin" size={16} /> : <Send size={16} />} 
+                            {invoiceStatus === 'processing' ? 'BEKLEYİNİZ...' : 'E-SMM OLUŞTUR'}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

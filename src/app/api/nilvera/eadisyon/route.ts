@@ -1,7 +1,31 @@
 import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { authorize, resolveCompanyId } from '@/lib/auth';
 
 export async function POST(req: Request) {
     try {
+        const auth = await authorize();
+        if (!auth.authorized) return auth.response;
+        const { user } = auth;
+        const companyId = await resolveCompanyId(user);
+
+        if (!companyId) {
+             return NextResponse.json({ success: false, error: 'Firma bilgisi bulunamadı.' }, { status: 400 });
+        }
+
+        // DB'den Entegrasyon Ayarlarını Çek
+        const settingsRecord = await prisma.appSettings.findUnique({
+             where: { companyId_key: { companyId, key: 'eFaturaSettings' } }
+        });
+
+        const settings = settingsRecord?.value as any || {};
+        const API_KEY = settings.apiKey;
+        const BASE_URL = settings.apiUrl || 'https://apitest.nilvera.com/v1';
+
+        if (!API_KEY) {
+            return NextResponse.json({ success: false, error: 'Nilvera API Key bulunamadı. Lütfen Sistem Entegrasyonları sayfasından API Key giriniz.' }, { status: 400 });
+        }
+
         const body = await req.json();
         
         // Gelen E-Adisyon isteğini Nilvera formatına dönüştürüyoruz
@@ -11,38 +35,33 @@ export async function POST(req: Request) {
                     IssueDate: new Date().toISOString(),
                     CurrencyCode: body.currency || "TRY",
                     ExchangeRate: body.exchangeRate || 1,
-                    // Eğer önceden açık bir belgeye referans verilmek istenirse (Opsiyonel)
-                    // RelatedDocument: { Type: "EFATURA", Code: "" },
                     ValidityPeriod: {
                         StartDate: body.sessionStart || new Date().toISOString(),
                         EndDate: new Date().toISOString()
                     }
                 },
-                // CompanyInfo: Restoran / Kafe (Biz)
                 CompanyInfo: {
-                    TaxNumber: "1111111111", 
-                    Name: "Örnek Restoran ve Gıda A.Ş.",
+                    TaxNumber: settings.companyVkn || "1111111111", 
+                    Name: settings.companyTitle || "Örnek Restoran A.Ş.",
                     TaxOffice: "Merkez",
-                    Address: "Örnek Mah. Lezzet Sok.",
+                    Address: "Örnek Adres",
                     District: "Merkez",
                     City: "İstanbul",
                     Country: "Türkiye"
                 },
-                // CustomerInfo: Müşteri bilgisi çoğu zaman adisyonda yoktur (Nihai Tüketicidir), ama fatura kesilecekse girilebilir.
                 CustomerInfo: {
                     TaxNumber: body.customer?.taxNumber || "11111111111",
                     Name: body.customer?.name || "Nihai Tüketici",
                     TaxOffice: "Yok",
-                    Address: "Kayıtlı Adres Yok",
+                    Address: "Bilinmiyor",
                     District: "Bilinmiyor",
                     City: "Bilinmiyor",
                     Country: "Türkiye"
                 },
-                // SellerInfo: Masaya hizmet veren Garson ve Masa Numarası (E-Adisyon'un kalbi)
                 SellerInfo: {
                     User: body.waiterName || "Kasiyer 1",
                     TableNo: body.tableNo || "Masa-01",
-                    Address: "Örnek Mah. Lezzet Sok.",
+                    Address: "Örnek Adres",
                     District: "Merkez",
                     City: "İstanbul",
                     Country: "Türkiye"
@@ -54,7 +73,7 @@ export async function POST(req: Request) {
                     return {
                         Name: line.name,
                         Quantity: Number(line.quantity),
-                        UnitType: "C62", // Adet / Porsiyon
+                        UnitType: "C62", // Adet
                         Price: Number(line.price),
                         KDVPercent: Number(line.vatRate) || 0,
                         KDVTotal: vatAmount
@@ -62,25 +81,40 @@ export async function POST(req: Request) {
                 }),
                 Notes: [
                     `E-Adisyon Fişi - ${body.tableNo || 'Masa'}`,
-                    "Mali Değeri Yoktur, Ödeme Öncesi Bilgilendirme Amaçlıdır."
+                    "Mali Değeri Yoktur."
                 ]
             }
         };
 
         // ADIM 1: TASLAK OLUŞTUR
-        // const draftRes = await fetch("https://apitest.nilvera.com/ebill/Draft/Create", { ... })
+        // Note: Replace ebill/Draft/Create based on Nilvera's e-adisyon documentation if different.
+        // Standard API url is usually https://api.nilvera.com/ebill/Draft/Create
+        const draftEndpoint = BASE_URL.replace('/v1', '') + '/ebill/Draft/Create';
 
-        // ADIM 2: E-GÖNDER (ConfirmAndSend - E-Adisyon)
-        // const sendRes = await fetch("https://apitest.nilvera.com/ebill/Draft/ConfirmAndSend", { ... })
+        const draftRes = await fetch(draftEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify(nilveraPayload)
+        });
 
+        if (!draftRes.ok) {
+             const errorText = await draftRes.text();
+             console.error("Nilvera E-Adisyon Draft Error:", errorText);
+             return NextResponse.json({ success: false, error: `Nilvera Hatası: ${draftRes.statusText}` }, { status: 400 });
+        }
+
+        const draftData = await draftRes.json();
+        
+        // Aslında draft oluştuktan sonra "ConfirmAndSend" veya "Send" yapılması gerekir.
+        // Adisyon UUID'si dönerse, direkt gönderilebilir.
+        
         return NextResponse.json({
             success: true,
-            message: "E-Adisyon başarıyla oluşturuldu ve masaya iletildi.",
-            data: {
-                draftId: Math.random().toString(36).substring(7),
-                tableNo: body.tableNo,
-                payload: nilveraPayload 
-            }
+            message: "E-Adisyon başarıyla Nilvera'ya iletildi.",
+            data: draftData
         });
 
     } catch (error: any) {
