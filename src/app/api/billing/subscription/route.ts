@@ -64,6 +64,7 @@ export async function GET(req: NextRequest) {
                 name: subscription.plan.name
             },
             features: subscription.plan.features.map((f: any) => f.feature.key),
+            addonFeatures: subscription.addonFeatures || [],
             status: subscription.status
         });
 

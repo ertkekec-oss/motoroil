@@ -239,7 +239,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const hasFeature = (featureKey: string) => {
         if (!subscription) return true; // Default to true while loading
         if (subscription.plan?.name === 'Super Admin') return true;
-        return subscription.features?.includes(featureKey);
+        return subscription.features?.includes(featureKey) || subscription.addonFeatures?.includes(featureKey);
     };
 
     useEffect(() => {
