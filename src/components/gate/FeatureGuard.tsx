@@ -80,7 +80,7 @@ export function FeatureGuard({ featureKey, children, variant = 'full-page' }: Fe
             )}
 
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                <Link href={`/settings/store?highlight=${featureKey}`} className="group relative w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 px-8 py-3.5 rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                <Link href={`/billing/store?highlight=${featureKey}`} className="group relative w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 px-8 py-3.5 rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                     <span>Modül Mağazasına Git</span>
                     {catalogItem && (
                         <span className="bg-slate-700 dark:bg-slate-200 text-slate-100 dark:text-slate-800 px-2 py-0.5 rounded-lg text-xs font-black">

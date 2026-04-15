@@ -68,7 +68,8 @@ export default function Sidebar() {
             'assets-parent': ['/assets', '/assets/assignments', '/assets/maintenance'],
             'service-parent': ['/service', '/service/work-orders', '/service/new', '/service/calendar', '/service/field/planner', '/service/field/dashboard'],
             'staff-parent': ['/staff', '/staff/performance'],
-            'tasks-parent': ['/tasks']
+            'tasks-parent': ['/tasks'],
+            'billing-parent': ['/billing', '/billing/store']
         };
 
         setOpenSections(prev => {
@@ -390,7 +391,16 @@ export default function Sidebar() {
                     { name: 'Gelişmiş İçe Aktar', href: '/data-import', icon: UploadCloud },
                     { name: 'Entegrasyonlar', href: '/integrations', icon: Plug },
                     { name: 'Yardım Merkezi', href: '/help', icon: LifeBuoy },
-                    { name: 'Abonelik', href: '/billing', icon: CreditCard },
+                    {
+                        name: 'Abonelik & Market',
+                        icon: CreditCard,
+                        isParent: true,
+                        id: 'billing-parent',
+                        subItems: [
+                            { name: 'Abonelik Paneli', href: '/billing' },
+                            { name: 'Modül Mağazası', href: '/billing/store' },
+                        ]
+                    },
                     { name: 'Ayarlar', href: '/settings', icon: Settings },
                 ]
             }
