@@ -11,18 +11,25 @@ export class ResendMailProvider implements MailProvider {
 
             console.log(`[RESEND API] Sending email to ${payload.to}`);
 
-            // await resend.emails.send({
-            //   from: process.env.MAIL_FROM || 'no-reply@periodya.com',
-            //   to: [payload.to],
-            //   cc: payload.cc,
-            //   bcc: payload.bcc,
-            //   subject: payload.subject,
-            //   html: payload.html || '',
-            //   text: payload.text || '',
-            // });
+            const res = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    from: process.env.MAIL_FROM || 'Periodya Enterprise <noreply@periodya.com>',
+                    to: [payload.to],
+                    subject: payload.subject,
+                    html: payload.htmlBody || `<p>${payload.textBody || ''}</p>`,
+                    text: payload.textBody
+                })
+            });
 
-            // Simulate Resend Response
-            return { messageId: `resend_${Date.now()}` };
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Resend error');
+
+            return { messageId: data.id };
         } catch (error: any) {
             return { error: error.message || 'Unknown Resend error' };
         }
