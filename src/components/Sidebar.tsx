@@ -12,6 +12,7 @@ import {
     ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool, Gift, Plug, CalendarDays, UtensilsCrossed
 } from "lucide-react";
 
+import { useLanguage } from '@/contexts/LanguageContext';
 export default function Sidebar() {
     const pathname = usePathname();
     const { user: authUser, logout } = useAuth();
@@ -92,6 +93,7 @@ export default function Sidebar() {
 
     const checkPerm = (permCode: string) => isSystemAdmin || hasPermission(permCode);
     const checkFeature = (featCode: string) => hasFeature(featCode);
+    const { t, language, setLanguage } = useLanguage();
 
     // @ts-ignore
     const isBuyer = isSystemAdmin || hasPermission('supplier_view') || currentUser?.type === 'buying';
@@ -177,231 +179,231 @@ export default function Sidebar() {
 
         const rawGroups = [
             {
-                group: "Workspace",
+                group: t('menu.workspace'),
                 items: [
-                    { name: 'POS Terminal', href: '/terminal', icon: Terminal },
+                    { name: t('menu.pos'), href: '/terminal', icon: Terminal },
                     {
-                        name: 'Restoran & KDS',
+                        name: t('menu.kds.parent'),
                         icon: UtensilsCrossed,
                         isParent: true,
                         id: 'kitchen-system-parent',
                         subItems: [
-                            { name: 'Mutfak Ekranı (KDS)', href: '/kitchen' },
-                            { name: 'QR Sipariş & Menü', href: '/qmenu' },
-                            { name: 'Kurye Operasyonu', href: '/kitchen/courier' }
+                            { name: t('menu.kds.kitchen'), href: '/kitchen' },
+                            { name: t('menu.kds.qmenu'), href: '/qmenu' },
+                            { name: t('menu.kds.courier'), href: '/kitchen/courier' }
                         ]
                     },
                     {
-                        name: 'Periodya Hub',
+                        name: t('menu.hub.parent'),
                         icon: Globe,
                         isParent: true,
                         id: 'b2b-global-parent',
                         subItems: [
-                            { name: 'Hub Paneli', href: '/hub-dashboard' },
-                            { name: 'Uyuşmazlık Çözüm Merkezi', href: '/support/tickets' },
+                            { name: t('menu.hub.hub'), href: '/hub-dashboard' },
+                            { name: t('menu.hub.dispute'), href: '/support/tickets' },
                             { name: 'SİPARİŞ & TEKLİF', href: '' },
                             ...((isSeller || isBuyer) ? [
-                                { name: 'Ağ Sepetim', href: '/catalog/cart' },
-                                { name: 'Talepler & Siparişler', href: '/hub/orders' }
+                                { name: t('menu.hub.cart'), href: '/catalog/cart' },
+                                { name: t('menu.hub.orders'), href: '/hub/orders' }
                             ] : []),
 
                             { name: 'KATALOG', href: '' },
                             ...((isSeller || isBuyer) ? [
-                                { name: 'B2B Katalog', href: '/catalog' }
+                                { name: t('menu.hub.catalog'), href: '/catalog' }
                             ] : []),
 
                             { name: 'FİNANS & BÜYÜME', href: '' },
                             ...((isSeller || isBuyer) ? [
-                                { name: 'Finans & Büyüme (Growth)', href: '/hub/finance/dashboard' }
+                                { name: t('menu.hub.finance'), href: '/hub/finance/dashboard' }
                             ] : []),
 
                             ...(isBuyer ? [
                                 { name: 'B2B SATINALMA', href: '' },
-                                { name: 'RFQ & Sözleşmeler', href: '/rfq' }
+                                { name: t('menu.hub.rfq'), href: '/rfq' }
                             ] : [])
                         ]
                     },
                     {
-                        name: 'Dealer Network',
+                        name: t('menu.dealer.parent'),
                         icon: Users,
                         isParent: true,
                         id: 'dealer-network-parent',
                         subItems: [
-                            { name: 'Bayiler', href: '/dealer-network/dealers' },
-                            { name: 'B2B Katalog', href: '/dealer-network/catalog' },
-                            { name: 'Sipariş Onayı', href: '/dealer-network/orders/approvals' },
-                            { name: 'İadeler', href: '/dealer-network/refunds' },
-                            { name: 'Banner Yönetimi', href: '/dealer-network/banners' },
-                            { name: 'Ayarlar', href: '/dealer-network/settings' },
+                            { name: t('menu.dealer.dealers'), href: '/dealer-network/dealers' },
+                            { name: t('menu.hub.catalog'), href: '/dealer-network/catalog' },
+                            { name: t('menu.dealer.orders'), href: '/dealer-network/orders/approvals' },
+                            { name: t('menu.dealer.refunds'), href: '/dealer-network/refunds' },
+                            { name: t('menu.dealer.banners'), href: '/dealer-network/banners' },
+                            { name: t('menu.settings'), href: '/dealer-network/settings' },
                         ]
                     },
                 ]
             },
             {
-                group: "Operasyonlar",
+                group: t('menu.operations'),
                 items: [
-                    { name: 'Global Takvim', href: '/global-calendar', icon: CalendarDays },
-                    { name: 'Personel Portalı', href: '/staff/me', icon: UserCircle },
+                    { name: t('menu.calendar'), href: '/global-calendar', icon: CalendarDays },
+                    { name: t('menu.staffme'), href: '/staff/me', icon: UserCircle },
                     {
-                        name: 'Görev Merkezi',
+                        name: t('menu.tasks.parent'),
                         icon: Clock,
                         isParent: true,
                         id: 'tasks-parent',
                         subItems: [
-                            { name: 'Görev Kulesi', href: '/tasks' },
+                            { name: t('menu.tasks.tower'), href: '/tasks' },
                         ]
                     },
                     {
-                        name: 'İmzalar',
+                        name: t('menu.signatures.parent'),
                         icon: PenTool,
                         isParent: true,
                         id: 'signatures-parent',
                         subItems: [
-                            { name: 'İmza Panosu', href: '/signatures' },
-                            { name: 'Belge & Zarflar', href: '/signatures/envelopes' },
-                            { name: 'Gelen Talepler', href: '/signatures/inbox' },
-                            { name: 'Tamamlananlar', href: '/signatures/completed' },
+                            { name: t('menu.signatures.board'), href: '/signatures' },
+                            { name: t('menu.signatures.envelopes'), href: '/signatures/envelopes' },
+                            { name: t('menu.signatures.inbox'), href: '/signatures/inbox' },
+                            { name: t('menu.signatures.completed'), href: '/signatures/completed' },
                         ]
                     },
                     {
-                        name: 'Mutabakatlar',
+                        name: t('menu.recon.parent'),
                         icon: Handshake,
                         isParent: true,
                         id: 'reconciliation-parent',
                         subItems: [
-                            { name: 'Açık Mutabakatlar', href: '/reconciliation' },
-                            { name: 'Tüm Mutabakatlar', href: '/reconciliation/list' },
-                            { name: 'İtiraz Yönetimi', href: '/reconciliation/disputes' },
+                            { name: t('menu.recon.open'), href: '/reconciliation' },
+                            { name: t('menu.recon.all'), href: '/reconciliation/list' },
+                            { name: t('menu.recon.disputes'), href: '/reconciliation/disputes' },
                         ]
                     },
-                    { name: 'Finansal Yönetim', href: '/accounting', icon: Landmark },
+                    { name: t('menu.accounting'), href: '/accounting', icon: Landmark },
                     {
-                        name: 'Satış Yönetimi',
+                        name: t('menu.sales.parent'),
                         icon: Receipt,
                         isParent: true,
                         id: 'sales-parent',
                         subItems: [
-                            { name: 'Tüm Satışlar', href: '/sales' },
-                            { name: 'Revenue Intelligence', href: '/sales/revenue-intelligence' },
+                            { name: t('menu.sales.all'), href: '/sales' },
+                            { name: t('menu.sales.radar'), href: '/sales/revenue-intelligence' },
                         ]
                     },
                     {
-                        name: 'Cariler',
+                        name: t('menu.customers.parent'),
                         icon: Users,
                         isParent: true,
                         id: 'customers-parent',
                         subItems: [
-                            { name: 'Müşteriler', href: '/customers' },
-                            { name: 'Tedarikçiler', href: '/suppliers' },
+                            { name: t('menu.customers.customers'), href: '/customers' },
+                            { name: t('menu.customers.suppliers'), href: '/suppliers' },
                         ]
                     },
                     {
-                        name: 'Envanter',
+                        name: t('menu.inventory.parent'),
                         icon: Box,
                         isParent: true,
                         id: 'inventory-parent',
                         subItems: [
-                            { name: 'Envanter Genel', href: '/inventory' },
-                            { name: 'Depo & Stoklar', href: '/inventory/warehouses' },
-                            { name: 'Üretim Kontrol Merkezi', href: '/inventory/manufacturing' },
+                            { name: t('menu.inventory.general'), href: '/inventory' },
+                            { name: t('menu.inventory.warehouse'), href: '/inventory/warehouses' },
+                            { name: t('menu.inventory.mfg'), href: '/inventory/manufacturing' },
                         ]
                     },
                     {
-                        name: 'Varlık ve Demirbaş',
+                        name: t('menu.assets.parent'),
                         icon: Library,
                         isParent: true,
                         id: 'assets-parent',
                         subItems: [
-                            { name: 'Demirbaş Listesi', href: '/assets' },
-                            { name: 'Zimmet Merkezi', href: '/assets/assignments' },
-                            { name: 'Bakım ve Masraflar', href: '/assets/maintenance' },
+                            { name: t('menu.assets.list'), href: '/assets' },
+                            { name: t('menu.assets.assignments'), href: '/assets/assignments' },
+                            { name: t('menu.assets.mnx'), href: '/assets/maintenance' },
                         ]
                     },
                     {
-                        name: 'Servis Masası',
+                        name: t('menu.service.parent'),
                         icon: Wrench,
                         isParent: true,
                         id: 'service-parent',
                         subItems: [
-                            { name: 'Servis Dashboard', href: '/service' },
-                            { name: 'İş Emirleri', href: '/service/work-orders' },
-                            { name: 'Yeni İş Emri', href: '/service/new' },
-                            { name: 'Servis Randevuları', href: '/service/calendar' },
-                            { name: 'Atölye Canlı TV', href: '/tv/workshop' },
+                            { name: t('menu.service.dash'), href: '/service' },
+                            { name: t('menu.service.workOrders'), href: '/service/work-orders' },
+                            { name: t('menu.service.new'), href: '/service/new' },
+                            { name: t('menu.service.calendar'), href: '/service/calendar' },
+                            { name: t('menu.service.tv'), href: '/tv/workshop' },
                             { name: 'SAHA SERVİS', href: '' },
-                            { name: 'Saha Planlama Panosu', href: '/service/field/planner' },
-                            { name: 'Servis Saha Paneli', href: '/service/field/dashboard' },
+                            { name: t('menu.service.field'), href: '/service/field/planner' },
+                            { name: t('menu.service.fieldDash'), href: '/service/field/dashboard' },
                         ]
                     },
-                    { name: 'Teklifler', href: '/offers', icon: FileText },
+                    { name: t('menu.offers'), href: '/offers', icon: FileText },
 
                     {
-                        name: 'SalesX Saha Paneli',
+                        name: t('menu.salesx'),
                         icon: Map,
                         href: '/field-sales',
                     },
                     {
-                        name: 'İnsan Kaynakları',
+                        name: t('menu.hr.parent'),
                         icon: Users,
                         isParent: true,
                         id: 'staff-parent',
                         subItems: [
-                            { name: 'Personeller', href: '/staff' },
-                            { name: 'Performans & Hedef', href: '/staff/performance' },
+                            { name: t('menu.hr.employees'), href: '/staff' },
+                            { name: t('menu.hr.perf'), href: '/staff/performance' },
                         ]
                     },
                     {
-                        name: 'Kampanya Engine',
+                        name: t('menu.campaign.parent'),
                         icon: Gift,
                         isParent: true,
                         id: 'campaigns-parent',
                         subItems: [
-                            { name: 'Dashboard', href: '/campaigns' },
-                            { name: 'Yeni Kurgu', href: '/campaigns/create' },
-                            { name: 'Aktif Kampanyalar', href: '/campaigns/active' },
-                            { name: 'Planlı Kampanyalar', href: '/campaigns/scheduled' },
-                            { name: 'Performans', href: '/campaigns/analytics' },
+                            { name: t('menu.campaign.dash'), href: '/campaigns' },
+                            { name: t('menu.campaign.new'), href: '/campaigns/create' },
+                            { name: t('menu.campaign.active'), href: '/campaigns/active' },
+                            { name: t('menu.campaign.scheduled'), href: '/campaigns/scheduled' },
+                            { name: t('menu.campaign.perf'), href: '/campaigns/analytics' },
                         ]
                     },
                 ]
             },
 
             {
-                group: "Analitik & Yönetim",
+                group: t('menu.analytics'),
                 items: [
                     {
-                        name: 'İş Zekası',
+                        name: t('menu.reports.parent'),
                         icon: BarChart2,
                         isParent: true,
                         id: 'reports-parent',
                         subItems: [
-                            { name: 'CEO Tablosu', href: '/reports/ceo' },
-                            { name: 'Detaylı Analiz', href: '/reports' },
+                            { name: t('menu.reports.ceo'), href: '/reports/ceo' },
+                            { name: t('menu.reports.detail'), href: '/reports' },
                         ]
                     },
-                    { name: 'Fintech Tower', href: '/fintech/control-tower', icon: Activity },
-                    { name: 'Mali Müşavir', href: '/advisor', icon: Briefcase },
-                    { name: 'Anomaliler', href: '/security/suspicious', icon: ShieldAlert, alertCount: suspiciousEventsCount },
+                    { name: t('menu.fintech'), href: '/fintech/control-tower', icon: Activity },
+                    { name: t('menu.advisor'), href: '/advisor', icon: Briefcase },
+                    { name: t('menu.anomaly'), href: '/security/suspicious', icon: ShieldAlert, alertCount: suspiciousEventsCount },
                 ]
             },
 
             {
-                group: "Sistem",
+                group: t('menu.system'),
                 items: [
-                    { name: 'Gelişmiş İçe Aktar', href: '/data-import', icon: UploadCloud },
-                    { name: 'Entegrasyonlar', href: '/integrations', icon: Plug },
-                    { name: 'Yardım Merkezi', href: '/help', icon: LifeBuoy },
+                    { name: t('menu.import'), href: '/data-import', icon: UploadCloud },
+                    { name: t('menu.integrations'), href: '/integrations', icon: Plug },
+                    { name: t('menu.help'), href: '/help', icon: LifeBuoy },
                     {
-                        name: 'Abonelik & Market',
+                        name: t('menu.billing.parent'),
                         icon: CreditCard,
                         isParent: true,
                         id: 'billing-parent',
                         subItems: [
-                            { name: 'Abonelik Paneli', href: '/billing' },
-                            { name: 'Modül Mağazası', href: '/billing/store' },
+                            { name: t('menu.billing.panel'), href: '/billing' },
+                            { name: t('menu.billing.store'), href: '/billing/store' },
                         ]
                     },
-                    { name: 'Ayarlar', href: '/settings', icon: Settings },
+                    { name: t('menu.settings'), href: '/settings', icon: Settings },
                 ]
             }
         ];
@@ -721,6 +723,14 @@ export default function Sidebar() {
                         </div>
                     )}
                 </div>
+
+                {!isDesktopSidebarCollapsed && (
+                    <div className="flex items-center justify-center gap-2 mb-3 mt-1">
+                        <button onClick={() => setLanguage('tr')} className={`text-xl transition-transform hover:scale-110 ${language === 'tr' ? 'grayscale-0 ring-2 ring-blue-500 rounded-full' : 'grayscale opacity-50'}`} title="Türkçe">🇹🇷</button>
+                        <button onClick={() => setLanguage('en')} className={`text-xl transition-transform hover:scale-110 ${language === 'en' ? 'grayscale-0 ring-2 ring-blue-500 rounded-full' : 'grayscale opacity-50'}`} title="English">🇺🇸</button>
+                        <button onClick={() => setLanguage('de')} className={`text-xl transition-transform hover:scale-110 ${language === 'de' ? 'grayscale-0 ring-2 ring-blue-500 rounded-full' : 'grayscale opacity-50'}`} title="Deutsch">🇩🇪</button>
+                    </div>
+                )}
 
                 {!isDesktopSidebarCollapsed && (
                     <button
