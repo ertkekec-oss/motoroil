@@ -254,17 +254,18 @@ model PlanLimit {
 }
 
 model Subscription {
-  id         String                @id @default(cuid())
-  tenantId   String                @unique
-  externalId String?               @unique
-  planId     String
-  status     String
-  period     String
-  startDate  DateTime
-  endDate    DateTime
-  plan       Plan                  @relation(fields: [planId], references: [id])
-  tenant     Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  history    SubscriptionHistory[]
+  id             String                @id @default(cuid())
+  tenantId       String                @unique
+  externalId     String?               @unique
+  planId         String
+  status         String
+  period         String
+  startDate      DateTime
+  endDate        DateTime
+  addonFeatures  String[]              @default([]) // A La Carte module Add-ons (e.g. ['field_service', 'q_commerce'])
+  plan           Plan                  @relation(fields: [planId], references: [id])
+  tenant         Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  history        SubscriptionHistory[]
 }
 
 model SubscriptionHistory {
