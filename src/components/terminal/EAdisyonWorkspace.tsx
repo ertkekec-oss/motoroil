@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Search, Plus, Trash2, Printer, CheckCircle2, ChevronRight, X, Clock, Coffee, Utensils, UtensilsCrossed, Send, Users, Edit3 } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function EAdisyonWorkspace({ products }: any) {
     const { showWarning, showSuccess } = useModal();
+    const { t } = useLanguage();
 
     const [activeZone, setActiveZone] = useState('salon');
     const [activeTable, setActiveTable] = useState<any>(null);
@@ -47,7 +49,7 @@ export default function EAdisyonWorkspace({ products }: any) {
     const handleSendAdisyon = async () => {
         if (!activeTable) return;
         if (activeTable.items.length === 0) {
-            return showWarning("Adisyon Boş", "Masaya henüz ürün eklenmemiş.");
+            return showWarning(t('adission.emptyAdission'), t('adission.errEmpty'));
         }
 
         setInvoiceStatus('processing');
@@ -68,7 +70,7 @@ export default function EAdisyonWorkspace({ products }: any) {
             
             if (data.success) {
                 setInvoiceStatus('sent');
-                showSuccess("E-Adisyon Başarıyla Yazdırıldı", `Belge GİB'e iletildi ve fiş çıkartılıyor.`);
+                showSuccess("{t('adission.successTitle')}", `Belge GİB'e iletildi ve fiş çıkartılıyor.`);
                 
                 setTables(tables.map(t => t.id === activeTable.id ? { ...t, status: 'empty', items: [], openTime: null, waiter: null } : t));
                 
@@ -91,7 +93,7 @@ export default function EAdisyonWorkspace({ products }: any) {
         if (!activeTable) return;
         const unsentItems = activeTable.items.filter((i: any) => !i.sent);
         if (unsentItems.length === 0) {
-            return showWarning("Uyarı", "Mutfağa iletilecek yeni bir ürün yok.");
+            return showWarning("Uyarı", t('adission.errKitchenEmpty'));
         }
         
         setKitchenStatus('printing');
@@ -106,7 +108,7 @@ export default function EAdisyonWorkspace({ products }: any) {
             setTables(tables.map(t => t.id === updatedTable.id ? updatedTable : t));
             
             setKitchenStatus('idle');
-            showSuccess("Mutfağa İletildi", `${unsentItems.length} yeni ürün/istek IP mutfak yazıcısına başarıyla gönderildi.`);
+            showSuccess(t('adission.kitchenSuccess'), `${unsentItems.length}  {t('adission.kitchenSuccessDesc')}`);
         }, 800);
     };
 
@@ -150,7 +152,7 @@ export default function EAdisyonWorkspace({ products }: any) {
          return (
             <div className="flex-1 w-full bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center p-8 h-full min-h-[500px]">
                 <CheckCircle2 size={80} strokeWidth={1} className="text-blue-500 mb-6" />
-                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">E-Adisyon Yazdırıldı</h2>
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">{t('adission.successTitle')}</h2>
                 <p className="text-slate-500 font-medium mb-8 text-center max-w-md">"{activeTable?.name}" hesabına ait elektronik adisyon başarıyla GİB'e iletildi ve mutfak fişi çıkarılıyor.</p>
                 <div className="w-16 h-1 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
                     <div className="h-full bg-blue-500 animate-pulse w-full"></div>
@@ -261,10 +263,10 @@ export default function EAdisyonWorkspace({ products }: any) {
                                 {activeTable.status === 'occupied' ? (
                                     <div className="flex items-center gap-3 text-xs font-medium text-slate-500">
                                         <span className="flex items-center gap-1"><Clock size={12}/> {activeTable.openTime ? Math.floor((Date.now() - activeTable.openTime.getTime()) / 60000) : 0} dk</span>
-                                        <span className="flex items-center gap-1"><Coffee size={12}/> {activeTable.waiter || 'Belirsiz'}</span>
+                                        <span className="flex items-center gap-1"><Coffee size={12}/> {activeTable.waiter || t('adission.unknown')}</span>
                                     </div>
                                 ) : (
-                                    <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">Adisyon Boş</p>
+                                    <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">{t('adission.emptyAdission')}</p>
                                 )}
                             </div>
                             <button onClick={() => setActiveTable(null)} className="p-2 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors">
@@ -282,9 +284,9 @@ export default function EAdisyonWorkspace({ products }: any) {
                                 <table className="w-full text-left">
                                     <thead className="sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm z-10 shadow-sm">
                                         <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                            <th className="px-4 py-2">Ürün</th>
-                                            <th className="px-4 py-2 text-center">Miktar</th>
-                                            <th className="px-4 py-2 text-right">Tutar</th>
+                                            <th className="px-4 py-2">{t('adission.thProd')}</th>
+                                            <th className="px-4 py-2 text-center">{t('adission.thQty')}</th>
+                                            <th className="px-4 py-2 text-right">{t('adission.thTotal')}</th>
                                             <th className="w-10"></th>
                                         </tr>
                                     </thead>
@@ -293,7 +295,7 @@ export default function EAdisyonWorkspace({ products }: any) {
                                             <tr key={`${item.id}-${index}`} className={`hover:bg-slate-50 dark:hover:bg-white/[0.02] group transition-all ${item.sent ? 'opacity-80' : 'bg-amber-50/50 dark:bg-amber-900/10'}`}>
                                                 <td className="px-4 py-2.5 font-bold text-xs text-slate-700 dark:text-slate-200">
                                                     {item.name}
-                                                    {!item.sent && <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">Yeni</span>}
+                                                    {!item.sent && <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">{t('adission.statusNew')}</span>}
                                                 </td>
                                                 <td className={`px-4 py-2.5 text-center font-bold text-xs ${item.sent ? 'text-slate-500 dark:text-slate-400' : 'text-blue-600 dark:text-blue-400'}`}>{item.quantity}</td>
                                                 <td className="px-4 py-2.5 text-right font-black text-xs text-slate-800 dark:text-white">{(item.price * item.quantity).toLocaleString()} ₺</td>
@@ -350,7 +352,7 @@ export default function EAdisyonWorkspace({ products }: any) {
                         {/* Totals & Action */}
                         <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-white/10 shrink-0">
                             <div className="flex justify-between items-center mb-3">
-                                <span className="font-bold text-xs text-slate-500 uppercase tracking-widest">Genel Toplam</span>
+                                <span className="font-bold text-xs text-slate-500 uppercase tracking-widest">{t('adission.generalTotal')}</span>
                                 <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">
                                     {calculateTotal(activeTable.items).toLocaleString()} ₺
                                 </span>
@@ -362,7 +364,7 @@ export default function EAdisyonWorkspace({ products }: any) {
                                     disabled={kitchenStatus === 'printing' || !activeTable.items.some((i: any) => !i.sent)}
                                     className="flex-1 py-3 rounded-lg font-black bg-amber-500 text-white hover:bg-amber-600 transition-colors flex items-center justify-center gap-1.5 text-sm disabled:opacity-50 disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-800"
                                 >
-                                    {kitchenStatus === 'printing' ? 'YAZDIRILIYOR...' : <><Printer size={16} strokeWidth={2.5}/> MUTFAK / BAR</>}
+                                    {kitchenStatus === 'printing' ? 'YAZDIRILIYOR...' : <><Printer size={16} strokeWidth={2.5}/> {t('adission.btnKitchen')}</>}
                                 </button>
                                 
                                 <button 
@@ -370,7 +372,7 @@ export default function EAdisyonWorkspace({ products }: any) {
                                     disabled={invoiceStatus === 'processing' || activeTable.items.length === 0}
                                     className="flex-1 py-3 rounded-lg font-black bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-1.5 text-sm disabled:opacity-50"
                                 >
-                                    {invoiceStatus === 'processing' ? 'KAPATILIYOR...' : <><Send size={16} strokeWidth={2.5}/> HESABI KAPAT</>}
+                                    {invoiceStatus === 'processing' ? 'KAPATILIYOR...' : <><Send size={16} strokeWidth={2.5}/> {t('adission.btnCheckout')}</>}
                                 </button>
                             </div>
                         </div>
@@ -380,8 +382,8 @@ export default function EAdisyonWorkspace({ products }: any) {
                         <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-white/5 flex items-center justify-center mb-6">
                             <Utensils size={32} className="text-slate-300 dark:text-slate-500" />
                         </div>
-                        <h3 className="font-black text-xl text-slate-700 dark:text-white mb-2 tracking-tight">Kasa Beklemede</h3>
-                        <p className="text-slate-500 text-sm">İşlem yapmak için sol taraftan bir masa seçin.</p>
+                        <h3 className="font-black text-xl text-slate-700 dark:text-white mb-2 tracking-tight">{t('adission.standbyTitle')}</h3>
+                        <p className="text-slate-500 text-sm">{t('adission.standbyDesc')}</p>
                     </div>
                 )}
             </div>
