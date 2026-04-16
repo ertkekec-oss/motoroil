@@ -18,6 +18,7 @@ model Tenant {
   setupState           String                   @default("PENDING")
   createdAt            DateTime                 @default(now())
   updatedAt            DateTime                 @updatedAt
+  tenantSlug           String?                  @unique
   b2bCustomDomain      String?                  @unique
   carrierAccounts      CarrierAccount[]
   companies            Company[]

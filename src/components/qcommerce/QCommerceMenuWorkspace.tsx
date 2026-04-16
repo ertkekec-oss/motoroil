@@ -38,7 +38,11 @@ const MENU_ITEMS: MenuItem[] = [
     { id: 'm-6', categoryId: 'c-2', name: 'Izgara Somon Dilimi', description: 'Kuşkonmaz yatağında, limon ve zeytinyağı soslu fırınlanmış Norveç somonu.', price: 520, image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&q=80&w=400' }
 ];
 
-export default function QCommerceMenuWorkspace() {
+interface QCommerceMenuWorkspaceProps {
+    tenantSlug?: string;
+}
+
+export default function QCommerceMenuWorkspace({ tenantSlug }: QCommerceMenuWorkspaceProps) {
     const { showSuccess, showConfirm } = useModal();
     const [activeCategory, setActiveCategory] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState('');

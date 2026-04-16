@@ -80,7 +80,7 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    // --- SUBDOMAIN LOGIC FOR B2B PORTAL & CUSTOM DOMAINS ---
+    // --- SUBDOMAIN LOGIC FOR TENANT GATEWAY & B2B PORTAL ---
     const hostname = request.headers.get("host") || "";
     // Note: Always remove port number before evaluating production domains if needed (localhost keeps it)
     const hostnameWithoutPort = hostname.split(':')[0];
@@ -92,18 +92,64 @@ export async function middleware(request: NextRequest) {
         hostnameWithoutPort === 'vercel.app' || // For default vercel deployment urls
         hostname.includes('vercel.app');
 
-    // A subdomain is considered a B2B subdomain if it's the default b2b.* domain, 
-    // OR if it's NOT the primary app domain (thus presumed to be a custom tenant domain)
-    const isB2BSubdomain = 
-        hostnameWithoutPort === 'b2b.periodya.com' || 
-        hostname.startsWith('b2b.localhost') || 
-        !isPrimaryDomain;
+    const isB2BGlobal = hostnameWithoutPort === 'b2b.periodya.com' || hostnameWithoutPort === 'b2b.localhost';
+
+    // Extract tenant slug from either [slug].periodya.com or custom domains
+    let tenantSlug = null;
+    if (!isPrimaryDomain && !isB2BGlobal) {
+        if (hostnameWithoutPort.endsWith('.periodya.com')) {
+            tenantSlug = hostnameWithoutPort.replace('.periodya.com', '');
+        } else if (hostnameWithoutPort.endsWith('.localhost')) {
+            tenantSlug = hostnameWithoutPort.replace('.localhost', '');
+        } else {
+            // It could be a custom domain like bakkal.com
+            tenantSlug = hostnameWithoutPort;
+        }
+    }
 
     const base = portalBasePath(); // usually "/network"
 
+    // Feature A: Tenant Gateway Interception (e.g. motoroil.periodya.com)
+    if (tenantSlug) {
+        const isApiOrAdmin = pathname.startsWith('/api/') || pathname.startsWith('/admin/');
+        if (!isApiOrAdmin) {
+            
+            // 1. /menu -> /_tenant/[slug]/menu
+            if (pathname.startsWith('/menu')) {
+                const url = request.nextUrl.clone();
+                const newPath = pathname.replace(/^\/menu/, '') || '';
+                url.pathname = `/_tenant/${tenantSlug}/menu${newPath}`;
+                return NextResponse.rewrite(url);
+            }
+            
+            // 2. /b2b -> /_tenant/[slug]/b2b
+            if (pathname.startsWith('/b2b')) {
+                const url = request.nextUrl.clone();
+                const newPath = pathname.replace(/^\/b2b/, '') || '';
+                url.pathname = `/_tenant/${tenantSlug}/b2b${newPath}`;
+                return NextResponse.rewrite(url);
+            }
+            
+            // 3. / -> /_tenant/[slug]
+            if (pathname === '/') {
+                const url = request.nextUrl.clone();
+                url.pathname = `/_tenant/${tenantSlug}`;
+                return NextResponse.rewrite(url);
+            }
+            
+            // 4. Catch-all for other public pages under tenant domain
+            const url = request.nextUrl.clone();
+            url.pathname = `/_tenant/${tenantSlug}${pathname}`;
+            return NextResponse.rewrite(url);
+        }
+    }
+
+    // Feature B: Global B2B Portal (b2b.periodya.com)
+    const isB2BSubdomain = isB2BGlobal;
+
     // Feature 1: Redirect old /network/* accessed via main domain to subdomain
     // E.g. periodya.com/network/login -> b2b.periodya.com/login
-    if (!isB2BSubdomain && pathname.startsWith(base)) {
+    if (!isB2BSubdomain && !tenantSlug && pathname.startsWith(base)) {
         const newPath = pathname.replace(new RegExp(`^${base}`), '') || '/login';
         const url = request.nextUrl.clone();
         url.pathname = newPath;
