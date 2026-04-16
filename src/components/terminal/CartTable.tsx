@@ -1,14 +1,16 @@
 import React from 'react';
 import { ShoppingCart, Minus, Plus, X } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function CartTable({ cart, setCart, getPrice }: { cart: any[], setCart: any, getPrice: (p: any) => number }) {
+    const { t } = useLanguage();
 
     if (cart.length === 0) {
         return (
             <div className="h-full flex flex-col items-center justify-center opacity-40 py-20">
                 <ShoppingCart size={80} className="mb-6 text-text-muted dark:text-slate-600" />
-                <span className="text-xl font-bold tracking-tight text-text-secondary dark:text-slate-400">Sepet Boş</span>
-                <span className="text-sm mt-2 text-text-muted dark:text-slate-500">Ürün okutarak veya arayarak ekleyin</span>
+                <span className="text-xl font-bold tracking-tight text-text-secondary dark:text-slate-400">{t('cart.empty')}</span>
+                <span className="text-sm mt-2 text-text-muted dark:text-slate-500">{t('cart.emptyDesc')}</span>
             </div>
         );
     }
@@ -18,11 +20,11 @@ export default function CartTable({ cart, setCart, getPrice }: { cart: any[], se
             <table className="w-full text-left border-collapse">
                 <thead className="sticky top-0 bg-slate-50/80 backdrop-blur-md dark:bg-slate-900 border-b border-slate-100 dark:border-white/5 z-10">
                     <tr>
-                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[40%]">Ürün</th>
-                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[15%] text-center">Birim Fiyat</th>
-                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[20%] text-center">Adet</th>
-                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[15%] text-right">Ara Toplam</th>
-                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[10%] text-center">Sil</th>
+                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[40%]">{t('cart.product')}</th>
+                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[15%] text-center">{t('cart.unitPrice')}</th>
+                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[20%] text-center">{t('cart.qty')}</th>
+                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[15%] text-right">{t('cart.subtotal')}</th>
+                        <th className="py-3 px-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest w-[10%] text-center">{t('cart.delete')}</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 dark:divide-white/5">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CreditCard, Banknote, Landmark, ArrowRight, User, Clock, Gift } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function CheckoutPanel({
     cart, subtotal, finalTotal, vatExcludedTotal, totalDiscount,
@@ -7,16 +8,17 @@ export default function CheckoutPanel({
     paymentMode, setPaymentMode, terminalMode, handleFinalize, handleSuspend, isProcessing, isOnline,
     applicableCampaigns, computedCampaignDiscount, computedPromoItems, computedEarnedPoints
 }: any) {
+    const { t } = useLanguage();
 
     return (
         <div className="w-full bg-white dark:bg-[#0f172a] rounded-2xl p-4 lg:p-5 flex flex-col flex-1 min-h-0 overflow-hidden shadow-sm border border-slate-200/60 dark:border-white/10">
-            <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-500 pb-4 tracking-widest text-center shrink-0 uppercase">SATIŞ ÖZETİ</h2>
+            <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-500 pb-4 tracking-widest text-center shrink-0 uppercase">{t('checkout.summaryTitle')}</h2>
 
             <div className="flex-1 overflow-y-auto space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {/* Customer Select */}
                 <div>
                     <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block mb-1.5 uppercase tracking-widest px-1">
-                        Müşteri / Cari {terminalMode === 'b2b' && <span className="text-rose-500">* (Zorunlu)</span>}
+                        {t('checkout.customer')} {terminalMode === 'b2b' && <span className="text-rose-500">* ({t('checkout.required')})</span>}
                     </label>
                     <div
                         onClick={() => setIsCustomerModalOpen(true)}
@@ -31,7 +33,7 @@ export default function CheckoutPanel({
                             </span>
                         </div>
                         <div className="flex flex-col items-end">
-                            <div className="text-[9px] text-indigo-600/60 font-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">SEÇ</div>
+                            <div className="text-[9px] text-indigo-600/60 font-bold tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">{t('checkout.select')}</div>
                             {activePriceListName && (
                                 <div className="text-[9px] text-indigo-600 mt-1 bg-white shadow-sm px-2 py-0.5 rounded-md uppercase font-bold dark:bg-indigo-500/20 dark:text-indigo-300">
                                     {activePriceListName}
@@ -44,21 +46,21 @@ export default function CheckoutPanel({
                 {/* Totals */}
                 <div className="space-y-3 bg-slate-50 dark:bg-slate-900/40 p-4 rounded-xl">
                     <div className="flex justify-between text-xs font-medium text-slate-500">
-                        <span>Ara Toplam</span>
+                        <span>{t('checkout.subtotal')}</span>
                         <span>₺{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                     {totalDiscount > 0 && (
                         <div className="flex justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                            <span>İndirim</span>
+                            <span>{t('checkout.discount')}</span>
                             <span>-₺{totalDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                     )}
                     <div className="flex justify-between text-[11px] font-medium text-slate-400">
-                        <span>KDV Hariç Tutar</span>
+                        <span>{t('checkout.vatExcl')}</span>
                         <span>₺{vatExcludedTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                     <div className="flex justify-between items-center pt-3 mt-1 border-t border-slate-200 dark:border-white/5">
-                        <span className="font-bold text-[13px] text-slate-800 dark:text-slate-200 mt-1">GENEL TOPLAM</span>
+                        <span className="font-bold text-[13px] text-slate-800 dark:text-slate-200 mt-1">{t('checkout.grandTotal')}</span>
                         <span className="text-2xl lg:text-3xl font-black text-rose-600 dark:text-rose-400 tracking-tight mt-1">₺{finalTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                 </div>
@@ -68,25 +70,25 @@ export default function CheckoutPanel({
                     <div className="relative overflow-hidden bg-surface-tertiary dark:from-indigo-900/20 dark:via-purple-900/10 dark:to-rose-900/10 p-4 rounded-[14px] shadow-sm group">
                         <div className="relative text-[9px] font-bold text-indigo-600/80 dark:text-indigo-300 mb-2 uppercase tracking-widest flex items-center gap-1.5">
                             <Gift size={10} className="animate-pulse" />
-                            Akıllı Kasiyer Kazanımları
+                            {t('checkout.smartCashier')}
                         </div>
                         <div className="relative space-y-1.5 text-[11px]">
                             {computedCampaignDiscount > 0 && (
                                 <div className="flex justify-between items-center font-bold text-state-success-text dark:text-emerald-400 bg-surface/60 dark:bg-slate-900/60 p-2 rounded-lg backdrop-blur-sm">
-                                    <span>🎁 Ödeme İndirimi</span>
+                                    <span>🎁 {t('checkout.paymentDiscount')}</span>
                                     <span>-₺{computedCampaignDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                             )}
                             {computedEarnedPoints > 0 && (
                                 <div className="flex justify-between items-center font-bold text-amber-700 dark:text-amber-400 bg-surface/60 dark:bg-slate-900/60 p-2 rounded-lg backdrop-blur-sm">
-                                    <span>💎 Kazanç Puanı</span>
+                                    <span>💎 {t('checkout.earnedPoints')}</span>
                                     <span>+{computedEarnedPoints.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                                 </div>
                             )}
                             {computedPromoItems?.map((pItem: any, i: number) => (
                                 <div key={i} className="flex justify-between items-center font-bold text-primary dark:text-blue-400 bg-surface/60 dark:bg-slate-900/60 p-2 rounded-lg backdrop-blur-sm">
                                     <span className="truncate pr-2 w-full">✨ {pItem.qty}x {pItem.campName}</span>
-                                    <span className="shrink-0 text-[9px] uppercase bg-state-info-bg dark:bg-blue-500/20 px-1.5 py-0.5 rounded text-state-info-text dark:text-blue-300">BEDELSİZ</span>
+                                    <span className="shrink-0 text-[9px] uppercase bg-state-info-bg dark:bg-blue-500/20 px-1.5 py-0.5 rounded text-state-info-text dark:text-blue-300">{t('checkout.freeItem')}</span>
                                 </div>
                             ))}
                         </div>
@@ -95,7 +97,7 @@ export default function CheckoutPanel({
 
                 {/* Payment Methods */}
                 <div>
-                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block mb-1.5 uppercase tracking-widest px-1">ÖDEME YÖNTEMİ</label>
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block mb-1.5 uppercase tracking-widest px-1">{t('checkout.paymentMethod')}</label>
                     <div className="grid grid-cols-3 gap-2">
                         <button
                             onClick={() => setPaymentMode('cash')}
@@ -113,7 +115,7 @@ export default function CheckoutPanel({
                                 : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
                         >
-                            <CreditCard size={16} /> <span className="truncate">YazarKasa POS</span>
+                            <CreditCard size={16} /> <span className="truncate">{t('checkout.pos')}</span>
                         </button>
                         <button
                             onClick={() => setPaymentMode('paytr')}
@@ -123,7 +125,7 @@ export default function CheckoutPanel({
                                 }`}
                         >
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> 
-                            <span className="truncate">PayTR Link</span>
+                            <span className="truncate">{t('checkout.paytr')}</span>
                         </button>
                         <button
                             onClick={() => setPaymentMode('transfer')}
@@ -143,9 +145,9 @@ export default function CheckoutPanel({
                                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 dark:bg-indigo-500'
                                     : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
-                            title={terminalMode === 'b2b' && selectedCustomer === 'Perakende Müşteri' ? 'Müşteri seçilmeli' : ''}
+                            title={terminalMode === 'b2b' && selectedCustomer === 'Perakende Müşteri' ? t('checkout.errSelectCustomer') : ''}
                         >
-                            <User size={16} /> <span className="truncate">Cari Kredi</span>
+                            <User size={16} /> <span className="truncate">{t('checkout.credit')}</span>
                         </button>
                         <button
                             onClick={() => setPaymentMode('split')}
@@ -155,7 +157,7 @@ export default function CheckoutPanel({
                                 }`}
                         >
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            <span className="truncate">Parçalı Tahsilat</span>
+                            <span className="truncate">{t('checkout.splitPayment')}</span>
                         </button>
                     </div>
                 </div>
@@ -184,14 +186,14 @@ export default function CheckoutPanel({
                     {isProcessing ? (
                         <>
                             <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            <span>İŞLENİYOR...</span>
+                            <span>{t('checkout.processing')}</span>
                         </>
                     ) : (
                         <>
                             <span>
                                 {isOnline 
-                                    ? (terminalMode === 'b2b' ? 'FATURA OLUŞTUR VE KES' : 'ÖDEMEYİ TAMAMLA') 
-                                    : 'OFFLINE İŞLEME AL'}
+                                    ? (terminalMode === 'b2b' ? t('checkout.createInvoice') : t('checkout.completePayment')) 
+                                    : t('checkout.offlineProcess')}
                             </span>
                             <ArrowRight size={20} strokeWidth={2.5} />
                         </>
