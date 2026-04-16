@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, FileText, Send, User, Search, Calculator, CheckCircle2, Clock, Tag } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function EMustahsilWorkspace({ products, customers }: any) {
     const { showWarning, showSuccess } = useModal();
+    const { t } = useLanguage();
 
     const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
     const [customerSearch, setCustomerSearch] = useState('');
@@ -81,11 +83,11 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
 
     const handleSendInvoice = async () => {
         if (!selectedCustomer) {
-            return showWarning("Üretici Seçimi Eksik", "Makbuz düzenleyebilmek için lütfen Müstahsil (Çiftçi) seçiniz.");
+            return showWarning(t('emustahsil.errFarmer'), t('emustahsil.errFarmerDesc'));
         }
         const validLines = invoiceLines.filter(l => l.name);
         if (validLines.length === 0) {
-            return showWarning("Makbuz Boş", "Lütfen en az bir kalem ekleyiniz.");
+            return showWarning(t('emustahsil.errEmpty'), t('emustahsil.errEmptyDesc'));
         }
 
         setInvoiceStatus('processing');
@@ -105,14 +107,14 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
             
             if (data.success) {
                 setInvoiceStatus('sent');
-                showSuccess("E-Müstahsil Makbuzu Başarıyla İletildi", `Belge Numarası: ${new Date().getFullYear()}${(Math.random().toString(36).substring(2, 8).toUpperCase())}`);
+                showSuccess(t('emustahsil.successMsg'), `\${t('emustahsil.docNo')}: ${new Date().getFullYear()}${(Math.random().toString(36).substring(2, 8).toUpperCase())}`);
             } else {
                 setInvoiceStatus('draft');
-                showWarning("Hata Oluştu", data.error || "Makbuz oluşturulamadı.");
+                showWarning(t('emustahsil.errOccurred'), data.error || t('emustahsil.errFailed'));
             }
         } catch (err: any) {
             setInvoiceStatus('draft');
-            showWarning("Bağlantı Hatası", err.message);
+            showWarning(t('emustahsil.errConn'), err.message);
         }
     };
 
@@ -120,11 +122,11 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
         return (
             <div className="flex-1 w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl flex flex-col items-center justify-center m-6 p-8">
                 <CheckCircle2 size={80} strokeWidth={1} className="text-emerald-500 mb-6" />
-                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">E-Müstahsil Makbuzu Düzenlendi</h2>
-                <p className="text-slate-500 font-medium mb-8 text-center max-w-md">Belge başarıyla GİB portalına iletilmek üzere sıraya alındı.</p>
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">{t('emustahsil.successTitle')}</h2>
+                <p className="text-slate-500 font-medium mb-8 text-center max-w-md">{t('emustahsil.successDetail')}</p>
                 <div className="space-x-4">
-                    <button className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold shadow-sm" onClick={() => { setInvoiceStatus('draft'); setInvoiceLines([{ id: 1, product: null, name: '', qty: 1, unitPrice: 0, gvRate: 0, sgkRate: 0, borsaRate: 0, meraRate: 0 }]); setSelectedCustomer(null); }}>YENİ MAKBUZ</button>
-                    <button className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-md hover:bg-indigo-700">PDF OLARAK İNDİR</button>
+                    <button className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold shadow-sm" onClick={() => { setInvoiceStatus('draft'); setInvoiceLines([{ id: 1, product: null, name: '', qty: 1, unitPrice: 0, gvRate: 0, sgkRate: 0, borsaRate: 0, meraRate: 0 }]); setSelectedCustomer(null); }}>{t('emustahsil.btnNew')}</button>
+                    <button className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-md hover:bg-indigo-700">{t('emustahsil.btnPdf')}</button>
                 </div>
             </div>
         );
@@ -135,12 +137,12 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
             <div className="w-full bg-white dark:bg-[#0f172a] rounded-xl shadow border border-[#D6DAE1] dark:border-white/10 flex flex-col mb-4">
                 <div className="p-4 lg:p-5 border-b border-slate-200 dark:border-white/5 grid grid-cols-1 lg:grid-cols-2 gap-6 bg-slate-50/30 dark:bg-white/[0.01] rounded-t-xl">
                     <div className="flex-1 max-w-md relative">
-                        <label className="text-[11px] font-black tracking-widest text-[#059669] dark:text-[#34d399] uppercase block mb-3">ÇİFTÇİ / MÜSTAHSİL (SATICI)</label>
+                        <label className="text-[11px] font-black tracking-widest text-[#059669] dark:text-[#34d399] uppercase block mb-3">{t('emustahsil.farmerSeller')}</label>
                         {!selectedCustomer ? (
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                 <input 
-                                    placeholder="Üretici Ad Soyad veya TC/VKN Ara..." 
+                                    placeholder={t('emustahsil.searchPlaceholder')} 
                                     className="w-full pl-10 pr-4 py-3 bg-white dark:bg-[#0f172a] border-l-4 border-l-emerald-500 border border-slate-200 dark:border-white/10 rounded-xl font-bold text-sm outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-sm"
                                     value={customerSearch}
                                     onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); }}
@@ -148,7 +150,7 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                                 />
                                 {showCustomerDropdown && (
                                     <div className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl shadow-xl max-h-[300px] overflow-y-auto py-2">
-                                        <div className="px-3 py-1.5 text-xs font-bold text-slate-400">Son Kullanılan Üreticiler</div>
+                                        <div className="px-3 py-1.5 text-xs font-bold text-slate-400">{t('emustahsil.recentFarmers')}</div>
                                         {filteredCustomers.slice(0, 10).map((c: any) => (
                                             <div 
                                                 key={c.id} 
@@ -156,7 +158,7 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                                                 className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer flex flex-col transition-colors border-b border-slate-50 dark:border-white/5 last:border-0"
                                             >
                                                 <span className="font-bold text-slate-800 dark:text-white text-[13px] leading-tight">{c.name}</span>
-                                                <span className="text-[11px] text-slate-500 mt-1 uppercase">TC/VKN: {c.taxNumber || 'Tanımsız'}</span>
+                                                <span className="text-[11px] text-slate-500 mt-1 uppercase">{t('emustahsil.tcVkn')}: {c.taxNumber || t('emustahsil.undefined')}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -165,7 +167,7 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                         ) : (
                             <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm relative group cursor-pointer" onClick={() => setSelectedCustomer(null)}>
                                 <div className="absolute inset-0 bg-rose-50 dark:bg-rose-500/10 rounded-xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity border border-rose-200 dark:border-rose-500/30">
-                                    <span className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2"><Trash2 size={16} /> Üreticiyi Değiştir</span>
+                                    <span className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2"><Trash2 size={16} /> {t('emustahsil.changeFarmer')}</span>
                                 </div>
                                 <div className="group-hover:opacity-0 transition-opacity">
                                     <div className="flex items-center gap-3">
@@ -174,11 +176,11 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                                         </div>
                                         <div>
                                             <h3 className="font-black text-slate-900 dark:text-white leading-tight pr-4">{selectedCustomer.name}</h3>
-                                            <p className="text-[11px] text-slate-500 font-medium mt-1">TC/VKN: <span className="font-bold">{selectedCustomer.taxNumber || 'Belirtilmemiş'}</span></p>
+                                            <p className="text-[11px] text-slate-500 font-medium mt-1">{t('emustahsil.tcVkn')}: <span className="font-bold">{selectedCustomer.taxNumber || t('emustahsil.unspecified')}</span></p>
                                         </div>
                                     </div>
                                     <div className="mt-3 text-[11px] text-slate-500 leading-relaxed border-t border-slate-100 dark:border-white/5 pt-3">
-                                        {selectedCustomer.address || 'Adres bilgisi eksik.'}
+                                        {selectedCustomer.address || t('emustahsil.noAddress')}
                                         <br/>{selectedCustomer.district} / {selectedCustomer.city}
                                     </div>
                                 </div>
@@ -189,13 +191,13 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                     <div className="flex flex-col items-end gap-4 ml-auto w-full lg:w-auto mt-4 lg:mt-0">
                         <div className="flex flex-row items-center justify-end gap-3 sm:gap-6 text-left flex-wrap">
                             <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Belge Tipi</label>
-                                <span className="font-black text-[13px] text-emerald-600 dark:text-emerald-400">E-MÜSTAHSİL MAKBUZU</span>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{t('emustahsil.docType')}</label>
+                                <span className="font-black text-[13px] text-emerald-600 dark:text-emerald-400">{t('emustahsil.docTypeLabel')}</span>
                             </div>
                             <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
                             
                             <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Döviz</label>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{t('emustahsil.currency')}</label>
                                 <select 
                                     value={currency}
                                     onChange={(e) => {
@@ -216,7 +218,7 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                                 <>
                                     <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1 hidden sm:block"></div>
                                     <div className="flex flex-col gap-1">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">TCMB Kuru</label>
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('emustahsil.cbrtRate')}</label>
                                         <input 
                                             type="number" step="0.0001" 
                                             value={exchangeRate} 
@@ -229,13 +231,13 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                             <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
 
                             <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Düzenlenme Tarihi</label>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('emustahsil.issueDate')}</label>
                                 <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">{new Date().toLocaleDateString('tr-TR')} {new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>
                             </div>
                             <div className="h-8 w-px bg-slate-200 dark:bg-white/10 hidden sm:block"></div>
                             <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Şube / Kasa</label>
-                                <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">Merkez (Online)</span>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('emustahsil.branch')}</label>
+                                <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">{t('emustahsil.hq')}</span>
                             </div>
                         </div>
                     </div>
@@ -246,14 +248,14 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                         <thead>
                             <tr className="bg-slate-100/50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-white/5 text-[9px] font-black text-slate-500 uppercase tracking-widest">
                                 <th className="p-3 w-10 text-center">#</th>
-                                <th className="p-3">Hizmet / Tarımsal Ürün Adı</th>
-                                <th className="p-3 w-24">Miktar(Kg/Ad)</th>
-                                <th className="p-3 w-28 text-right">Birim Fiyat</th>
-                                <th className="p-3 w-20 text-center">GV(%)</th>
-                                <th className="p-3 w-20 text-center">SGK(%)</th>
-                                <th className="p-3 w-20 text-center">Borsa(%)</th>
-                                <th className="p-3 w-20 text-center">Mera(%)</th>
-                                <th className="p-3 w-28 text-right">Brüt Tutar</th>
+                                <th className="p-3">{t('emustahsil.thProduct')}</th>
+                                <th className="p-3 w-24">{t('emustahsil.thQty')}</th>
+                                <th className="p-3 w-28 text-right">{t('emustahsil.thPrice')}</th>
+                                <th className="p-3 w-20 text-center">{t('emustahsil.thGv')}</th>
+                                <th className="p-3 w-20 text-center">{t('emustahsil.thSgk')}</th>
+                                <th className="p-3 w-20 text-center">{t('emustahsil.thBorsa')}</th>
+                                <th className="p-3 w-20 text-center">{t('emustahsil.thMera')}</th>
+                                <th className="p-3 w-28 text-right">{t('emustahsil.thGross')}</th>
                                 <th className="p-3 w-10 text-center"></th>
                             </tr>
                         </thead>
@@ -289,17 +291,17 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                                                         }, 250);
                                                     }}
                                                     className="w-full bg-transparent font-bold text-slate-800 dark:text-white text-xs outline-none border-b border-transparent focus:border-emerald-500 pb-1"
-                                                    placeholder="Örn: Buğday, Arpa, Süt..."
+                                                    placeholder={t('emustahsil.pHint')}
                                                 />
                                                 <div className="text-[9px] mt-1 space-x-2 font-medium">
                                                     <span className="text-slate-400 cursor-pointer hover:text-emerald-500" onClick={() => {
                                                         setFocusedLineId(line.id); 
                                                         setProductSearchStr('');
-                                                    }}>🔍 Stok Arama</span>
+                                                    }}>{t('emustahsil.stockSearch')}</span>
                                                 </div>
                                                 {focusedLineId === line.id && productSearchStr.length >= 2 && (
                                                     <div className="absolute z-50 left-0 top-full mt-1 w-full min-w-[280px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl shadow-xl max-h-[250px] overflow-y-auto py-2">
-                                                        <div className="px-3 py-1 text-xs font-bold text-slate-400 border-b border-slate-100 dark:border-white/5">Stok Kartları</div>
+                                                        <div className="px-3 py-1 text-xs font-bold text-slate-400 border-b border-slate-100 dark:border-white/5">{t('emustahsil.stockCards')}</div>
                                                         {filteredProducts.map((p: any) => (
                                                             <div 
                                                                 key={p.id} 
@@ -315,7 +317,7 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                                                                 </span>
                                                             </div>
                                                         ))}
-                                                        {filteredProducts.length === 0 && <div className="px-3 py-3 text-xs text-slate-500 text-center">Sonuç bulunamadı.</div>}
+                                                        {filteredProducts.length === 0 && <div className="px-3 py-3 text-xs text-slate-500 text-center">{t('emustahsil.noResults')}</div>}
                                                     </div>
                                                 )}
                                             </div>
@@ -379,48 +381,48 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                 <div className="bg-slate-50 dark:bg-slate-900 border-t items-start border-slate-200 dark:border-white/10 p-5 lg:p-6 flex flex-row justify-between gap-6 w-full min-w-min">
                     
                     <div className="flex-1 max-w-xl">
-                        <label className="text-[10px] font-bold text-slate-400 block uppercase tracking-widest mb-1.5">Makbuz Alt Notu / Açıklama</label>
-                        <textarea placeholder="Kesinti açıklamaları vs..." className="w-full h-32 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg p-3 text-sm font-medium resize-none outline-none focus:ring-1 focus:ring-emerald-500 shadow-sm leading-relaxed" />
+                        <label className="text-[10px] font-bold text-slate-400 block uppercase tracking-widest mb-1.5">{t('emustahsil.noteLabel')}</label>
+                        <textarea placeholder={t('emustahsil.notePlaceholder')} className="w-full h-32 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg p-3 text-sm font-medium resize-none outline-none focus:ring-1 focus:ring-emerald-500 shadow-sm leading-relaxed" />
                     </div>
 
                     <div className="w-[320px] shrink-0 bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/10 rounded-lg shadow-sm p-4 flex flex-col space-y-2 ml-auto">
                         <div className="flex justify-between text-xs font-bold text-slate-500">
-                            <span>Müstahsil Brüt Tutar</span>
+                            <span>{t('emustahsil.grossTotal')}</span>
                             <span>{currSymbol}{totals.subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                         </div>
                         <div className="h-px w-full bg-slate-100 dark:bg-white/5 my-0.5"></div>
                         {totals.gvTotal > 0 && (
                             <div className="flex justify-between text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                                <span>(-) Gelir Vergisi (Stopaj)</span>
+                                <span>{t('emustahsil.gvLabel')}</span>
                                 <span>-{currSymbol}{totals.gvTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                             </div>
                         )}
                         {totals.sgkTotal > 0 && (
                             <div className="flex justify-between text-[11px] font-bold text-rose-500">
-                                <span>(-) Bağ-Kur / SGK Kesintisi</span>
+                                <span>{t('emustahsil.sgkLabel')}</span>
                                 <span>-{currSymbol}{totals.sgkTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                             </div>
                         )}
                         {totals.borsaTotal > 0 && (
                             <div className="flex justify-between text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                                <span>(-) Borsa Tescil Ücreti</span>
+                                <span>{t('emustahsil.borsaLabel')}</span>
                                 <span>-{currSymbol}{totals.borsaTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                             </div>
                         )}
                         {totals.meraTotal > 0 && (
                             <div className="flex justify-between text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                                <span>(-) Mera Fonu</span>
+                                <span>{t('emustahsil.meraLabel')}</span>
                                 <span>-{currSymbol}{totals.meraTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                             </div>
                         )}
                         <div className="h-px w-full bg-slate-200 dark:bg-white/10 my-1"></div>
                         <div className="flex justify-between items-end">
-                            <span className="font-black text-[11px] text-slate-800 dark:text-white uppercase pb-0.5" title="Net Üreticiye Ödenecek Tutar">ÇİFTÇİYE ÖDENECEK NET</span>
+                            <span className="font-black text-[11px] text-slate-800 dark:text-white uppercase pb-0.5" title={t('emustahsil.netPayableHint')}>{t('emustahsil.netPayable')}</span>
                             <span className="text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-400 leading-none">{currSymbol}{totals.payableTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
                         </div>
                         {currency !== 'TRY' && (
                             <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-2 rounded -mx-2 mt-2 border border-slate-100 dark:border-white/5">
-                                <span className="text-[10px] font-bold text-slate-500 uppercase">Sistem (TL) Karşılığı</span>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">{t('emustahsil.sysEquiv')}</span>
                                 <span className="text-xs font-black text-slate-700 dark:text-slate-300">₺{(totals.payableTotal * exchangeRate).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
                             </div>
                         )}
@@ -431,8 +433,8 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                     {/* Payment Method Selector for E-Mustahsil */}
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                         <div className="flex flex-col text-left">
-                            <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest leading-none">Para Çıkış Yönü</span>
-                            <span className="text-sm font-black text-rose-700 dark:text-rose-400 mt-1">Üreticiye Ödeme Devri</span>
+                            <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest leading-none">{t('emustahsil.cashFlow')}</span>
+                            <span className="text-sm font-black text-rose-700 dark:text-rose-400 mt-1">{t('emustahsil.paymentTransfer')}</span>
                         </div>
                         <div className="h-8 w-px bg-slate-200 dark:bg-white/10 hidden sm:block mx-1"></div>
                         <div className="flex bg-rose-50/50 dark:bg-rose-950/20 p-1.5 rounded-xl border border-rose-100 dark:border-rose-900/30 gap-1.5 w-full sm:w-auto overflow-x-auto">
@@ -450,7 +452,7 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
 
                     <div className="flex flex-row gap-3 w-full sm:w-auto justify-end">
                         <button className="px-5 py-2.5 rounded-lg font-bold bg-slate-100 text-slate-700 dark:bg-white/5 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-xs shadow-sm">
-                            <FileText size={14} className="hidden sm:inline" /> <span className="hidden sm:inline">TASLAK OLARAK KAYDET</span><span className="sm:hidden">TASLAK</span>
+                            <FileText size={14} className="hidden sm:inline" /> <span className="hidden sm:inline">TASLAK OLARAK KAYDET</span><span className="sm:hidden">{t('emustahsil.btnDraftShort')}</span>
                         </button>
                         <button 
                             onClick={handleSendInvoice}
@@ -458,7 +460,7 @@ export default function EMustahsilWorkspace({ products, customers }: any) {
                             className="px-8 py-2.5 rounded-lg font-black bg-emerald-600 text-white hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 text-[13px] shadow-sm disabled:opacity-50 tracking-wide"
                         >
                             {invoiceStatus === 'processing' ? <Calculator className="animate-spin" size={16} /> : <Send size={16} />} 
-                            {invoiceStatus === 'processing' ? 'BEKLEYİNİZ...' : 'E-MÜSTAHSİL OLUŞTUR'}
+                            {invoiceStatus === 'processing' ? t('emustahsil.btnWait') : t('emustahsil.btnCreate')}
                         </button>
                     </div>
                 </div>
