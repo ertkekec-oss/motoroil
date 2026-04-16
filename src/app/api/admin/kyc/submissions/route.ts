@@ -10,26 +10,39 @@ export async function GET(req: NextRequest) {
 
         const searchParams = req.nextUrl.searchParams;
         const status = searchParams.get('status');
+        const tenantId = searchParams.get('tenantId');
 
         const filter: any = {};
         if (status) {
             filter.status = status;
         }
+        if (tenantId) {
+            filter.tenantId = tenantId;
+        }
 
         const submissions = await prisma.tenantRequirementSubmission.findMany({
             where: filter,
             include: {
-                requirement: true
-                // in reality we may also fetch Tenant / User names. Given current DB limits, we can just return IDs or join if possible.
+                requirement: true,
+                tenant: true,
+                user: true
             },
             orderBy: { createdAt: 'desc' },
             take: 200
         });
 
+        const sigFilter: any = {};
+        if (tenantId) {
+            sigFilter.tenantId = tenantId;
+        }
+
         // Also fetch signatures
         const signatures = await prisma.tenantContractSignature.findMany({
+            where: sigFilter,
             include: {
-                contract: true
+                contract: true,
+                tenant: true,
+                user: true
             },
             orderBy: { signedAt: 'desc' },
             take: 200

@@ -274,9 +274,9 @@ export default function PlatformKycClient() {
                                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{sub.requirement?.moduleId}</p>
                                         <h4 className="text-base font-bold mt-0.5 text-white">{sub.requirement?.name}</h4>
                                         <div className="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-slate-400">
-                                            <span>Firma: <strong className="text-white">{sub.tenantId}</strong></span>
+                                            <span>Firma: <strong className="text-white">{sub.tenant?.name || sub.tenantId}</strong></span>
                                             <span className="w-1 h-1 rounded-full bg-slate-600" />
-                                            <span>Kullanıcı: <strong className="text-white">{sub.userId}</strong></span>
+                                            <span>Kullanıcı: <strong className="text-white">{sub.user?.name || sub.user?.email || sub.userId}</strong></span>
                                             <span className="w-1 h-1 rounded-full bg-slate-600" />
                                             <span>{new Date(sub.createdAt).toLocaleString('tr-TR')}</span>
                                         </div>
@@ -331,10 +331,13 @@ export default function PlatformKycClient() {
                             <tbody className="divide-y divide-white/5">
                                 {signatures.map(sig => (
                                     <tr key={sig.id} className="hover:bg-slate-800/30 transition">
-                                        <td className="px-5 py-3 font-mono font-medium text-white text-xs">{sig.tenantId}</td>
                                         <td className="px-5 py-3">
-                                            <div className="font-bold text-white text-xs">{sig.userId}</div>
-                                            <div className="text-[10px] text-slate-500 mt-0.5">{sig.ipAddress}</div>
+                                            <div className="font-medium text-white text-xs">{sig.tenant?.name || sig.tenantId}</div>
+                                            <div className="text-[10px] text-slate-500 font-mono mt-0.5">{sig.tenantId}</div>
+                                        </td>
+                                        <td className="px-5 py-3">
+                                            <div className="font-bold text-white text-xs">{sig.user?.name || sig.user?.email || sig.userId}</div>
+                                            <div className="text-[10px] text-slate-500 font-mono mt-0.5">{sig.ipAddress}</div>
                                         </td>
                                         <td className="px-5 py-3">
                                             <div className="font-semibold text-blue-400 text-xs">{sig.contract?.title}</div>

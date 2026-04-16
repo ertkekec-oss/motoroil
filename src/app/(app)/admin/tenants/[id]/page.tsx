@@ -19,7 +19,8 @@ export default function TenantDetailPage({
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [showModal, setShowModal] = useState<string | null>(null); // 'PLAN', 'TRIAL', 'STATUS'
-  const [activeTab, setActiveTab] = useState<"LOGS" | "FINANCE">("LOGS");
+  const [activeTab, setActiveTab] = useState<"LOGS" | "FINANCE" | "DOCS">("LOGS");
+  const [kycDocs, setKycDocs] = useState<{ submissions: any[], signatures: any[] }>({ submissions: [], signatures: [] });
 
   // Form States
   const [selectedPlan, setSelectedPlan] = useState("");
@@ -52,6 +53,17 @@ export default function TenantDetailPage({
         console.error(e);
       } finally {
         setLoading(false);
+      }
+
+      // Fetch KYC Documents
+      try {
+        const docRes = await fetch(`/api/admin/kyc/submissions?tenantId=${params.id}`);
+        const docData = await docRes.json();
+        if (docData.success) {
+            setKycDocs({ submissions: docData.submissions || [], signatures: docData.signatures || [] });
+        }
+      } catch (e) {
+          console.error(e);
       }
     };
     loadData();
@@ -237,6 +249,12 @@ export default function TenantDetailPage({
             Sistem Logları & Geçmiş
           </button>
           <button
+            onClick={() => setActiveTab("DOCS")}
+            className={`px-6 py-4 font-semibold text-sm transition-colors border-b-2 flex items-center gap-2 ${activeTab === "DOCS" ? "border-indigo-600 text-indigo-700 bg-white" : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100"}`}
+          >
+            Evraklar & Sözleşmeler
+          </button>
+          <button
             onClick={() => setActiveTab("FINANCE")}
             className={`px-6 py-4 font-semibold text-sm transition-colors border-b-2 flex items-center gap-2 ${activeTab === "FINANCE" ? "border-indigo-600 text-indigo-700 bg-white" : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100"}`}
           >
@@ -246,6 +264,80 @@ export default function TenantDetailPage({
             </span>
           </button>
         </div>
+
+        {activeTab === "DOCS" && (
+            <div className="p-6 animate-in fade-in zoom-in-95 duration-300">
+             <div className="mb-6">
+                <h4 className="text-base font-black text-slate-900">Müşteri Sözleşmeleri</h4>
+                <p className="text-xs text-slate-500 mt-1">Bu müşterinin platformda onayladığı dijital yasal metinler.</p>
+             </div>
+             
+             {kycDocs.signatures.length === 0 ? (
+                 <div className="bg-slate-50 text-slate-500 text-sm p-4 rounded-xl border border-slate-200 text-center mb-8">Henüz imzalanmış bir sözleşme bulunmuyor.</div>
+             ) : (
+                 <div className="overflow-x-auto border border-slate-200 rounded-xl mb-8">
+                    <table className="w-full text-left text-xs bg-white">
+                        <thead className="text-slate-500 border-b border-slate-200 bg-slate-50">
+                            <tr>
+                                <th className="py-3 px-4">Kullanıcı / IP</th>
+                                <th className="py-3 px-4">Sözleşme</th>
+                                <th className="py-3 px-4">İmzalanma Tarihi</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-slate-700">
+                            {kycDocs.signatures.map(sig => (
+                                <tr key={sig.id} className="hover:bg-slate-50 transition-colors">
+                                    <td className="py-3 px-4">
+                                        <div className="font-bold">{sig.user?.name || sig.user?.email || sig.userId}</div>
+                                        <div className="text-[10px] text-slate-500">{sig.ipAddress}</div>
+                                    </td>
+                                    <td className="py-3 px-4">
+                                        <div className="font-semibold text-blue-600">{sig.contract?.title}</div>
+                                        <div className="text-[10px] text-slate-500">Versiyon: {sig.version}</div>
+                                    </td>
+                                    <td className="py-3 px-4 text-emerald-600 font-medium">
+                                        {new Date(sig.signedAt).toLocaleString('tr-TR')}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                 </div>
+             )}
+
+             <div className="mb-6">
+                <h4 className="text-base font-black text-slate-900">Modül Başvuruları & Evraklar</h4>
+                <p className="text-xs text-slate-500 mt-1">Gatekeeper (KYC) sisteminden yüklenen vergi levhası vb. dokümanlar.</p>
+             </div>
+             {kycDocs.submissions.length === 0 ? (
+                 <div className="bg-slate-50 text-slate-500 text-sm p-4 rounded-xl border border-slate-200 text-center">Henüz modül başvurusu veya evrak bulunmuyor.</div>
+             ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {kycDocs.submissions.map(sub => (
+                        <div key={sub.id} className="bg-white border text-sm border-slate-200 p-4 rounded-xl flex items-start gap-4">
+                            <div className={`p-3 rounded-xl flex-shrink-0 ${sub.status === 'PENDING' ? 'bg-amber-100 text-amber-600' : sub.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            </div>
+                            <div className="flex-1">
+                                <span className="text-[10px] bg-slate-100 font-bold px-2 py-0.5 rounded text-slate-500 tracking-wider mb-1 inline-block">{sub.requirement?.moduleId}</span>
+                                <h5 className="font-bold text-slate-800">{sub.requirement?.name}</h5>
+                                <div className="text-xs text-slate-500 mt-1">Yükleyen: {sub.user?.name || sub.user?.email || sub.userId}</div>
+                                <div className="text-xs text-slate-500">Tarih: {new Date(sub.createdAt).toLocaleDateString('tr-TR')}</div>
+                                <div className="mt-2 flex items-center justify-between">
+                                    <span className={`text-[10px] font-bold px-2 py-1 rounded-md ${sub.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : sub.status === 'PENDING' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                                        {sub.status === 'APPROVED' ? 'ONAYLANDI' : sub.status === 'PENDING' ? 'BEKLİYOR' : 'REDDEDİLDİ'}
+                                    </span>
+                                    {sub.documentUrl && (
+                                        <a href={sub.documentUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-600 hover:text-blue-800 underline">İndir / Görüntüle</a>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+             )}
+            </div>
+        )}
 
         {activeTab === "LOGS" && (
           <div className="p-6">
