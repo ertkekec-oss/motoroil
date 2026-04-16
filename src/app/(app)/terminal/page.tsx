@@ -1,4 +1,5 @@
-﻿import TerminalClient from "./TerminalClient";
+import TerminalClient from "./TerminalClient";
+import ModuleGatekeeper from "@/components/ModuleGatekeeper";
 
 export const metadata = {
     title: "POS Terminal | Periodya Enterprise",
@@ -6,5 +7,9 @@ export const metadata = {
 };
 
 export default function TerminalPage() {
-    return <TerminalClient />;
+    return (
+        <ModuleGatekeeper moduleId="POS">
+            <TerminalClient />
+        </ModuleGatekeeper>
+    );
 }
