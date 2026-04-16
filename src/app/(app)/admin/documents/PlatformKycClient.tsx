@@ -371,15 +371,27 @@ export default function PlatformKycClient() {
                                     className="w-full bg-slate-800 border-none rounded-xl h-10 px-3 text-white focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="" disabled>Modül Seçiniz...</option>
-                                    <option value="EFATURA">E-Fatura & E-Arşiv (EFATURA)</option>
-                                    <option value="ODEAL">Ödeal Sanal/Fiziksel Pos (ODEAL)</option>
-                                    <option value="B2B">B2B Pazaryeri (B2B)</option>
-                                    <option value="PAYTR">PayTR Sanal Pos (PAYTR)</option>
-                                    <option value="IYZICO">İyzico Sanal Pos (IYZICO)</option>
-                                    <option value="MARKETPLACE">Pazaryeri Entegrasyonları (MARKETPLACE)</option>
+                                    <option value="GENERAL">Platform Genel (Kayıt Sonrası Göster)</option>
+                                    <option value="CRM">Müşteri & CRM</option>
+                                    <option value="INVENTORY">Stok & Envanter (WMS)</option>
+                                    <option value="SALES">Satış & Sipariş Yönetimi</option>
+                                    <option value="PURCHASING">Satınalma & Tedarikçi</option>
+                                    <option value="ACCOUNTING">Genel Muhasebe & E-Defter</option>
+                                    <option value="TREASURY">Finans & Kasa / Banka</option>
+                                    <option value="EFATURA">E-Fatura & E-İrsaliye Merkezi</option>
+                                    <option value="REPORTS">Raporlar & Analizler</option>
+                                    <option value="B2B">B2B Pazaryeri (Alıcı/Satıcı)</option>
+                                    <option value="FIELD_SALES">Saha Satış Modülü</option>
                                     <option value="HR">Personel / İK (HR)</option>
-                                    <option value="POS">Mağaza POS Terminali (POS)</option>
-                                    <option value="KDS">Mutfak/Restoran Ekranı (KDS)</option>
+                                    <option value="POS">Mağaza POS Terminali</option>
+                                    <option value="KDS">Mutfak/Restoran Ekranı</option>
+                                    <option value="FINTECH">Fintech & Ödeme Sistemleri</option>
+                                    <option value="ASSETS">Demirbaş & Varlık Yönetimi</option>
+                                    <option value="ADVISOR">AI Danışman & Periodya Advisor</option>
+                                    <option value="MARKETPLACE">Pazaryeri Entegrasyonları</option>
+                                    <option value="ODEAL">Ödeal Sanal/Fiziksel Pos</option>
+                                    <option value="PAYTR">PayTR Sanal Pos</option>
+                                    <option value="IYZICO">İyzico Sanal Pos</option>
                                 </select>
                             </div>
                             <div>
