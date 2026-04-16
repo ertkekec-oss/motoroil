@@ -116,17 +116,17 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
 
     const handleSendInvoice = () => {
         if (!selectedCustomer) {
-            return showWarning("Cari Seçimi Eksik", "Fatura kesebilmek için lütfen Cari Hesap seçiniz.");
+            return showWarning(t('invoice.errCustomer'), t('invoice.errCustomerDesc'));
         }
         const validLines = invoiceLines.filter(l => l.name);
         if (validLines.length === 0) {
-            return showWarning("Fatura Boş", "Lütfen en az bir ürün/hizmet ekleyiniz.");
+            return showWarning(t('invoice.errEmpty'), t('invoice.errEmptyDesc'));
         }
 
         setInvoiceStatus('processing');
         setTimeout(() => {
             setInvoiceStatus('sent');
-            showSuccess("E-Fatura Başarıyla GİB'e İletildi", `Fatura Numarası: ${new Date().getFullYear()}${(Math.random().toString(36).substring(2, 8).toUpperCase())}`);
+            showSuccess(t('invoice.successGib'), `${t('invoice.invNoLabel')} ${new Date().getFullYear()}${(Math.random().toString(36).substring(2, 8).toUpperCase())}`);
         }, 1500);
     };
 
@@ -177,7 +177,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                                 className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer flex flex-col transition-colors border-b border-slate-50 dark:border-white/5 last:border-0"
                                             >
                                                 <span className="font-bold text-slate-800 dark:text-white text-[13px] leading-tight">{c.name}</span>
-                                                <span className="text-[11px] text-slate-500 mt-1 uppercase">{t('invoice.balance')}: {Number(c.balance || 0).toLocaleString()} TL • {c.taxOffice || '{t('invoice.taxOffice')}'}: {c.taxNumber || 'Tanımsız'}</span>
+                                                <span className="text-[11px] text-slate-500 mt-1 uppercase">{t('invoice.balance')}: {Number(c.balance || 0).toLocaleString()} TL • {c.taxOffice || t('invoice.taxOffice')}: {c.taxNumber || t('invoice.undefined')}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -199,7 +199,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                         </div>
                                     </div>
                                     <div className="mt-3 text-[11px] text-slate-500 leading-relaxed border-t border-slate-100 dark:border-white/5 pt-3">
-                                        {selectedCustomer.address || '{t('invoice.noAddress')}'}
+                                        {selectedCustomer.address || t('invoice.noAddress')}
                                         <br/>{selectedCustomer.district} / {selectedCustomer.city}
                                     </div>
                                 </div>
@@ -421,7 +421,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                         
                                         {invoiceType === 'ISTISNA' && (
                                             <td className="p-2 align-top pt-3">
-                                                <input type="text" placeholder="Örn: 301" value={line.istisnaCode || ''} onChange={(e) => updateLine(line.id, 'istisnaCode', e.target.value)} className="w-full bg-transparent border-b border-slate-200 dark:border-white/20 py-1.5 text-xs font-bold text-center outline-none focus:border-indigo-500" />
+                                                <input type="text" placeholder={t('invoice.placeholderIstisna')} value={line.istisnaCode || ''} onChange={(e) => updateLine(line.id, 'istisnaCode', e.target.value)} className="w-full bg-transparent border-b border-slate-200 dark:border-white/20 py-1.5 text-xs font-bold text-center outline-none focus:border-indigo-500" />
                                             </td>
                                         )}
 
@@ -572,7 +572,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                 {/* Final Action Bar */}
                 <div className="bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-white/10 p-4 shrink-0 flex flex-row justify-end items-center gap-3 rounded-b-xl">
                     <button className="px-5 py-2.5 rounded-lg font-bold bg-slate-100 text-slate-700 dark:bg-white/5 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-xs shadow-sm">
-                        <FileText size={14} className="hidden sm:inline" /> <span className="hidden sm:inline">TASLAK OLARAK KAYDET</span><span className="sm:hidden">{t('invoice.btnDraftShort')}</span>
+                        <FileText size={14} className="hidden sm:inline" /> <span className="hidden sm:inline">{t('invoice.btnDraft')}</span><span className="sm:hidden">{t('invoice.btnDraftShort')}</span>
                     </button>
                     <button 
                         onClick={handleSendInvoice}
