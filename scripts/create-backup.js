@@ -1,13 +1,7 @@
 /**
  * Veritabanı Yedekleme Script
  * 
- * Kullanım:
- * node scripts/create-backup.js
- * 
- * Bu script:
- * 1. Tüm veritabanı tablolarını export eder
- * 2. JSON formatında yedek oluşturur
- * 3. checkpoints/ klasörüne kaydeder
+ * Dinamik model bulma özelliği ile güncellendi.
  */
 
 const { PrismaClient } = require('@prisma/client');
@@ -25,78 +19,38 @@ async function createBackup() {
     console.log(`📁 Yedek dosyası: ${backupFile}`);
 
     try {
-        // Tüm verileri çek
+        // Find all models dynamically from prisma object
+        // They are lowercase getters
+        const models = Object.getOwnPropertyNames(prisma).filter(key => 
+            !key.startsWith('_') && 
+            !key.startsWith('$') && 
+            typeof prisma[key]?.findMany === 'function'
+        );
+
+        console.log(`🔍 Toplam ${models.length} tablo bulundu. Veriler çekiliyor...`);
+
+        const backupData = {};
+        const stats = {};
+
+        for (const model of models) {
+            try {
+                const records = await prisma[model].findMany();
+                backupData[model] = records;
+                stats[model] = records.length;
+            } catch (e) {
+                console.warn(`⚠️ Warning: ${model} modeli atlandı. (${e.message.split('\\n')[0]})`);
+            }
+        }
+
         const backup = {
             metadata: {
                 timestamp: new Date().toISOString(),
-                version: '4.2.0',
+                version: '4.2.0-dynamic',
                 checkpointId: `BACKUP_${timestamp}`,
+                stats
             },
-            data: {
-                users: await prisma.user.findMany(),
-                staff: await prisma.staff.findMany(),
-                branches: await prisma.branch.findMany(),
-                products: await prisma.product.findMany(),
-                customers: await prisma.customer.findMany(),
-                suppliers: await prisma.supplier.findMany(),
-                kasalar: await prisma.kasa.findMany(),
-                transactions: await prisma.transaction.findMany(),
-                salesInvoices: await prisma.salesInvoice.findMany(),
-                purchaseInvoices: await prisma.purchaseInvoice.findMany(),
-                checks: await prisma.check.findMany(),
-                orders: await prisma.order.findMany(),
-                serviceRecords: await prisma.serviceRecord.findMany(),
-                stockTransfers: await prisma.stockTransfer.findMany(),
-                campaigns: await prisma.campaign.findMany(),
-                coupons: await prisma.coupon.findMany(),
-                warranties: await prisma.warranty.findMany(),
-                auditLogs: await prisma.auditLog.findMany(),
-                securityEvents: await prisma.securityEvent.findMany(),
-                notifications: await prisma.notification.findMany(),
-                pendingProducts: await prisma.pendingProduct.findMany(),
-                pendingTransfers: await prisma.pendingTransfer.findMany(),
-                inventoryAudits: await prisma.inventoryAudit.findMany(),
-                appSettings: await prisma.appSettings.findMany(),
-                marketplaceConfigs: await prisma.marketplaceConfig.findMany(),
-                marketplaceProductMaps: await prisma.marketplaceProductMap.findMany(),
-                customerCategories: await prisma.customerCategory.findMany(),
-                customerDocuments: await prisma.customerDocument.findMany(),
-            },
+            data: backupData
         };
-
-        // İstatistikler
-        const stats = {
-            users: backup.data.users.length,
-            staff: backup.data.staff.length,
-            branches: backup.data.branches.length,
-            products: backup.data.products.length,
-            customers: backup.data.customers.length,
-            suppliers: backup.data.suppliers.length,
-            kasalar: backup.data.kasalar.length,
-            transactions: backup.data.transactions.length,
-            salesInvoices: backup.data.salesInvoices.length,
-            purchaseInvoices: backup.data.purchaseInvoices.length,
-            checks: backup.data.checks.length,
-            orders: backup.data.orders.length,
-            serviceRecords: backup.data.serviceRecords.length,
-            stockTransfers: backup.data.stockTransfers.length,
-            campaigns: backup.data.campaigns.length,
-            coupons: backup.data.coupons.length,
-            warranties: backup.data.warranties.length,
-            auditLogs: backup.data.auditLogs.length,
-            securityEvents: backup.data.securityEvents.length,
-            notifications: backup.data.notifications.length,
-            pendingProducts: backup.data.pendingProducts.length,
-            pendingTransfers: backup.data.pendingTransfers.length,
-            inventoryAudits: backup.data.inventoryAudits.length,
-            appSettings: backup.data.appSettings.length,
-            marketplaceConfigs: backup.data.marketplaceConfigs.length,
-            marketplaceProductMaps: backup.data.marketplaceProductMaps.length,
-            customerCategories: backup.data.customerCategories.length,
-            customerDocuments: backup.data.customerDocuments.length,
-        };
-
-        backup.metadata.stats = stats;
 
         // Dosyaya yaz
         if (!fs.existsSync(backupDir)) {
@@ -108,9 +62,21 @@ async function createBackup() {
         console.log('\n✅ Yedekleme tamamlandı!');
         console.log('\n📊 İstatistikler:');
         console.log('─'.repeat(50));
-        Object.entries(stats).forEach(([key, value]) => {
-            console.log(`  ${key.padEnd(25)} : ${value.toString().padStart(6)} kayıt`);
+        
+        // Tabloları kayıt sayısına göre sırala (büyükten küçüğe)
+        const sortedModels = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+        
+        sortedModels.forEach(([key, value]) => {
+            if (value > 0) {
+                console.log(`  ${key.padEnd(30)} : ${value.toString().padStart(6)} kayıt`);
+            }
         });
+        
+        const emptyCount = sortedModels.filter(m => m[1] === 0).length;
+        if (emptyCount > 0) {
+             console.log(`  (Diğer ${emptyCount} tablo boştur)`);
+        }
+        
         console.log('─'.repeat(50));
 
         const fileSizeMB = (fs.statSync(backupFile).size / 1024 / 1024).toFixed(2);
