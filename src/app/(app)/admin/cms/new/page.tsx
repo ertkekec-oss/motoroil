@@ -2,7 +2,7 @@ import React from "react";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { EnterprisePageShell } from "@/components/ui/enterprise";
+import { EnterprisePageShell, EnterpriseCard, EnterpriseInput, EnterpriseSelect, EnterpriseButton, EnterpriseField } from "@/components/ui/enterprise";
 import { Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -47,57 +47,53 @@ export default async function NewCMSPage() {
       title="Yeni Sayfa Oluştur"
       description="Yapay Zeka destekli boş bir şablon ile hemen vizyonunuzu koda dökün."
       actions={
-        <Link href="/admin/cms" className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-[#0E1528] text-sm font-semibold rounded-lg transition-all shadow-sm">
-          <ArrowLeft className="w-4 h-4" />
-          <span>Geri Dön</span>
+        <Link href="/admin/cms">
+          <EnterpriseButton variant="secondary" className="gap-2">
+            <ArrowLeft className="w-4 h-4" />GERİ DÖN
+          </EnterpriseButton>
         </Link>
       }
     >
       <div className="max-w-2xl mx-auto mt-8">
-        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-8">
-          <form action={createPage} className="space-y-6">
-            <div>
-              <label className="block text-sm font-bold text-[#0E1528] mb-2">Sayfa Başlığı</label>
-              <input 
+        <EnterpriseCard noPadding>
+          <div className="p-8">
+            <form action={createPage} className="space-y-6">
+              <EnterpriseInput 
                 name="title" 
+                label="SAYFA BAŞLIĞI"
                 required 
                 placeholder="Örn: Hakkımızda" 
-                className="w-full border border-slate-200 rounded-lg px-4 py-3 text-[#0E1528] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
               />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-bold text-[#0E1528] mb-2">URL (Slug)</label>
-              <div className="flex rounded-lg shadow-sm">
-                <span className="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-slate-200 bg-slate-50 text-slate-500 text-sm">
-                  periodya.com/
-                </span>
-                <input 
-                  name="slug" 
-                  required 
-                  placeholder="hakkimizda" 
-                  className="flex-1 min-w-0 block w-full px-4 py-3 border border-slate-200 rounded-none rounded-r-lg text-[#0E1528] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                />
+              
+              <EnterpriseField label="URL (SLUG)">
+                <div className="flex rounded-[16px] overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500 transition-all group">
+                  <span className="inline-flex items-center px-4 bg-slate-50 dark:bg-slate-800 text-slate-500 font-medium text-[13px] border-r border-slate-200 dark:border-slate-700">
+                    periodya.com/
+                  </span>
+                  <input 
+                    name="slug" 
+                    required 
+                    placeholder="hakkimizda" 
+                    className="flex-1 w-full h-11 px-4 bg-white dark:bg-[#0f172a] text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 outline-none"
+                  />
+                </div>
+              </EnterpriseField>
+
+              <EnterpriseSelect name="locale" label="SAYFA DİLİ">
+                <option value="tr">🇹🇷 TÜRKÇE (TR)</option>
+                <option value="en">🇬🇧 İNGİLİZCE (EN)</option>
+                <option value="de">🇩🇪 ALMANCA (DE)</option>
+              </EnterpriseSelect>
+
+              <div className="pt-6 mt-4 border-t border-slate-100 dark:border-white/5 flex justify-end">
+                <EnterpriseButton type="submit" variant="primary" className="gap-2">
+                  <Plus className="w-5 h-5" />
+                  OLUŞTUR VE EDİTÖRE GİT
+                </EnterpriseButton>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-[#0E1528] mb-2">Sayfa Dili</label>
-              <select name="locale" className="w-full border border-slate-200 rounded-lg px-4 py-3 text-[#0E1528] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm">
-                <option value="tr">Türkçe (TR)</option>
-                <option value="en">İngilizce (EN)</option>
-                <option value="de">Almanca (DE)</option>
-              </select>
-            </div>
-
-            <div className="pt-4 border-t border-slate-100 flex justify-end">
-              <button type="submit" className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all shadow-sm hover:shadow-md">
-                <Plus className="w-5 h-5" />
-                <span>Oluştur ve Editöre Git</span>
-              </button>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
+        </EnterpriseCard>
       </div>
     </EnterprisePageShell>
   );
