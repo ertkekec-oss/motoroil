@@ -79,8 +79,8 @@ export default async function OnboardingAdminPage() {
                             {steps.length === 0 ? (
                                 <EnterpriseEmptyState 
                                     icon={<ListChecks className="w-10 h-10" />}
-                                    title="Kayıt Bulunamadı"
-                                    description="Sistem üzerinde aktif bir onboarding adımı yoktur."
+                                    title="Özel Kayıt Bulunamadı"
+                                    description="Sistem üzerine kendi özel onboarding adımlarınızı henüz eklemediniz. Siz ekleyene kadar, tüm kullanıcılara ana ekranda varsayılan 3 temel görev (İlk Fatura, İlk Müşteri, Stok) gösterilmeye devam eder. Sağ taraftan ilk adımı eklediğiniz an varsayılan görevler devreden çıkar."
                                 />
                             ) : (
                                 <div className="space-y-4">
