@@ -2,8 +2,8 @@ import React from "react";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { EnterprisePageShell } from "@/components/ui/enterprise";
-import { ArrowLeft, Save, Globe, Shield, Database } from "lucide-react";
+import { EnterprisePageShell, EnterpriseCard, EnterpriseInput, EnterpriseTextarea, EnterpriseButton } from "@/components/ui/enterprise";
+import { ArrowLeft, Save, Globe, Shield, Database, Trash2, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 
@@ -86,9 +86,10 @@ export default async function CMSSettingsPage({ searchParams }: { searchParams: 
       title="Site Ayarları"
       description="Genel site yapılandırması ve meta bilgileri"
       actions={
-        <Link href="/admin/cms" className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-[#0E1528] text-sm font-semibold rounded-lg transition-all shadow-sm">
-          <ArrowLeft className="w-4 h-4" />
-          <span>Geri Dön</span>
+        <Link href="/admin/cms">
+          <EnterpriseButton variant="secondary" className="gap-2">
+            <ArrowLeft className="w-4 h-4" /> GERİ DÖN
+          </EnterpriseButton>
         </Link>
       }
     >
@@ -96,131 +97,119 @@ export default async function CMSSettingsPage({ searchParams }: { searchParams: 
         
         {/* Settings Navigation Sidebar */}
         <div className="lg:col-span-1 space-y-2">
-           <Link href="?tab=general" className={`w-full flex items-center gap-3 px-4 py-3 font-bold rounded-xl border transition-all ${activeTab === 'general' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-white text-slate-500 border-transparent hover:bg-slate-50'}`}>
+           <Link href="?tab=general" className={`w-full flex items-center gap-3 px-5 py-4 font-black tracking-widest uppercase text-[11px] rounded-[16px] border transition-all ${activeTab === 'general' ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30 shadow-sm' : 'bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
              <Globe className={`w-5 h-5 ${activeTab === 'general' ? '' : 'opacity-50'}`} />
-             <span className="text-sm">Genel Ayarlar</span>
+             GENEL AYARLAR
            </Link>
-           <Link href="?tab=seo" className={`w-full flex items-center gap-3 px-4 py-3 font-bold rounded-xl border transition-all ${activeTab === 'seo' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-white text-slate-500 border-transparent hover:bg-slate-50'}`}>
+           <Link href="?tab=seo" className={`w-full flex items-center gap-3 px-5 py-4 font-black tracking-widest uppercase text-[11px] rounded-[16px] border transition-all ${activeTab === 'seo' ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30 shadow-sm' : 'bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
              <Shield className={`w-5 h-5 ${activeTab === 'seo' ? '' : 'opacity-50'}`} />
-             <span className="text-sm">SEO & Meta</span>
+             SEO & META
            </Link>
-           <Link href="?tab=data" className={`w-full flex items-center gap-3 px-4 py-3 font-bold rounded-xl border transition-all ${activeTab === 'data' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-white text-slate-500 border-transparent hover:bg-slate-50'}`}>
+           <Link href="?tab=data" className={`w-full flex items-center gap-3 px-5 py-4 font-black tracking-widest uppercase text-[11px] rounded-[16px] border transition-all ${activeTab === 'data' ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30 shadow-sm' : 'bg-white dark:bg-[#1e293b] text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
              <Database className={`w-5 h-5 ${activeTab === 'data' ? '' : 'opacity-50'}`} />
-             <span className="text-sm">Veri ve Bakım</span>
+             VERİ VE BAKIM
            </Link>
         </div>
 
         {/* Main Form Area */}
         <div className="lg:col-span-3">
           {activeTab === 'general' && (
-            <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-8">
-              <h3 className="text-xl font-bold text-[#0E1528] mb-6 pb-4 border-b border-slate-100">Genel Yapılandırma</h3>
-              
+            <EnterpriseCard title="Genel Yapılandırma" icon={<Globe className="w-5 h-5 text-indigo-500" />}>
+              <div className="mb-6 pb-6 border-b border-slate-100 dark:border-white/5">
+                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Sitenizin temel yayın kimlik bilgileri.</p>
+              </div>
               <form action={updateGeneralSettings} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-bold text-[#0E1528] mb-2">Site Adı</label>
-                  <input 
-                    name="name" 
-                    defaultValue={site.name}
-                    required 
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-[#0E1528] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
-                  />
-                  <p className="text-xs text-slate-500 font-medium mt-2">Bu isim CMS panelinde ve tarayıcı başlığında kullanılacaktır.</p>
-                </div>
+                <EnterpriseInput 
+                  name="name" 
+                  label="SİTE ADI"
+                  defaultValue={site.name}
+                  required 
+                  hint="Bu isim CMS panelinde ve tarayıcı başlığında kullanılacaktır."
+                />
                 
-                <div>
-                  <label className="block text-sm font-bold text-[#0E1528] mb-2">Varsayılan Domain</label>
-                  <input 
-                    name="domain" 
-                    defaultValue={site.domain}
-                    required 
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-[#0E1528] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
-                  />
-                </div>
+                <EnterpriseInput 
+                  name="domain" 
+                  label="VARSAYILAN DOMAIN"
+                  defaultValue={site.domain}
+                  required 
+                />
 
-                <div className="pt-6 border-t border-slate-100 flex justify-end">
-                  <button type="submit" className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all shadow-sm hover:shadow-md">
-                    <Save className="w-5 h-5" />
-                    <span>Ayarları Kaydet</span>
-                  </button>
+                <div className="pt-6 mt-4 border-t border-slate-100 dark:border-white/5 flex justify-end">
+                  <EnterpriseButton type="submit" variant="primary" className="gap-2">
+                    <Save className="w-4 h-4" /> AYARLARI KAYDET
+                  </EnterpriseButton>
                 </div>
               </form>
-            </div>
+            </EnterpriseCard>
           )}
 
           {activeTab === 'seo' && (
-            <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-8">
-              <h3 className="text-xl font-bold text-[#0E1528] mb-6 pb-4 border-b border-slate-100">SEO & Meta Etiketleri</h3>
-              
+            <EnterpriseCard title="SEO & Meta Etiketleri" icon={<Shield className="w-5 h-5 text-indigo-500" />}>
+              <div className="mb-6 pb-6 border-b border-slate-100 dark:border-white/5">
+                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Arama motorları için standart yapılandırmalar.</p>
+              </div>
+
               <form action={updateSEOSettings} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-bold text-[#0E1528] mb-2">Varsayılan Sayfa Başlığı (Title)</label>
-                  <input 
-                    name="title" 
-                    defaultValue={seoData.title || "Periodya Enterprise | Türkiye'nin En Kapsamlı ERP Yazılımı | Periodya"}
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-[#0E1528] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
-                  />
-                </div>
+                <EnterpriseInput 
+                  name="title" 
+                  label="VARSAYILAN SAYFA BAŞLIĞI (TITLE)"
+                  defaultValue={seoData.title || "Periodya Enterprise | Türkiye'nin En Kapsamlı ERP Yazılımı | Periodya"}
+                />
                 
-                <div>
-                  <label className="block text-sm font-bold text-[#0E1528] mb-2">Meta Açıklaması (Description)</label>
-                  <textarea 
-                    name="description" 
-                    rows={3}
-                    defaultValue={seoData.description || "Finans, Stok, Satış ve Saha Operasyonları tek bir platformda."}
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-[#0E1528] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm resize-none"
-                  />
-                </div>
+                <EnterpriseTextarea 
+                  name="description" 
+                  label="META AÇIKLAMASI (DESCRIPTION)"
+                  rows={3}
+                  defaultValue={seoData.description || "Finans, Stok, Satış ve Saha Operasyonları tek bir platformda."}
+                />
 
-                <div>
-                  <label className="block text-sm font-bold text-[#0E1528] mb-2">Anahtar Kelimeler (Keywords)</label>
-                  <input 
-                    name="keywords" 
-                    defaultValue={seoData.keywords || "erp, b2b, b2c, muhasebe, finans"}
-                    className="w-full border border-slate-200 rounded-lg px-4 py-3 text-[#0E1528] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"
-                  />
-                  <p className="text-xs text-slate-500 font-medium mt-2">Kelimeleri virgül ile ayırarak yazın.</p>
-                </div>
+                <EnterpriseInput 
+                  name="keywords" 
+                  label="ANAHTAR KELİMELER (KEYWORDS)"
+                  defaultValue={seoData.keywords || "erp, b2b, b2c, muhasebe, finans"}
+                  hint="Kelimeleri virgül ile ayırarak yazın."
+                />
 
-                <div className="pt-6 border-t border-slate-100 flex justify-end">
-                  <button type="submit" className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all shadow-sm hover:shadow-md">
-                    <Save className="w-5 h-5" />
-                    <span>Ayarları Kaydet</span>
-                  </button>
+                <div className="pt-6 mt-4 border-t border-slate-100 dark:border-white/5 flex justify-end">
+                  <EnterpriseButton type="submit" variant="primary" className="gap-2">
+                    <Save className="w-4 h-4" /> AYARLARI KAYDET
+                  </EnterpriseButton>
                 </div>
               </form>
-            </div>
+            </EnterpriseCard>
           )}
 
           {activeTab === 'data' && (
-            <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-8">
-              <h3 className="text-xl font-bold text-[#0E1528] mb-6 pb-4 border-b border-slate-100">Veri ve Bakım</h3>
-              
+            <EnterpriseCard title="Veri ve Bakım" icon={<Database className="w-5 h-5 text-indigo-500" />}>
+              <div className="mb-6 pb-6 border-b border-slate-100 dark:border-white/5">
+                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Önbellek (Cache) temizliği ve riskli operasyonlar.</p>
+              </div>
+
               <div className="space-y-6">
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-                   <h4 className="font-bold text-slate-800 mb-2">Sistem Önbelleğini Temizle</h4>
-                   <p className="text-sm text-slate-600 mb-4">CMS değişikliklerinin canlıya yansıması için sistem önbelleğini temizleyin.</p>
+                <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 rounded-2xl p-6">
+                   <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-widest text-[13px] mb-2">SİSTEM ÖNBELLEĞİNİ TEMİZLE</h4>
+                   <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-6">CMS değişikliklerinin canlıya yansıması için sistem önbelleğini (cache) temizleyin.</p>
                    {sp.cache === "cleared" && (
-                     <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 text-sm font-bold rounded-lg">
-                       Sistem önbelleği başarıyla temizlendi!
+                     <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-widest rounded-xl">
+                       SİSTEM ÖNBELLEĞİ BAŞARIYLA TEMİZLENDİ!
                      </div>
                    )}
                    <form action={clearSystemCache}>
-                     <button type="submit" className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg text-sm transition-all shadow-sm">
-                       Önbelleği Temizle
-                     </button>
+                     <EnterpriseButton type="submit" variant="secondary" className="gap-2">
+                       <RefreshCw className="w-4 h-4" /> ÖNBELLEĞİ TEMİZLE
+                     </EnterpriseButton>
                    </form>
                 </div>
 
-                <div className="bg-red-50 border border-red-100 rounded-lg p-6">
-                   <h4 className="font-bold text-red-800 mb-2">Tehlikeli Alan</h4>
-                   <p className="text-sm text-red-600 mb-4">Bu işlemler geri alınamaz. Lütfen dikkatli kullanın.</p>
-                   <button disabled className="px-4 py-2 bg-red-600 opacity-50 cursor-not-allowed text-white font-semibold rounded-lg text-sm transition-all shadow-sm">
-                     Veritabanını Yeniden Yapılandır
-                   </button>
+                <div className="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 rounded-2xl p-6">
+                   <h4 className="font-black text-rose-700 dark:text-rose-400 uppercase tracking-widest text-[13px] mb-2 flex items-center gap-2"><Shield className="w-4 h-4"/> TEHLİKELİ ALAN</h4>
+                   <p className="text-xs font-bold text-rose-600/80 dark:text-rose-400/80 mb-6">Bu işlemler geri alınamaz. Lütfen dikkatli kullanın.</p>
+                   <EnterpriseButton disabled variant="danger" className="gap-2">
+                     <Trash2 className="w-4 h-4" /> VERİTABANINI SİL
+                   </EnterpriseButton>
                 </div>
               </div>
-            </div>
+            </EnterpriseCard>
           )}
         </div>
 
