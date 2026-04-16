@@ -361,8 +361,23 @@ export default function PlatformKycClient() {
                         <h2 className="text-xl font-bold mb-4">Yeni Kural / Evrak Gereksinimi</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-xs font-medium text-slate-400 mb-1">Bağlı Modül (Örn: EFATURA, ODEAL, B2B)</label>
-                                <input value={ruleForm.moduleId} onChange={e => setRuleForm({ ...ruleForm, moduleId: e.target.value.toUpperCase() })} className="w-full bg-slate-800 border-none rounded-xl h-10 px-3 text-white focus:ring-2 focus:ring-blue-500" />
+                                <label className="block text-xs font-medium text-slate-400 mb-1">Bağlı Modül</label>
+                                <select 
+                                    value={ruleForm.moduleId} 
+                                    onChange={e => setRuleForm({ ...ruleForm, moduleId: e.target.value })} 
+                                    className="w-full bg-slate-800 border-none rounded-xl h-10 px-3 text-white focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="" disabled>Modül Seçiniz...</option>
+                                    <option value="EFATURA">E-Fatura & E-Arşiv (EFATURA)</option>
+                                    <option value="ODEAL">Ödeal Sanal/Fiziksel Pos (ODEAL)</option>
+                                    <option value="B2B">B2B Pazaryeri (B2B)</option>
+                                    <option value="PAYTR">PayTR Sanal Pos (PAYTR)</option>
+                                    <option value="IYZICO">İyzico Sanal Pos (IYZICO)</option>
+                                    <option value="MARKETPLACE">Pazaryeri Entegrasyonları (MARKETPLACE)</option>
+                                    <option value="HR">Personel / İK (HR)</option>
+                                    <option value="POS">Mağaza POS Terminali (POS)</option>
+                                    <option value="KDS">Mutfak/Restoran Ekranı (KDS)</option>
+                                </select>
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-slate-400 mb-1">Gereksinim Adı</label>
