@@ -1,5 +1,5 @@
 import { NetworkJobPayload } from './jobTypes';
-import { unstable_after as after } from 'next/server';
+import { after } from 'next/server';
 
 export async function dispatchNetworkJob(payload: NetworkJobPayload) {
     // Current foundation for async background queue execution

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PrismaClient } from '@prisma/client';
 import { TrendyolActionProvider } from '../src/services/marketplaces/actions/providers/trendyol-actions';
 
@@ -33,3 +34,4 @@ async function main() {
     process.exit(0);
 }
 main().catch(console.error);
+

@@ -6,14 +6,14 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
         const companyId = session.companyId;
-        const productId = params.id;
+        const productId = (await params).id;
 
         const mappings = await prisma.marketplaceProductMap.findMany({
             where: {
@@ -33,14 +33,14 @@ export async function GET(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getSession();
         if (!session) return NextResponse.json({ error: 'Oturum gerekli' }, { status: 401 });
 
         const companyId = session.companyId;
-        const productId = params.id;
+        const productId = (await params).id;
 
         const body = await request.json();
         const { mappingId } = body;

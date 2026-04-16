@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PrismaClient } from '@prisma/client';
 import { Queue } from 'bullmq';
 
@@ -34,3 +35,4 @@ async function main() {
     process.exit(0);
 }
 main().catch(console.error);
+

@@ -34,7 +34,11 @@ export default function AdminSignaturesPage() {
                 ))}
             </div>
 
-            <EnterpriseCard title="Güvenlik Durumu" icon={<ShieldCheck className="w-5 h-5 text-rose-500" />}>
+            <EnterpriseCard>
+                <div className="flex items-center gap-3">
+                    <ShieldCheck className="w-5 h-5 text-rose-500" />
+                    <h3 className="font-bold text-slate-900 dark:text-white">Güvenlik Durumu</h3>
+                </div>
                 <div className="mt-4 p-4 bg-rose-50 dark:bg-rose-500/5 text-rose-700 dark:text-rose-300 rounded-xl text-sm font-medium border border-rose-100 dark:border-rose-500/20">
                     Tüm imza bağlantıları tenant izoleli uç noktalardan geçmekte olup, atanan tokenler varsayılan olarak 7 gün sonra geçersiz kılınmaktadır. Dış API rate threshold seviyeleri "Sıkı" (100 req/min) profilindedir.
                 </div>

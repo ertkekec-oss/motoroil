@@ -21,8 +21,8 @@ export class ResendMailProvider implements MailProvider {
                     from: process.env.MAIL_FROM || 'Periodya Enterprise <noreply@periodya.com>',
                     to: [payload.to],
                     subject: payload.subject,
-                    html: payload.htmlBody || `<p>${payload.textBody || ''}</p>`,
-                    text: payload.textBody
+                    html: payload.html || `<p>${payload.text || ''}</p>`,
+                    text: payload.text
                 })
             });
 

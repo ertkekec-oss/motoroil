@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PrismaClient } from '@prisma/client';
 import { ActionProviderRegistry } from '../src/services/marketplaces/actions/registry';
 
@@ -45,3 +46,4 @@ async function main() {
     process.exit(0);
 }
 main().catch(console.error);
+

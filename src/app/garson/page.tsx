@@ -16,7 +16,8 @@ import {
     Coffee,
     Pizza,
     IceCream,
-    Send
+    Send,
+    Trash2
 } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
 

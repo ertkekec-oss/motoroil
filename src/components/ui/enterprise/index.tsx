@@ -6,12 +6,16 @@ export const EnterpriseCard = ({
     className = '',
     noPadding = false,
     borderLeftColor = '',
+    title,
+    icon,
     onClick
 }: {
     children?: React.ReactNode;
     className?: string;
     noPadding?: boolean;
     borderLeftColor?: string;
+    title?: string;
+    icon?: React.ReactNode;
     onClick?: React.MouseEventHandler<HTMLDivElement>;
 }) => {
     return (
@@ -23,6 +27,12 @@ export const EnterpriseCard = ({
             {/* Ambient Background Glow Effect (Subtle) */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 dark:bg-teal-500/10 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/3 pointer-events-none transition-all duration-500"></div>
             <div className="relative z-10 w-full">
+                {title && (
+                    <div className="flex items-center gap-3 mb-4">
+                        {icon && icon}
+                        <h3 className="font-bold text-slate-900 dark:text-white">{title}</h3>
+                    </div>
+                )}
                 {children}
             </div>
         </div>

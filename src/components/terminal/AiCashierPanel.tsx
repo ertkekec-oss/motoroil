@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Sparkles, PackagePlus } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function AiCashierPanel({ cartItems, onAddSuggested, allProducts = [] }: { cartItems: any[], onAddSuggested: (prod: any) => void, allProducts?: any[] }) {
-    import { useLanguage } from '@/contexts/LanguageContext';
 
 const isAiEnabled = process.env.NEXT_PUBLIC_POS_AI_CASHIER !== 'false';
     const [isCollapsed, setIsCollapsed] = useState(false);

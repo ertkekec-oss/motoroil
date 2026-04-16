@@ -200,7 +200,7 @@ export default async function CMSSettingsPage({ searchParams }: { searchParams: 
                 <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
                    <h4 className="font-bold text-slate-800 mb-2">Sistem Önbelleğini Temizle</h4>
                    <p className="text-sm text-slate-600 mb-4">CMS değişikliklerinin canlıya yansıması için sistem önbelleğini temizleyin.</p>
-                   {searchParams.cache === "cleared" && (
+                   {sp.cache === "cleared" && (
                      <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 text-sm font-bold rounded-lg">
                        Sistem önbelleği başarıyla temizlendi!
                      </div>

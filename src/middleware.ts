@@ -205,12 +205,12 @@ export async function middleware(request: NextRequest) {
         const { payload } = await jwtVerify(sessionToken, getJWTAscii());
         
         // --- 6. ENTERPRISE ROLE-BASED ACCESS CONTROL (RBAC) ---
-        const userRole = String(payload?.role || '').toUpperCase('tr-TR');
+        const userRole = String(payload?.role || '').toLocaleUpperCase('tr-TR');
         const role = userRole.trim();
         
         const hasRole = (roles: string[]) => {
             if (role.includes('ADMIN') || role === 'SİSTEM YÖNETİCİSİ' || role === 'ŞİRKET YÖNETİCİSİ') return true;
-            return roles.some(r => role.includes(r.toUpperCase('tr-TR')));
+            return roles.some(r => role.includes(r.toLocaleUpperCase('tr-TR')));
         };
 
         // Module URL Path -> Permitted Role Keywords

@@ -39,7 +39,11 @@ export default function LimitsPage() {
             actions={<button onClick={handleSave} className="flex gap-2 items-center px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl"><Save className="w-4 h-4"/> Değişiklikleri Kaydet</button>}
         >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <EnterpriseCard title="Global İstek Oranları" icon={<Activity className="w-5 h-5"/>} className="border border-indigo-100">
+                <EnterpriseCard className="border border-indigo-100">
+                    <div className="flex items-center gap-3">
+                        <Activity className="w-5 h-5"/>
+                        <h3 className="font-bold text-slate-900 dark:text-white">Global İstek Oranları</h3>
+                    </div>
                     <div className="space-y-4 pt-4">
                         <div>
                             <label className="text-xs font-bold text-slate-500 uppercase">Kimliği Doğrulanmayanlar (IP/Saniye)</label>
@@ -52,7 +56,11 @@ export default function LimitsPage() {
                     </div>
                 </EnterpriseCard>
 
-                <EnterpriseCard title="Finansal İşlem Kilidi (Idempotency)" icon={<Shield className="w-5 h-5"/>}>
+                <EnterpriseCard>
+                    <div className="flex items-center gap-3">
+                        <Shield className="w-5 h-5"/>
+                        <h3 className="font-bold text-slate-900 dark:text-white">Finansal İşlem Kilidi (Idempotency)</h3>
+                    </div>
                     <div className="space-y-4 pt-4">
                         <div>
                             <label className="text-xs font-bold text-slate-500 uppercase">Idempotency Key Geçerlilik (Saat)</label>
