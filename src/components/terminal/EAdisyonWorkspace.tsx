@@ -70,7 +70,7 @@ export default function EAdisyonWorkspace({ products }: any) {
             
             if (data.success) {
                 setInvoiceStatus('sent');
-                showSuccess("{t('adission.successTitle')}", `Belge GİB'e iletildi ve fiş çıkartılıyor.`);
+                showSuccess(t('adission.successTitle'), `Belge GİB'e iletildi ve fiş çıkartılıyor.`);
                 
                 setTables(tables.map(t => t.id === activeTable.id ? { ...t, status: 'empty', items: [], openTime: null, waiter: null } : t));
                 

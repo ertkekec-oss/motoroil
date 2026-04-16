@@ -161,7 +161,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                 <input 
-                                    placeholder="{t('invoice.searchCustomer')}" 
+                                    placeholder={t('invoice.searchCustomer')} 
                                     className="w-full pl-10 pr-4 py-3 bg-white dark:bg-[#0f172a] border-l-4 border-l-indigo-500 border border-slate-200 dark:border-white/10 rounded-xl font-bold text-sm outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-sm"
                                     value={customerSearch}
                                     onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); }}
@@ -299,7 +299,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                             type="text" 
                                             value={dispatchNo} 
                                             onChange={(e) => setDispatchNo(e.target.value)} 
-                                            placeholder="{t('invoice.dispatchPlaceholder')}" 
+                                            placeholder={t('invoice.dispatchPlaceholder')} 
                                             className="w-36 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded px-2 py-1 text-[11px] font-bold outline-none focus:ring-1 focus:ring-indigo-500 uppercase" 
                                         />
                                     </div>
@@ -373,7 +373,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                                                         }, 200);
                                                     }}
                                                     className="w-full bg-transparent font-bold text-slate-800 dark:text-white text-xs outline-none border-b border-transparent focus:border-indigo-500 pb-1"
-                                                    placeholder="{t('invoice.itemSearch')}"
+                                                    placeholder={t('invoice.itemSearch')}
                                                 />
                                                 <div className="text-[9px] mt-1 space-x-2 font-medium">
                                                     <span className="text-slate-400 cursor-pointer hover:text-indigo-500" onClick={() => {
@@ -515,7 +515,7 @@ export default function B2BInvoiceWorkspace({ products, customers }: any) {
                     
                     <div className="flex-1 max-w-xl">
                         <label className="text-[10px] font-bold text-slate-400 block uppercase tracking-widest mb-1.5">{t('invoice.noteLabel')}</label>
-                        <textarea placeholder="{t('invoice.notePlaceholder')}" className="w-full h-32 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg p-3 text-sm font-medium resize-none outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm leading-relaxed" />
+                        <textarea placeholder={t('invoice.notePlaceholder')} className="w-full h-32 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg p-3 text-sm font-medium resize-none outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm leading-relaxed" />
                     </div>
 
                     <div className="w-[320px] shrink-0 bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/10 rounded-lg shadow-sm p-4 flex flex-col space-y-2 ml-auto">
