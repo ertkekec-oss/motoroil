@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import { Map, Users, Bike, Package, CheckCircle2, Clock, Phone, AlertCircle, Navigation } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function CourierDispatchWorkspace() {
     const { showConfirm, showSuccess } = useModal();
+    const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState<'DISPATCH' | 'MAP'>('DISPATCH');
 
     // Mock data for the Courier Dispatch system
@@ -23,10 +25,10 @@ export default function CourierDispatchWorkspace() {
 
     const handleAssign = (orderId: string, courierName: string) => {
         showConfirm(
-            'Kurye Atama Onayı',
-            `${orderId} nolu sipariş ${courierName} adlı kuryeye zimmetlenecektir. Onaylıyor musunuz?`,
+            t('courier.confirmTitle'),
+            `\$\{orderId\} ${t('courier.confirmMsgPart1')} \$\{courierName\} ${t('courier.confirmMsgPart2')}`,
             () => {
-                showSuccess('Atandı!', `Sipariş ${courierName} üzerine alındı ve SMS gönderildi.`);
+                showSuccess(t('courier.successTitle'), `${t('courier.successMsgPart1')} \$\{courierName\} ${t('courier.successMsgPart2')}`);
             }
         );
     };
@@ -41,10 +43,10 @@ export default function CourierDispatchWorkspace() {
                     </div>
                     <div className="flex flex-col min-w-0">
                         <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-none truncate">
-                            Kurye Operasyonu
+                            {t('courier.title')}
                         </h1>
                         <span className="text-[12px] font-bold tracking-widest uppercase text-slate-500 mt-1.5 block">
-                            Paket Servis Takibi ve Zimmet Panosu
+                            {t('courier.subtitle')}
                         </span>
                     </div>
                 </div>
@@ -74,7 +76,7 @@ export default function CourierDispatchWorkspace() {
                                 <Package className="text-orange-500" size={20}/>
                                 Teslimat Bekleyen Siparişler
                             </h3>
-                            <span className="bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 font-bold px-2.5 py-1 rounded-full text-xs">{waitingOrders.length} Paket</span>
+                            <span className="bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 font-bold px-2.5 py-1 rounded-full text-xs">{waitingOrders.length} {t('courier.package')}</span>
                         </div>
                         <div className="flex-1 overflow-y-auto custom-scroll p-4 space-y-4">
                             {waitingOrders.map((order, idx) => (
@@ -94,7 +96,7 @@ export default function CourierDispatchWorkspace() {
                                         <span className="font-black text-slate-900 dark:text-white">{order.total}</span>
                                         <div className="flex items-center gap-2">
                                             <select className="text-xs font-bold bg-slate-50 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 rounded-lg px-2 py-1.5 outline-none cursor-pointer">
-                                                <option value="">Kurye Seç...</option>
+                                                <option value="">{t('courier.selectCourier')}</option>
                                                 <option value="C-2">Can Özkan (Müsait)</option>
                                                 <option value="C-3">Volkan K. (Dönüşte)</option>
                                             </select>
@@ -115,7 +117,7 @@ export default function CourierDispatchWorkspace() {
                                 <Bike className="text-blue-500" size={20}/>
                                 Aktif Kurye Filosu
                             </h3>
-                            <button className="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1"><Navigation size={14}/> Tümü Haritada</button>
+                            <button className="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1"><Navigation size={14}/> {t('courier.allOnMap')}</button>
                         </div>
                         <div className="flex-1 overflow-y-auto custom-scroll p-4 grid grid-cols-1 gap-4">
                             {activeCouriers.map((c, i) => (
@@ -136,7 +138,7 @@ export default function CourierDispatchWorkspace() {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tahmini Süre</div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('courier.eta')}</div>
                                         <div className="text-lg font-black text-slate-700 dark:text-slate-300">{c.eta}</div>
                                     </div>
                                 </div>
@@ -152,8 +154,8 @@ export default function CourierDispatchWorkspace() {
                     <div className="absolute inset-0 bg-[#e2e8f0] dark:bg-[#0f172a] opacity-50 z-0"></div>
                     <div className="z-10 flex flex-col items-center p-8 text-center max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10">
                         <Map size={64} className="text-blue-500 mb-6"/>
-                        <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Canlı Harita Devrede</h2>
-                        <p className="text-sm font-medium text-slate-500 leading-relaxed mb-6">Paket servisteki tüm kuryelerinizin anlık koordinatları, Periodya Field Planner altyapısı (Leaflet OSM) üzerinden 10 saniyede bir güncellenerek bu alanda yansıtılacaktır.</p>
+                        <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">{t('courier.mapActive')}</h2>
+                        <p className="text-sm font-medium text-slate-500 leading-relaxed mb-6">{t('courier.mapDesc')}</p>
                         <button onClick={() => setActiveTab('DISPATCH')} className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-md">
                             Zimmet Panosuna Dön
                         </button>

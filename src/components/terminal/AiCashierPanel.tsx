@@ -2,8 +2,11 @@ import React, { useState, useMemo } from 'react';
 import { Sparkles, PackagePlus } from 'lucide-react';
 
 export default function AiCashierPanel({ cartItems, onAddSuggested, allProducts = [] }: { cartItems: any[], onAddSuggested: (prod: any) => void, allProducts?: any[] }) {
-    const isAiEnabled = process.env.NEXT_PUBLIC_POS_AI_CASHIER !== 'false';
+    import { useLanguage } from '@/contexts/LanguageContext';
+
+const isAiEnabled = process.env.NEXT_PUBLIC_POS_AI_CASHIER !== 'false';
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const { t } = useLanguage();
 
     // AI Heuristic: Find products related to the cart's latest item, or random "bestsellers"
     const suggestedProducts = useMemo(() => {
@@ -35,10 +38,10 @@ export default function AiCashierPanel({ cartItems, onAddSuggested, allProducts 
                     <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                         <Sparkles size={18} className={cartItems.length > 0 ? "animate-pulse" : ""} />
                     </div>
-                    <h3 className="text-sm font-bold text-slate-800 dark:text-white">Akıllı Kasiyer (AI)</h3>
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-white">{t('ai.cashier')}</h3>
                 </div>
                 <button className="text-xs font-semibold text-slate-400 hover:text-slate-600 transition-colors">
-                    {isCollapsed ? 'GÖSTER' : 'GİZLE'}
+                    {isCollapsed ? t('ai.show') : t('ai.hide')}
                 </button>
             </div>
 
@@ -46,7 +49,7 @@ export default function AiCashierPanel({ cartItems, onAddSuggested, allProducts 
                 <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2">
                     {cartItems.length === 0 ? (
                         <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl justify-center">
-                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Öneri İçin Ürün Ekleyin</span>
+                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">{t('ai.addForSuggestion')}</span>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -57,7 +60,7 @@ export default function AiCashierPanel({ cartItems, onAddSuggested, allProducts 
                                             <PackagePlus size={14} />
                                         </div>
                                         <div className="truncate pr-2">
-                                            <p className="text-[10px] font-bold text-indigo-500 mb-0.5 uppercase tracking-widest">Birlikte Alınan</p>
+                                            <p className="text-[10px] font-bold text-indigo-500 mb-0.5 uppercase tracking-widest">{t('ai.boughtTogether')}</p>
                                             <p className="text-xs font-bold text-slate-800 dark:text-white truncate">{prod.name}</p>
                                         </div>
                                     </div>
@@ -65,12 +68,12 @@ export default function AiCashierPanel({ cartItems, onAddSuggested, allProducts 
                                         onClick={(e) => { e.stopPropagation(); onAddSuggested(prod); }}
                                         className="shrink-0 px-3 py-1.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/30 transition-colors rounded-lg text-[11px] font-black tracking-widest shadow-sm"
                                     >
-                                        EKLE
+                                        {t('ai.add')}
                                     </button>
                                 </div>
                             )) : (
                                 <div className="col-span-1 md:col-span-2 flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl justify-center">
-                                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Uygun Öneri Bulunamadı</span>
+                                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">{t('ai.noSuggestion')}</span>
                                 </div>
                             )}
                         </div>

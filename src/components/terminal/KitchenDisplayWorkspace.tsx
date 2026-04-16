@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Play, CheckCircle2, BellRing, ChefHat, Maximize, AlertCircle, UtensilsCrossed } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type TicketStatus = 'pending' | 'preparing' | 'ready';
 
@@ -24,6 +25,7 @@ interface Ticket {
 
 export default function KitchenDisplayWorkspace() {
     const { showSuccess } = useModal();
+    const { t } = useLanguage();
     const [currentTime, setCurrentTime] = useState(new Date());
 
     // Mock initial tickets
@@ -71,7 +73,7 @@ export default function KitchenDisplayWorkspace() {
     const updateStatus = (ticketId: string, newStatus: TicketStatus) => {
         setTickets(tickets.map(t => t.id === ticketId ? { ...t, status: newStatus } : t));
         if (newStatus === 'ready') {
-            showSuccess('Servise Hazır', `Sipariş #${ticketId} hazırlandı. Garson terminaline bildirim gönderildi.`);
+            showSuccess(t('kitchen.successTitle'), `\$\{ticketId\} ${t('kitchen.successMsgPart2')}`);
             
             // Remove 'ready' tickets after 5 seconds to keep screen clean
             setTimeout(() => {
@@ -96,8 +98,8 @@ export default function KitchenDisplayWorkspace() {
                         <ChefHat size={24} className="text-white" strokeWidth={2.5}/>
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black text-white tracking-tight leading-none mb-1">KITCHEN SYSTEM <span className="text-blue-400 font-bold text-lg opacity-80">(KDS)</span></h1>
-                        <p className="text-slate-400 text-xs font-bold tracking-widest uppercase">Mutfak Görüntüleme & Optimizasyon Panosu</p>
+                        <h1 className="text-2xl font-black text-white tracking-tight leading-none mb-1">{t('kitchen.systemTitle')} <span className="text-blue-400 font-bold text-lg opacity-80">(KDS)</span></h1>
+                        <p className="text-slate-400 text-xs font-bold tracking-widest uppercase">{t('kitchen.systemSubtitle')}</p>
                     </div>
                 </div>
 
@@ -108,7 +110,7 @@ export default function KitchenDisplayWorkspace() {
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                               <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
                             </span>
-                            <span className="text-sm font-black tracking-widest">{pendingTickets.length} BEKLEYEN</span>
+                            <span className="text-sm font-black tracking-widest">{pendingTickets.length} {t('kitchen.waiting')}</span>
                         </div>
                     </div>
                     
@@ -133,7 +135,7 @@ export default function KitchenDisplayWorkspace() {
                     <div className="px-5 py-4 border-b border-rose-500/20 bg-rose-500/10 flex justify-between items-center shrink-0">
                         <div className="flex items-center gap-2 text-rose-400">
                             <BellRing size={20} strokeWidth={2.5}/>
-                            <h2 className="text-lg font-black tracking-widest uppercase">Bekliyor (Yeni)</h2>
+                            <h2 className="text-lg font-black tracking-widest uppercase">{t('kitchen.waitingNew')}</h2>
                         </div>
                         <span className="bg-rose-500 text-white font-black px-3 py-1 rounded-lg text-sm">{pendingTickets.length}</span>
                     </div>
@@ -153,7 +155,7 @@ export default function KitchenDisplayWorkspace() {
                                         </div>
                                         <div className="text-right">
                                             <span className={`text-2xl font-black ${isLate ? 'text-rose-400' : 'text-slate-300'}`}>{minutes}'</span>
-                                            <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Önce</span>
+                                            <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">{t('kitchen.ago')}</span>
                                         </div>
                                     </div>
                                     
@@ -194,7 +196,7 @@ export default function KitchenDisplayWorkspace() {
                     <div className="px-5 py-4 border-b border-amber-500/20 bg-amber-500/10 flex justify-between items-center shrink-0">
                         <div className="flex items-center gap-2 text-amber-400">
                             <UtensilsCrossed size={20} strokeWidth={2.5}/>
-                            <h2 className="text-lg font-black tracking-widest uppercase">Hazırlanıyor</h2>
+                            <h2 className="text-lg font-black tracking-widest uppercase">{t('kitchen.preparing')}</h2>
                         </div>
                         <span className="bg-amber-500 text-white font-black px-3 py-1 rounded-lg text-sm">{preparingTickets.length}</span>
                     </div>
@@ -239,7 +241,7 @@ export default function KitchenDisplayWorkspace() {
                         })}
                         {preparingTickets.length === 0 && (
                             <div className="flex h-full items-center justify-center text-slate-600 font-bold uppercase tracking-widest text-sm">
-                                Tezgahta SİPARİŞ YOK
+                                {t('kitchen.noOrderPrep')}
                             </div>
                         )}
                     </div>
@@ -250,7 +252,7 @@ export default function KitchenDisplayWorkspace() {
                     <div className="px-5 py-4 border-b border-emerald-500/20 bg-emerald-500/10 flex justify-between items-center shrink-0">
                         <div className="flex items-center gap-2 text-emerald-400">
                             <CheckCircle2 size={20} strokeWidth={2.5}/>
-                            <h2 className="text-lg font-black tracking-widest uppercase">Hazır (Alınmayı Bekliyor)</h2>
+                            <h2 className="text-lg font-black tracking-widest uppercase">{t('kitchen.readyWaiting')}</h2>
                         </div>
                         <span className="bg-emerald-500 text-white font-black px-3 py-1 rounded-lg text-sm">{readyTickets.length}</span>
                     </div>
@@ -260,7 +262,7 @@ export default function KitchenDisplayWorkspace() {
                             <div key={ticket.id} className="bg-emerald-900/20 rounded-xl overflow-hidden border border-emerald-500 opacity-80 scale-95 origin-top transition-all">
                                 <div className="px-4 py-3 flex justify-between items-center bg-emerald-500/20">
                                     <span className="block text-xl font-black text-emerald-400">{ticket.table}</span>
-                                    <span className="text-xs font-bold text-emerald-400/80 uppercase tracking-widest">GARSONA BİLDİRİLDİ ✔</span>
+                                    <span className="text-xs font-bold text-emerald-400/80 uppercase tracking-widest">{t('kitchen.notified')}</span>
                                 </div>
                                 <div className="px-4 py-2 bg-transparent space-y-1">
                                     {ticket.items.map(item => (
@@ -273,7 +275,7 @@ export default function KitchenDisplayWorkspace() {
                         ))}
                         {readyTickets.length === 0 && (
                             <div className="flex h-full items-center justify-center text-slate-600 font-bold uppercase tracking-widest text-sm text-center px-8">
-                                HAZIRLANAN SİPARİŞLER<br/>GARSON TARAFINDAN TESLİM ALINDI
+                                {t('kitchen.allDelivered').split('\\n').map((line, i) => <React.Fragment key={i}>{line}{i === 0 && <br/>}</React.Fragment>)}
                             </div>
                         )}
                     </div>
