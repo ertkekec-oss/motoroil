@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, FileText, Send, User, Search, Calculator, CheckCircle2, RefreshCw, Clock, Tag } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function ESMMWorkspace({ products, customers }: any) {
     const { showWarning, showSuccess } = useModal();
+    const { t } = useLanguage();
 
     const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
     const [customerSearch, setCustomerSearch] = useState('');
@@ -71,11 +73,11 @@ export default function ESMMWorkspace({ products, customers }: any) {
 
     const handleSendInvoice = async () => {
         if (!selectedCustomer) {
-            return showWarning("Müşteri Seçimi Eksik", "Makbuz düzenleyebilmek için lütfen alıcı seçiniz.");
+            return showWarning(t('esmm.errCustomer'), t('esmm.errCustomerDesc'));
         }
         const validLines = invoiceLines.filter(l => l.name);
         if (validLines.length === 0 || totals.brutTotal === 0) {
-            return showWarning("Makbuz Boş", "Lütfen en az bir hizmet ekleyiniz ve tutar giriniz.");
+            return showWarning(t('esmm.errEmpty'), t('esmm.errEmptyDesc'));
         }
 
         setInvoiceStatus('processing');
@@ -95,14 +97,14 @@ export default function ESMMWorkspace({ products, customers }: any) {
             
             if (data.success) {
                 setInvoiceStatus('sent');
-                showSuccess("E-SMM Başarıyla İletildi", `Belge Numarası: SMM${new Date().getFullYear()}${(Math.random().toString(36).substring(2, 8).toUpperCase())}`);
+                showSuccess(t('esmm.successMsg'), `Belge Numarası: SMM${new Date().getFullYear()}${(Math.random().toString(36).substring(2, 8).toUpperCase())}`);
             } else {
                 setInvoiceStatus('draft');
-                showWarning("Hata Oluştu", data.error || "Makbuz oluşturulamadı.");
+                showWarning(t('esmm.errOccurred'), data.error || t('esmm.errFailed'));
             }
         } catch (err: any) {
             setInvoiceStatus('draft');
-            showWarning("Bağlantı Hatası", err.message);
+            showWarning(t('esmm.errConn'), err.message);
         }
     };
 
@@ -110,11 +112,11 @@ export default function ESMMWorkspace({ products, customers }: any) {
         return (
             <div className="flex-1 w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl flex flex-col items-center justify-center m-6 p-8">
                 <CheckCircle2 size={80} strokeWidth={1} className="text-purple-500 mb-6" />
-                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">E-SMM Düzenlendi</h2>
-                <p className="text-slate-500 font-medium mb-8 text-center max-w-md">Serbest Meslek Makbuzunuz başarıyla oluşturuldu ve GİB portalına iletilmek üzere kuyruğa eklendi.</p>
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">{t('esmm.successTitle')}</h2>
+                <p className="text-slate-500 font-medium mb-8 text-center max-w-md">{t('esmm.successDetail')}</p>
                 <div className="space-x-4">
-                    <button className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold shadow-sm" onClick={() => { setInvoiceStatus('draft'); setInvoiceLines([{ id: 1, name: '', amount: 0, calcMode: 'brut', gvRate: 20, vatRate: 20 }]); setSelectedCustomer(null); }}>YENİ E-SMM</button>
-                    <button className="px-6 py-3 bg-purple-600 text-white rounded-xl font-bold shadow-md hover:bg-purple-700">PDF OLARAK İNDİR</button>
+                    <button className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold shadow-sm" onClick={() => { setInvoiceStatus('draft'); setInvoiceLines([{ id: 1, name: '', amount: 0, calcMode: 'brut', gvRate: 20, vatRate: 20 }]); setSelectedCustomer(null); }}>{t('esmm.btnNew')}</button>
+                    <button className="px-6 py-3 bg-purple-600 text-white rounded-xl font-bold shadow-md hover:bg-purple-700">{t('esmm.btnPdf')}</button>
                 </div>
             </div>
         );
@@ -127,12 +129,12 @@ export default function ESMMWorkspace({ products, customers }: any) {
                 {/* Header Section */}
                 <div className="p-4 lg:p-5 border-b border-slate-200 dark:border-white/5 grid grid-cols-1 lg:grid-cols-2 gap-6 bg-slate-50/30 dark:bg-white/[0.01] rounded-t-xl">
                     <div className="flex-1 max-w-md relative">
-                        <label className="text-[11px] font-black tracking-widest text-purple-600 dark:text-purple-400 uppercase block mb-3">MÜŞTERİ / ALICI</label>
+                        <label className="text-[11px] font-black tracking-widest text-purple-600 dark:text-purple-400 uppercase block mb-3">{t('esmm.customerBuyer')}</label>
                         {!selectedCustomer ? (
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                 <input 
-                                    placeholder="Firma Ünvanı veya Müşteri Adı Ara..." 
+                                    placeholder={t('esmm.searchPlaceholder')} 
                                     className="w-full pl-10 pr-4 py-3 bg-white dark:bg-[#0f172a] border-l-4 border-l-purple-500 border border-slate-200 dark:border-white/10 rounded-xl font-bold text-sm outline-none focus:ring-4 focus:ring-purple-500/10 transition-all shadow-sm"
                                     value={customerSearch}
                                     onChange={(e) => { setCustomerSearch(e.target.value); setShowCustomerDropdown(true); }}
@@ -140,7 +142,7 @@ export default function ESMMWorkspace({ products, customers }: any) {
                                 />
                                 {showCustomerDropdown && (
                                     <div className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl shadow-xl max-h-[300px] overflow-y-auto py-2">
-                                        <div className="px-3 py-1.5 text-xs font-bold text-slate-400">Son Kullanılanlar</div>
+                                        <div className="px-3 py-1.5 text-xs font-bold text-slate-400">{t('esmm.recentCustomers')}</div>
                                         {filteredCustomers.slice(0, 10).map((c: any) => (
                                             <div 
                                                 key={c.id} 
@@ -148,7 +150,7 @@ export default function ESMMWorkspace({ products, customers }: any) {
                                                 className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer flex flex-col transition-colors border-b border-slate-50 dark:border-white/5 last:border-0"
                                             >
                                                 <span className="font-bold text-slate-800 dark:text-white text-[13px] leading-tight">{c.name}</span>
-                                                <span className="text-[11px] text-slate-500 mt-1 uppercase">VKN/TC: {c.taxNumber || 'Tanımsız'}</span>
+                                                <span className="text-[11px] text-slate-500 mt-1 uppercase">{t('esmm.vknTc')}: {c.taxNumber || t('esmm.undefined')}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -157,7 +159,7 @@ export default function ESMMWorkspace({ products, customers }: any) {
                         ) : (
                             <div className="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-sm relative group cursor-pointer" onClick={() => setSelectedCustomer(null)}>
                                 <div className="absolute inset-0 bg-rose-50 dark:bg-rose-500/10 rounded-xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity border border-rose-200 dark:border-rose-500/30">
-                                    <span className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2"><Trash2 size={16} /> Değiştir</span>
+                                    <span className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2"><Trash2 size={16} /> {t('esmm.change')}</span>
                                 </div>
                                 <div className="group-hover:opacity-0 transition-opacity">
                                     <div className="flex items-center gap-3">
@@ -166,11 +168,11 @@ export default function ESMMWorkspace({ products, customers }: any) {
                                         </div>
                                         <div>
                                             <h3 className="font-black text-slate-900 dark:text-white leading-tight pr-4">{selectedCustomer.name}</h3>
-                                            <p className="text-[11px] text-slate-500 font-medium mt-1">VKN: <span className="font-bold">{selectedCustomer.taxNumber || 'Belirtilmemiş'}</span></p>
+                                            <p className="text-[11px] text-slate-500 font-medium mt-1">{t('esmm.vkn')}: <span className="font-bold">{selectedCustomer.taxNumber || t('esmm.unspecified')}</span></p>
                                         </div>
                                     </div>
                                     <div className="mt-3 text-[11px] text-slate-500 leading-relaxed border-t border-slate-100 dark:border-white/5 pt-3">
-                                        {selectedCustomer.address || 'Adres bilgisi eksik.'}
+                                        {selectedCustomer.address || t('esmm.noAddress')}
                                         <br/>{selectedCustomer.district} / {selectedCustomer.city}
                                     </div>
                                 </div>
@@ -181,13 +183,13 @@ export default function ESMMWorkspace({ products, customers }: any) {
                     <div className="flex flex-col items-end gap-4 ml-auto w-full lg:w-auto mt-4 lg:mt-0">
                         <div className="flex flex-row items-center justify-end gap-3 sm:gap-6 text-left flex-wrap">
                             <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Belge Tipi</label>
-                                <span className="font-black text-[13px] text-purple-600 dark:text-purple-400">E-SERBEST MESLEK MAKBUZU</span>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{t('esmm.docType')}</label>
+                                <span className="font-black text-[13px] text-purple-600 dark:text-purple-400">{t('esmm.docTypeLabel')}</span>
                             </div>
                             <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
                             
                             <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Para Birimi</label>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{t('esmm.currency')}</label>
                                 <select 
                                     value={currency}
                                     onChange={(e) => {
@@ -207,7 +209,7 @@ export default function ESMMWorkspace({ products, customers }: any) {
                             <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-1"></div>
 
                             <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Düzenlenme</label>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('esmm.issueDate')}</label>
                                 <span className="font-bold text-xs text-slate-800 dark:text-white leading-tight">{new Date().toLocaleDateString('tr-TR')} {new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'})}</span>
                             </div>
                         </div>
@@ -220,12 +222,12 @@ export default function ESMMWorkspace({ products, customers }: any) {
                         <thead>
                             <tr className="bg-slate-100/50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-white/5 text-[9px] font-black text-slate-500 uppercase tracking-widest">
                                 <th className="p-3 w-10 text-center">#</th>
-                                <th className="p-3">Hizmet Açıklaması</th>
-                                <th className="p-3 w-32 text-center" title="Hangi tutar üzerinden hesaplanacağı">Hesap Tipi</th>
-                                <th className="p-3 w-36 text-right">Girilen Tutar</th>
-                                <th className="p-3 w-20 text-center">GV (%)</th>
-                                <th className="p-3 w-20 text-center">KDV (%)</th>
-                                <th className="p-3 w-36 text-right text-purple-600 dark:text-purple-400">Çıkan Sonuç</th>
+                                <th className="p-3">{t('esmm.thServiceDesc')}</th>
+                                <th className="p-3 w-32 text-center" title="Hangi tutar üzerinden hesaplanacağı">{t('esmm.thCalcType')}</th>
+                                <th className="p-3 w-36 text-right">{t('esmm.thEnteredAmt')}</th>
+                                <th className="p-3 w-20 text-center">{t('esmm.thGv')}</th>
+                                <th className="p-3 w-20 text-center">{t('esmm.thVat')}</th>
+                                <th className="p-3 w-36 text-right text-purple-600 dark:text-purple-400">{t('esmm.thResult')}</th>
                                 <th className="p-3 w-10 text-center"></th>
                             </tr>
                         </thead>
@@ -261,7 +263,7 @@ export default function ESMMWorkspace({ products, customers }: any) {
                                                 value={line.name}
                                                 onChange={(e) => updateLine(line.id, 'name', e.target.value)}
                                                 className="w-full bg-transparent font-bold text-slate-800 dark:text-white text-xs outline-none border-b border-transparent focus:border-purple-500 pb-1 pt-1.5"
-                                                placeholder="Örn: Haziran Ayı Mali Müşavirlik Hizmeti"
+                                                placeholder={t('esmm.pHint')}
                                             />
                                         </td>
                                         <td className="p-2 align-top pt-3">
@@ -270,8 +272,8 @@ export default function ESMMWorkspace({ products, customers }: any) {
                                                 onChange={(e) => updateLine(line.id, 'calcMode', e.target.value)} 
                                                 className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/10 py-1.5 text-[10px] font-black uppercase tracking-widest outline-none focus:border-purple-500 cursor-pointer text-center rounded text-slate-600 dark:text-slate-300"
                                             >
-                                                <option value="brut">Brütten</option>
-                                                <option value="net">Netten</option>
+                                                <option value="brut">{t('esmm.grossMode')}</option>
+                                                <option value="net">{t('esmm.netMode')}</option>
                                             </select>
                                         </td>
                                         <td className="p-2 align-top pt-3">
@@ -322,7 +324,7 @@ export default function ESMMWorkspace({ products, customers }: any) {
                             <Plus size={14} strokeWidth={3} /> YENİ HİZMET EKLE
                         </button>
                         <div className="text-[10px] font-medium text-slate-400 flex items-center gap-1.5">
-                            <RefreshCw size={12} /> Serbest Meslek Makbuzunda Tahsil Edilen Net = Brüt + KDV - Stopaj Formülü Uygulanır
+                            <RefreshCw size={12} /> {t('esmm.formulaHint')}
                         </div>
                     </div>
                 </div>
@@ -331,30 +333,30 @@ export default function ESMMWorkspace({ products, customers }: any) {
                 <div className="bg-slate-50 dark:bg-slate-900 border-t items-start border-slate-200 dark:border-white/10 p-5 lg:p-6 flex flex-row justify-between gap-6 w-full min-w-min">
                     
                     <div className="flex-1 max-w-xl">
-                        <label className="text-[10px] font-bold text-slate-400 block uppercase tracking-widest mb-1.5">Açıklama / IBAN Bilgileri</label>
-                        <textarea placeholder="Ödemenin yapılacağı hesap bilgileri vb..." className="w-full h-32 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg p-3 text-sm font-medium resize-none outline-none focus:ring-1 focus:ring-purple-500 shadow-sm leading-relaxed" />
+                        <label className="text-[10px] font-bold text-slate-400 block uppercase tracking-widest mb-1.5">{t('esmm.noteLabel')}</label>
+                        <textarea placeholder={t('esmm.notePlaceholder')} className="w-full h-32 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 rounded-lg p-3 text-sm font-medium resize-none outline-none focus:ring-1 focus:ring-purple-500 shadow-sm leading-relaxed" />
                     </div>
 
                     <div className="w-[320px] shrink-0 bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-white/10 rounded-lg shadow-sm p-4 flex flex-col space-y-2 ml-auto">
                         <div className="flex justify-between text-[11px] font-bold text-slate-500">
-                            <span>Brüt Ücret (Hizmet Bedeli)</span>
+                            <span>{t('esmm.grossFee')}</span>
                             <span>{currSymbol}{totals.brutTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                         </div>
                         {totals.gvTotal > 0 && (
                             <div className="flex justify-between text-[11px] font-bold text-rose-500">
-                                <span>(-) Gelir Vergisi (Stopaj)</span>
+                                <span>{t('esmm.gvLabel')}</span>
                                 <span>-{currSymbol}{totals.gvTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                             </div>
                         )}
                         {totals.vatTotal > 0 && (
                             <div className="flex justify-between text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                                <span className="text-emerald-600 dark:text-emerald-400">(+) KDV Hesaplanan</span>
+                                <span className="text-emerald-600 dark:text-emerald-400">{t('esmm.vatCalc')}</span>
                                 <span>+{currSymbol}{totals.vatTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                             </div>
                         )}
                         <div className="h-px w-full bg-slate-200 dark:bg-white/10 my-1"></div>
                         <div className="flex justify-between items-end">
-                            <span className="font-black text-[11px] text-slate-800 dark:text-white uppercase pb-0.5" title="Cebinize girecek asıl tutar">TAHSİL EDİLECEK NET</span>
+                            <span className="font-black text-[11px] text-slate-800 dark:text-white uppercase pb-0.5" title="Cebinize girecek asıl tutar">{t('esmm.netCollected')}</span>
                             <span className="text-2xl font-black tracking-tight text-purple-600 dark:text-purple-400 leading-none">{currSymbol}{totals.netTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
                         </div>
                     </div>
@@ -366,8 +368,8 @@ export default function ESMMWorkspace({ products, customers }: any) {
                     {/* Payment Method Selector for ESMM */}
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                         <div className="flex flex-col text-left">
-                            <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest leading-none">Para Giriş Yönü</span>
-                            <span className="text-sm font-black text-purple-700 dark:text-purple-400 mt-1">Makbuz Tahsilatı</span>
+                            <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest leading-none">{t('esmm.cashFlowIn')}</span>
+                            <span className="text-sm font-black text-purple-700 dark:text-purple-400 mt-1">{t('esmm.receiptCollection')}</span>
                         </div>
                         <div className="h-8 w-px bg-slate-200 dark:bg-white/10 hidden sm:block mx-1"></div>
                         <div className="flex bg-purple-50/50 dark:bg-purple-900/10 p-1.5 rounded-xl border border-purple-100 dark:border-purple-900/30 gap-1.5 w-full sm:w-auto overflow-x-auto">
@@ -385,7 +387,7 @@ export default function ESMMWorkspace({ products, customers }: any) {
 
                     <div className="flex flex-row gap-3 w-full sm:w-auto justify-end">
                         <button className="px-5 py-2.5 rounded-lg font-bold bg-slate-100 text-slate-700 dark:bg-white/5 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2 text-xs shadow-sm">
-                            <FileText size={14} className="hidden sm:inline" /> <span className="hidden sm:inline">TASLAK OLARAK KAYDET</span><span className="sm:hidden">TASLAK</span>
+                            <FileText size={14} className="hidden sm:inline" /> <span className="hidden sm:inline">TASLAK OLARAK KAYDET</span><span className="sm:hidden">{t('esmm.btnDraftShort')}</span>
                         </button>
                         <button 
                             onClick={handleSendInvoice}
@@ -393,7 +395,7 @@ export default function ESMMWorkspace({ products, customers }: any) {
                             className="px-8 py-2.5 rounded-lg font-black bg-purple-600 text-white hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 text-[13px] shadow-sm disabled:opacity-50 tracking-wide"
                         >
                             {invoiceStatus === 'processing' ? <Calculator className="animate-spin" size={16} /> : <Send size={16} />} 
-                            {invoiceStatus === 'processing' ? 'BEKLEYİNİZ...' : 'E-SMM OLUŞTUR'}
+                            {invoiceStatus === 'processing' ? t('esmm.btnWait') : t('esmm.btnCreate')}
                         </button>
                     </div>
                 </div>
