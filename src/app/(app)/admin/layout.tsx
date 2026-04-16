@@ -14,8 +14,12 @@ export default async function AdminLayout({
     // Support new structure (session.user) or fallback to flat structure
     const session = sessionResult?.user || sessionResult;
 
-    // 1. Role Gate - Allow platform owner OR super admins
-    const isPlatformAdmin = session?.role === 'SUPER_ADMIN' || session?.tenantId === 'PLATFORM_ADMIN';
+    // 1. Role Gate - Allow platform owner OR super admins OR specific platform roles
+    const isPlatformAdmin = 
+        session?.role === 'SUPER_ADMIN' || 
+        session?.role === 'OWNER' ||
+        (session?.role && session.role.includes('PLATFORM_')) ||
+        session?.tenantId === 'PLATFORM_ADMIN';
 
     if (!session || !isPlatformAdmin) {
         redirect('/login?error=unauthorized_admin');

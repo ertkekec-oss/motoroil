@@ -38,7 +38,8 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
   const isFinance = userRole === "PLATFORM_FINANCE_ADMIN";
   const isGrowth = userRole === "PLATFORM_GROWTH_ADMIN";
   const isRisk = userRole === "PLATFORM_RISK_ADMIN";
-  const isSuper = userRole === "SUPER_ADMIN" || userRole === "PLATFORM_ADMIN";
+  const isSupport = userRole === "PLATFORM_SUPPORT";
+  const isSuper = userRole === "SUPER_ADMIN" || userRole === "PLATFORM_ADMIN" || userRole === "OWNER";
 
   const toggleGroup = (group: string) => {
     setOpenSections((prev) => ({ ...prev, [group]: !prev[group] }));
@@ -158,12 +159,17 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
                   icon={CreditCard}
                   label="SaaS Planları"
                 />
+                <NavItem
+                  href="/admin/staff"
+                  icon={Users}
+                  label="Platform Ekibi"
+                />
               </>
             )}
           </NavGroup>
         )}
 
-        {isSuper && (
+        {(isSuper || isSupport) && (
           <NavGroup
             title="Ticket & Kütüphane"
             icon={Inbox}
@@ -485,33 +491,35 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
       )}
 
       {/* GÜVENLİK VE AYARLAR - SABİT BAŞLIK */}
-      {isSuper && (
+      {(isSuper || isRisk) && (
         <div className="space-y-1">
           <div className="px-3 mb-2 mt-4 text-xs font-bold tracking-wider text-slate-500">
             Güvenlik ve Ayarlar
           </div>
 
-          <NavGroup
-            title="Loglar ve Güvenlik"
-            icon={ShieldAlert}
-            groupKey="logs_security_main"
-          >
-            <NavItem
-              href="/admin/audit-logs"
-              icon={Search}
-              label="Denetim Kayıtları"
-            />
-            <NavItem
-              href="/admin/logs"
-              icon={Activity}
-              label="Sistem Kayıtları"
-            />
-            <NavItem
-              href="/admin/security"
-              icon={ShieldCheck}
-              label="Güvenlik Kalkanı"
-            />
-          </NavGroup>
+          {isSuper && (
+            <NavGroup
+              title="Loglar ve Güvenlik"
+              icon={ShieldAlert}
+              groupKey="logs_security_main"
+            >
+              <NavItem
+                href="/admin/audit-logs"
+                icon={Search}
+                label="Denetim Kayıtları"
+              />
+              <NavItem
+                href="/admin/logs"
+                icon={Activity}
+                label="Sistem Kayıtları"
+              />
+              <NavItem
+                href="/admin/security"
+                icon={ShieldCheck}
+                label="Güvenlik Kalkanı"
+              />
+            </NavGroup>
+          )}
 
           <NavGroup title="Sistem Ayarları" icon={Settings} groupKey="settings_main">
             <NavItem
@@ -519,17 +527,20 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
               icon={FileText}
               label="Platform Dökümanları"
             />
-            <NavItem
-              href="/admin/settings/categories"
-              icon={DatabaseZap}
-              label="Global Kategoriler"
-            />
-            
-            <NavItem
-              href="/admin/settings/payroll"
-              icon={Settings}
-              label="Bordro Parametreleri"
-            />
+            {isSuper && (
+              <>
+                <NavItem
+                  href="/admin/settings/categories"
+                  icon={DatabaseZap}
+                  label="Global Kategoriler"
+                />
+                <NavItem
+                  href="/admin/settings/payroll"
+                  icon={Settings}
+                  label="Bordro Parametreleri"
+                />
+              </>
+            )}
           </NavGroup>
         </div>
       )}
