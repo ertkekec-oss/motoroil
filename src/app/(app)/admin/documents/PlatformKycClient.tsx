@@ -198,7 +198,7 @@ export default function PlatformKycClient() {
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 text-xs font-bold border border-blue-500/20">
-                                                            <FileSignature className="w-3.5 h-3.5" /> E-İmza (ID: {req.contract?.slug})
+                                                            <FileSignature className="w-3.5 h-3.5" /> E-İmza ({req.contract?.title || req.contract?.slug})
                                                         </span>
                                                     )}
                                                 </td>

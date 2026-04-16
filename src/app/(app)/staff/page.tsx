@@ -1,5 +1,3 @@
-"use client";
-
 import StaffManagementContent from "@/components/StaffManagementContent";
 
 export default function StaffPage() {
