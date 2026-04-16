@@ -1,10 +1,10 @@
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import MainClient from "./MainClient";
+import PlatformKycClient from "./PlatformKycClient";
 
 export const metadata = {
-    title: "Platform Dökümanları | Periodya Admin",
-    description: "Sistem seviyesindeki tüm sözleşme, form ve politikaların yönetimi.",
+    title: "Risk, KYC ve Belgeler | Periodya Admin",
+    description: "Gatekeeper kuralları, sözleşmeler ve evrak havuzu.",
 };
 
 export default async function PlatformDocumentsPage() {
@@ -15,18 +15,7 @@ export default async function PlatformDocumentsPage() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-white mb-1">
-                        Platform Dökümantasyon Modülü
-                    </h1>
-                    <p className="text-sm text-slate-400">
-                        Periodya üzerinde aktif kullanılacak olan tüm sözleşme, yasal form ve politikaları sürümleriyle (versiyonlarıyla) yönetebilirsiniz.
-                    </p>
-                </div>
-            </div>
-
-            <MainClient />
+            <PlatformKycClient />
         </div>
     );
 }
