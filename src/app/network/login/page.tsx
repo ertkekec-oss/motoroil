@@ -14,17 +14,17 @@ export default function DealerNetworkLoginPage() {
     const [success, setSuccess] = useState("");
 
     useEffect(() => {
-        // Try to fetch the tenantId of the current platform/supplier
-        fetch("/api/system/public/info")
+        // Try to fetch the tenantId of the current platform/supplier via headers
+        fetch("/api/network/public/tenant")
             .then((res) => res.json())
             .then((data) => {
                 if (data.tenantId) {
                     setTenantId(data.tenantId);
                 } else {
-                    setTenantId("motoroils"); // Hardcoded fallback for demo
+                    setTenantId(""); // Global mode, no predefined tenantId
                 }
             })
-            .catch(() => setTenantId("motoroils"));
+            .catch(() => setTenantId(""));
     }, []);
 
     const handleLogin = async (e: React.FormEvent) => {

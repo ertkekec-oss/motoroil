@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useModal } from "@/contexts/ModalContext"
+import { useNetworkPath } from "@/hooks/useNetworkPath"
 import { PackageOpen, ChevronLeft, Loader2, Coins, ShoppingCart, Plus, Minus } from "lucide-react"
 
 export default function CatalogProductDetailPage() {
     const params = useParams()
     const router = useRouter()
+    const getPath = useNetworkPath()
     const { showError, showSuccess } = useModal()
     
     const [product, setProduct] = useState<any>(null)
@@ -31,17 +33,17 @@ export default function CatalogProductDetailPage() {
                     setQuantity(Math.max(1, data.product.minOrderQty || 1))
                 } else {
                     showError("Hata", data.error || "Ürün yüklenemedi")
-                    router.push('/network/catalog')
+                    router.push(getPath('/network/catalog'))
                 }
             } catch (err: any) {
                 showError("Hata", "Bağlantı hatası oluştu.")
-                router.push('/network/catalog')
+                router.push(getPath('/network/catalog'))
             } finally {
                 setLoading(false)
             }
         }
         if (params.id) fetchProduct()
-    }, [params.id, router, showError])
+    }, [params.id, router, showError, getPath])
 
     const handleAddToCart = async () => {
         if (!product || addingToCart) return
@@ -91,7 +93,7 @@ export default function CatalogProductDetailPage() {
         <div className="min-h-screen bg-white font-sans pb-24 text-slate-900">
             {/* Top Bar */}
             <div className="max-w-[1400px] mx-auto px-6 py-6 border-b border-slate-100">
-                <button onClick={() => router.push('/network/catalog')} className="flex items-center gap-2 text-[13px] font-black text-slate-400 hover:text-slate-900 transition-colors uppercase tracking-widest">
+                <button onClick={() => router.push(getPath('/network/catalog'))} className="flex items-center gap-2 text-[13px] font-black text-slate-400 hover:text-slate-900 transition-colors uppercase tracking-widest">
                     <ChevronLeft size={16} strokeWidth={3} /> Kataloğa Dön
                 </button>
             </div>

@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useModal } from "@/contexts/ModalContext"
+import { useNetworkPath } from "@/hooks/useNetworkPath"
 import { PackageOpen, Search, Filter, ShoppingCart, Info, Loader2, Plus, Check, Eye, EyeOff, ArrowRight, Coins } from "lucide-react"
 
 export default function NetworkCatalogPage() {
     const { showError, showSuccess } = useModal()
     const router = useRouter()
+    const getPath = useNetworkPath()
     const [q, setQ] = useState("")
     const [debouncedQ, setDebouncedQ] = useState("")
     const [activeCat, setActiveCat] = useState<string>("")
@@ -183,13 +185,13 @@ export default function NetworkCatalogPage() {
                                 <>
                                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                                         <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                            {imageProducts.slice(0, 2).map(p => <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                            {imageProducts.slice(0, 2).map(p => <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} getPath={getPath} />)}
                                         </div>
                                         {imageProducts.length > 2 && (
                                             <div className="lg:col-span-2">
                                                 {(() => {
                                                     const feat = imageProducts[featuredIndex % Math.min(imageProducts.length, 5)];
-                                                    return <FeaturedCardHorizontal p={feat} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
+                                                    return <FeaturedCardHorizontal p={feat} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} getPath={getPath} />
                                                 })()}
                                             </div>
                                         )}
@@ -197,21 +199,21 @@ export default function NetworkCatalogPage() {
 
                                     {imageProducts.length > 5 && (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <BestSellerBox p={imageProducts[5]} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />
-                                            {imageProducts.length > 6 && <BestSellerBox p={imageProducts[6]} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />}
+                                            <BestSellerBox p={imageProducts[5]} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} getPath={getPath} />
+                                            {imageProducts.length > 6 && <BestSellerBox p={imageProducts[6]} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} getPath={getPath} />}
                                         </div>
                                     )}
 
                                     {imageProducts.length > 7 && (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                            {imageProducts.slice(7, 11).map(p => <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                            {imageProducts.slice(7, 11).map(p => <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} getPath={getPath} />)}
                                         </div>
                                     )}
                                 </>
                             ) : (
                                 <div className="space-y-8">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        {imageProducts.map(p => <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                        {imageProducts.map(p => <ProductCard key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} getPath={getPath} />)}
                                     </div>
                                     
                                     {noImageProducts.length > 0 && (
@@ -222,10 +224,10 @@ export default function NetworkCatalogPage() {
                                             </h4>
                                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                                 <div className="space-y-2.5">
-                                                    {noImageProducts.slice(0, Math.ceil(noImageProducts.length/2)).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                                    {noImageProducts.slice(0, Math.ceil(noImageProducts.length/2)).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} getPath={getPath} />)}
                                                 </div>
                                                 <div className="space-y-2.5">
-                                                    {noImageProducts.slice(Math.ceil(noImageProducts.length/2)).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                                    {noImageProducts.slice(Math.ceil(noImageProducts.length/2)).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} getPath={getPath} />)}
                                                 </div>
                                             </div>
                                         </div>
@@ -237,10 +239,10 @@ export default function NetworkCatalogPage() {
                             {isHomePage && noImageProducts.length > 0 && (
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12 pt-8 border-t border-slate-100">
                                     <div className="space-y-3">
-                                        {noImageProducts.slice(0, 4).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                        {noImageProducts.slice(0, 4).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} getPath={getPath} />)}
                                     </div>
                                     <div className="space-y-3">
-                                        {noImageProducts.slice(4, 8).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} />)}
+                                        {noImageProducts.slice(4, 8).map(p => <ProductRowItem key={p.id} p={p} router={router} addingToCart={addingToCart} addToCart={addToCart} hideB2bPrice={hideB2bPrice} fmt={fmt} getPath={getPath} />)}
                                     </div>
                                 </div>
                             )}
@@ -260,7 +262,7 @@ export default function NetworkCatalogPage() {
     )
 }
 
-function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: any) {
+function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt, getPath }: any) {
     const stockStatus = p.stock > 0 ? "bg-emerald-500" : "bg-rose-500";
     const stockText = p.stock > 0 ? `${p.stock} adet` : "Tükendi";
     const earnPoints = p.pointsRate > 0 ? Math.floor((p.priceResolved || 0) * p.pointsRate) : 0;
@@ -312,7 +314,7 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
                     <span className="text-xl font-black text-slate-900 tracking-tight leading-none">{fmt(p.priceResolved)}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[42px] h-[42px] bg-white text-slate-400 border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm"><Search size={18} /></button>
+                    <button onClick={() => router.push(getPath('/network/catalog/' + p.id))} className="w-[42px] h-[42px] bg-white text-slate-400 border border-slate-200 rounded-xl flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm"><Search size={18} /></button>
                     <button disabled={addingToCart === p.id} onClick={() => addToCart(p, 1)} className="h-[42px] px-5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:scale-95 transition-all text-[12px] font-bold flex items-center gap-2 shadow-sm">
                         <Plus size={16} strokeWidth={3} /> Ekle
                     </button>
@@ -322,7 +324,7 @@ function ProductCard({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: 
     )
 }
 
-function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: any) {
+function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPrice, fmt, getPath }: any) {
     const earnPoints = p.pointsRate > 0 ? Math.floor((p.priceResolved || 0) * p.pointsRate) : 0;
     return (
         <div className="bg-white rounded-[16px] border border-slate-200 shadow-sm flex h-[480px] overflow-hidden group">
@@ -365,7 +367,7 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPri
                         <div className="text-3xl font-black text-slate-900 tracking-tight leading-none truncate">{fmt(p.priceResolved)}</div>
                     </div>
                     <div className="flex gap-2 shrink-0">
-                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[48px] h-[48px] border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all shadow-sm shrink-0"><Search size={22} /></button>
+                        <button onClick={() => router.push(getPath('/network/catalog/' + p.id))} className="w-[48px] h-[48px] border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all shadow-sm shrink-0"><Search size={22} /></button>
                         <button onClick={() => addToCart(p, 1)} className="h-[48px] px-6 bg-blue-600 text-white rounded-xl font-black text-xs hover:bg-blue-700 shadow-md flex items-center gap-2 shrink-0">
                              Ekle
                         </button>
@@ -376,7 +378,7 @@ function FeaturedCardHorizontal({ p, router, addingToCart, addToCart, hideB2bPri
     )
 }
 
-function BestSellerBox({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: any) {
+function BestSellerBox({ p, router, addingToCart, addToCart, hideB2bPrice, fmt, getPath }: any) {
     const earnPoints = p.pointsRate > 0 ? Math.floor((p.priceResolved || 0) * p.pointsRate) : 0;
     return (
         <div className="bg-white rounded-[16px] border border-slate-200 p-5 flex items-center gap-6 shadow-sm hover:shadow-md transition-all group h-[160px] relative overflow-hidden">
@@ -401,7 +403,7 @@ function BestSellerBox({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }
                         <span className="text-xl font-black text-slate-900 leading-none truncate">{fmt(p.priceResolved)}</span>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                        <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-9 h-9 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all shadow-sm shrink-0">
+                        <button onClick={() => router.push(getPath('/network/catalog/' + p.id))} className="w-9 h-9 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all shadow-sm shrink-0">
                             <Search size={14} strokeWidth={2.5} />
                         </button>
                         <button onClick={() => addToCart(p, 1)} className="h-9 px-5 bg-blue-600 text-white rounded-xl font-bold text-[11px] hover:bg-blue-700 transition-all shadow-sm shrink-0">Ekle</button>
@@ -412,7 +414,7 @@ function BestSellerBox({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }
     )
 }
 
-function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt }: any) {
+function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt, getPath }: any) {
     const earnPoints = p.pointsRate > 0 ? Math.floor((p.priceResolved || 0) * p.pointsRate) : 0;
     return (
         <div className="bg-white rounded-2xl p-4 flex items-center justify-between border border-slate-100 shadow-sm transition-all group">
@@ -440,7 +442,7 @@ function ProductRowItem({ p, router, addingToCart, addToCart, hideB2bPrice, fmt 
                     <span className="text-[14px] font-black text-slate-900 tracking-tight leading-none">{fmt(p.priceResolved)}</span>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
-                    <button onClick={() => router.push('/network/catalog/' + p.id)} className="w-[38px] h-[38px] rounded-xl border border-slate-200 text-slate-400 flex items-center justify-center hover:bg-slate-50 transition-all shrink-0 bg-white">
+                    <button onClick={() => router.push(getPath('/network/catalog/' + p.id))} className="w-[38px] h-[38px] rounded-xl border border-slate-200 text-slate-400 flex items-center justify-center hover:bg-slate-50 transition-all shrink-0 bg-white">
                         <Search size={16} />
                     </button>
                     <button onClick={() => addToCart(p, 1)} className="w-[38px] h-[38px] rounded-xl border border-blue-200 text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-all shrink-0 bg-white">

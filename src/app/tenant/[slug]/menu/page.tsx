@@ -8,10 +8,11 @@ export const metadata: Metadata = {
     description: 'Periodya Q-Commerce Online Menü Altyapısı',
 };
 
-export default async function TenantMenuPage({ params }: { params: { slug: string } }) {
+export default async function TenantMenuPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     // 1. Resolve Tenant
     const tenant = await prisma.tenant.findUnique({
-        where: { tenantSlug: params.slug },
+        where: { tenantSlug: slug },
         select: { id: true, name: true, companies: { select: { id: true } } }
     });
 
@@ -58,7 +59,7 @@ export default async function TenantMenuPage({ params }: { params: { slug: strin
     return (
         <div className="w-full min-h-screen flex flex-col bg-slate-50 dark:bg-[#0B1220]">
             <QCommerceMenuWorkspace 
-                tenantSlug={params.slug} 
+                tenantSlug={slug} 
                 tenantName={tenant.name}
                 menuItems={mappedProducts}
             />

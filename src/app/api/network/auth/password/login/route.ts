@@ -8,7 +8,7 @@ import { getClientIp } from "@/lib/network/ip"
 
 export async function POST(req: Request) {
     const { email, password, supplierTenantId } = await req.json().catch(() => ({}))
-    if (!email || !password || !supplierTenantId) {
+    if (!email || !password) {
         return NextResponse.json({ ok: false, error: "INVALID_INPUT" }, { status: 400 })
     }
 
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
         status: "ACTIVE"
     };
 
-    if (supplierTenantId && supplierTenantId !== "motoroils") {
+    if (supplierTenantId) {
         membershipWhere.tenantId = supplierTenantId;
     }
 

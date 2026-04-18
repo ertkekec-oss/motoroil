@@ -112,21 +112,13 @@ export async function middleware(request: NextRequest) {
     // Feature A: Tenant Gateway Interception (e.g. motoroil.periodya.com)
     if (tenantSlug) {
         const isApiOrAdmin = pathname.startsWith('/api/') || pathname.startsWith('/admin/');
-        if (!isApiOrAdmin) {
+        if (!isApiOrAdmin && !pathname.startsWith('/b2b')) {
             
             // 1. /menu -> /tenant/[slug]/menu
             if (pathname.startsWith('/menu')) {
                 const url = request.nextUrl.clone();
                 const newPath = pathname.replace(/^\/menu/, '') || '';
                 url.pathname = `/tenant/${tenantSlug}/menu${newPath}`;
-                return NextResponse.rewrite(url);
-            }
-            
-            // 2. /b2b -> /tenant/[slug]/b2b
-            if (pathname.startsWith('/b2b')) {
-                const url = request.nextUrl.clone();
-                const newPath = pathname.replace(/^\/b2b/, '') || '';
-                url.pathname = `/tenant/${tenantSlug}/b2b${newPath}`;
                 return NextResponse.rewrite(url);
             }
             
@@ -169,16 +161,18 @@ export async function middleware(request: NextRequest) {
     }
 
     // Determine if the current request is for the B2B portal
-    // Either it's on the subdomain (and not an API or admin path) or it has the /network prefix (handled above)
     const isApiOrAdmin = pathname.startsWith('/api/') || pathname.startsWith('/admin/');
-    const isB2BPortalRequest = (isB2BSubdomain && !isApiOrAdmin) || pathname.startsWith(base);
+    const isTenantB2B = Boolean(tenantSlug && pathname.startsWith('/b2b'));
+    const isB2BPortalRequest = (isB2BSubdomain && !isApiOrAdmin) || pathname.startsWith(base) || isTenantB2B;
 
     // 3. NETWORK B2B PORTAL GUARD (Dealer Auth)
     if (isB2BPortalRequest) {
         // Evaluate effective pathname for internal guard checks
         const effectivePathname = (isB2BSubdomain && !pathname.startsWith(base)) 
             ? `${base}${pathname === '/' ? '' : pathname}` 
-            : pathname;
+            : isTenantB2B
+                ? `${base}${pathname.replace(/^\/b2b/, '')}`
+                : pathname;
 
         const isLogin = effectivePathname.startsWith(`${base}/login`);
         const isInvite = effectivePathname.startsWith(`${base}/invite`);
@@ -192,7 +186,7 @@ export async function middleware(request: NextRequest) {
                 if (isApi) {
                     return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
                 }
-                const loginUrl = isB2BSubdomain ? '/login' : `${base}/login`;
+                const loginUrl = isB2BSubdomain ? '/login' : isTenantB2B ? '/b2b/login' : `${base}/login`;
                 return NextResponse.redirect(new URL(loginUrl, request.url));
             }
 
@@ -202,13 +196,20 @@ export async function middleware(request: NextRequest) {
                 if (isApi) {
                     return NextResponse.json({ error: 'Membership required' }, { status: 403 });
                 }
-                const selectUrl = isB2BSubdomain ? '/select-supplier' : `${base}/select-supplier`;
+                const selectUrl = isB2BSubdomain ? '/select-supplier' : isTenantB2B ? '/b2b/select-supplier' : `${base}/select-supplier`;
                 return NextResponse.redirect(new URL(selectUrl, request.url));
             }
         }
 
         if (isB2BSubdomain) {
             return NextResponse.rewrite(new URL(effectivePathname, request.url));
+        }
+
+        if (isTenantB2B) {
+            const url = new URL(effectivePathname, request.url);
+            const response = NextResponse.rewrite(url);
+            response.headers.set('x-b2b-tenant-slug', tenantSlug);
+            return response;
         }
         
         return NextResponse.next();
@@ -226,7 +227,7 @@ export async function middleware(request: NextRequest) {
     ];
     
     // We also consider /network/login and such as public if handled behind a B2B rewrite
-    const effectivePublicPath = isB2BSubdomain ? (pathname === '/login' ? '/network/login' : pathname) : pathname;
+    const effectivePublicPath = isB2BSubdomain ? (pathname === '/login' ? '/network/login' : pathname) : isTenantB2B ? (pathname === '/b2b/login' ? '/network/login' : pathname) : pathname;
 
     if (publicPaths.some(path => effectivePublicPath === path || effectivePublicPath.startsWith(path + '/'))) {
         return NextResponse.next();

@@ -5,9 +5,10 @@ import prisma from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const { slug } = await params;
     const tenant = await prisma.tenant.findUnique({
-        where: { tenantSlug: params.slug },
+        where: { tenantSlug: slug },
     });
     
     // If not found, use a fallback generic title
@@ -17,9 +18,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
 }
 
-export default async function TenantGatewayPage({ params }: { params: { slug: string } }) {
+export default async function TenantGatewayPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     const tenant = await prisma.tenant.findUnique({
-        where: { tenantSlug: params.slug },
+        where: { tenantSlug: slug },
         select: { id: true, name: true }
     });
 
