@@ -114,32 +114,32 @@ export async function middleware(request: NextRequest) {
         const isApiOrAdmin = pathname.startsWith('/api/') || pathname.startsWith('/admin/');
         if (!isApiOrAdmin) {
             
-            // 1. /menu -> /_tenant/[slug]/menu
+            // 1. /menu -> /tenant/[slug]/menu
             if (pathname.startsWith('/menu')) {
                 const url = request.nextUrl.clone();
                 const newPath = pathname.replace(/^\/menu/, '') || '';
-                url.pathname = `/_tenant/${tenantSlug}/menu${newPath}`;
+                url.pathname = `/tenant/${tenantSlug}/menu${newPath}`;
                 return NextResponse.rewrite(url);
             }
             
-            // 2. /b2b -> /_tenant/[slug]/b2b
+            // 2. /b2b -> /tenant/[slug]/b2b
             if (pathname.startsWith('/b2b')) {
                 const url = request.nextUrl.clone();
                 const newPath = pathname.replace(/^\/b2b/, '') || '';
-                url.pathname = `/_tenant/${tenantSlug}/b2b${newPath}`;
+                url.pathname = `/tenant/${tenantSlug}/b2b${newPath}`;
                 return NextResponse.rewrite(url);
             }
             
-            // 3. / -> /_tenant/[slug]
+            // 3. / -> /tenant/[slug]
             if (pathname === '/') {
                 const url = request.nextUrl.clone();
-                url.pathname = `/_tenant/${tenantSlug}`;
+                url.pathname = `/tenant/${tenantSlug}`;
                 return NextResponse.rewrite(url);
             }
             
             // 4. Catch-all for other public pages under tenant domain
             const url = request.nextUrl.clone();
-            url.pathname = `/_tenant/${tenantSlug}${pathname}`;
+            url.pathname = `/tenant/${tenantSlug}${pathname}`;
             return NextResponse.rewrite(url);
         }
     }
