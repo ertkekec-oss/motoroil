@@ -40,9 +40,11 @@ const MENU_ITEMS: MenuItem[] = [
 
 interface QCommerceMenuWorkspaceProps {
     tenantSlug?: string;
+    tenantName?: string;
+    menuItems?: MenuItem[];
 }
 
-export default function QCommerceMenuWorkspace({ tenantSlug }: QCommerceMenuWorkspaceProps) {
+export default function QCommerceMenuWorkspace({ tenantSlug, tenantName, menuItems }: QCommerceMenuWorkspaceProps) {
     const { showSuccess, showConfirm } = useModal();
     const [activeCategory, setActiveCategory] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -73,17 +75,29 @@ export default function QCommerceMenuWorkspace({ tenantSlug }: QCommerceMenuWork
         });
     };
 
+    const targetItems = menuItems || MENU_ITEMS;
+
+    const dynamicCategories = useMemo(() => {
+        if (!menuItems) return CATEGORIES;
+        const uniqueCatNames = Array.from(new Set(menuItems.map(i => i.categoryId)));
+        return uniqueCatNames.map((name, idx) => ({
+            id: name,
+            name: name,
+            icon: idx % 2 === 0 ? '🍽️' : '✨' // Gelişigüzel görselleştirme
+        }));
+    }, [menuItems]);
+
     const cartTotal = useMemo(() => cart.reduce((sum, i) => sum + (i.item.price * i.qty), 0), [cart]);
     const cartCount = useMemo(() => cart.reduce((sum, i) => sum + i.qty, 0), [cart]);
 
     const filteredItems = useMemo(() => {
-        let items = MENU_ITEMS;
+        let items = targetItems;
         if (activeCategory === 'c-1') items = items.filter(i => i.popular);
         else if (activeCategory !== 'all') items = items.filter(i => i.categoryId === activeCategory);
         
         if (searchQuery) items = items.filter(i => i.name.toLowerCase().includes(searchQuery.toLowerCase()) || i.description.toLowerCase().includes(searchQuery.toLowerCase()));
         return items;
-    }, [activeCategory, searchQuery]);
+    }, [activeCategory, searchQuery, targetItems]);
 
     const handleCheckout = () => {
         if (cart.length === 0) return;
@@ -130,7 +144,10 @@ export default function QCommerceMenuWorkspace({ tenantSlug }: QCommerceMenuWork
                 <div className="max-w-[1400px] mx-auto px-4 lg:px-8 relative">
                     <div className="flex justify-between items-start mb-6">
                         <div>
-                            <h1 className="text-3xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-2">MotorOil <span className="text-orange-500">Cafe.</span></h1>
+                            <h1 className="text-3xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-2">
+                                {tenantName ? tenantName.split(' ')[0] : 'MotorOil'} <span className="text-orange-500">{tenantName && tenantName.split(' ').slice(1).join(' ')}</span>
+                                {!tenantName && <span className="text-orange-500">Cafe.</span>}
+                            </h1>
                             <div className="flex items-center gap-4 text-[13px] font-bold text-slate-500">
                                 <span className="flex items-center gap-1 text-emerald-600"><Star size={16} className="fill-current"/> 4.9 (24K+)</span>
                                 <span className="w-1 h-1 rounded-full bg-slate-300"></span>
@@ -160,7 +177,7 @@ export default function QCommerceMenuWorkspace({ tenantSlug }: QCommerceMenuWork
                         >
                             Tümü
                         </button>
-                        {CATEGORIES.map(cat => (
+                        {dynamicCategories.map(cat => (
                             <button 
                                 key={cat.id}
                                 onClick={() => setActiveCategory(cat.id)}
