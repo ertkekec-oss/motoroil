@@ -288,6 +288,15 @@ export default function Sidebar() {
                         ]
                     },
                     {
+                        name: 'SoSales (Sosyal)',
+                        icon: Sparkles,
+                        isParent: true,
+                        id: 'sosales-parent',
+                        subItems: [
+                            { name: 'SoSales Hub', href: '/sosales' },
+                        ]
+                    },
+                    {
                         name: t('menu.customers.parent'),
                         icon: Users,
                         isParent: true,
