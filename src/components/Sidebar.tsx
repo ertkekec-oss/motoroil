@@ -297,6 +297,15 @@ export default function Sidebar() {
                         ]
                     },
                     {
+                        name: 'Ecosystem (Fintech)',
+                        icon: Globe,
+                        isParent: true,
+                        id: 'ecosystem-parent',
+                        subItems: [
+                            { name: 'Periodya B2B Kart & İhale', href: '/ecosystem' },
+                        ]
+                    },
+                    {
                         name: t('menu.customers.parent'),
                         icon: Users,
                         isParent: true,
