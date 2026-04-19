@@ -13,7 +13,10 @@ import {
   Settings,
   ArrowRight,
   Sparkles,
-  Zap
+  Zap,
+  Mic,
+  Network,
+  Workflow
 } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
 
@@ -51,6 +54,36 @@ export default function EcosystemDashboard() {
       color: "amber",
       active: false,
       stats: "₺840K Kurtarılan"
+    },
+    {
+      id: "acoustic-inventory",
+      title: "Akustik Stok Düşümü",
+      subtitle: "Acoustic Inventory Mgmt",
+      description: "POS'a girmeden cihaz seslerini (kompresör, kahve değirmeni) algılayarak kullanılan hammaddeleri saniyesinde ERP'den otonom düşer.",
+      icon: Mic,
+      color: "rose",
+      active: true,
+      stats: "2.4M Algılama"
+    },
+    {
+      id: "deep-routing",
+      title: "Temerrüt Kalkanı",
+      subtitle: "Deep Routing Engine",
+      description: "Ağdaki iflas riskli firmaları sezip, paranızı direkt bir üst tedarikçiye göndererek riski sıfırlar. Çapraz ve güvenli ödeme rotası çizer.",
+      icon: Network,
+      color: "blue",
+      active: true,
+      stats: "₺44M Korunan"
+    },
+    {
+      id: "intent-genesis",
+      title: "Tersine Ticaret Ağı",
+      subtitle: "Intent-Genesis Trade",
+      description: "Hiçbir şey üretilmeden sadece tüketici talebini toplayıp doğrudan fabrika ve hammaddeye sipariş fırlatan yapay zeka konsorsiyumu.",
+      icon: Workflow,
+      color: "violet",
+      active: false,
+      stats: "Yeni Ekipman"
     }
   ];
 
