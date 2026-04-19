@@ -16,7 +16,9 @@ import {
   Zap,
   Mic,
   Network,
-  Workflow
+  Workflow,
+  BrainCircuit,
+  Power
 } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
 
@@ -120,6 +122,41 @@ export default function EcosystemDashboard() {
 
       <div className="max-w-7xl mx-auto px-8 py-10">
         
+        {/* SOVEREIGN AUTO-PILOT NUCLEAR CARD */}
+        <div className="mb-10 relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 rounded-[28px] blur-md opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+            <div className="relative bg-white dark:bg-[#0B1220] border-2 border-rose-500/30 dark:border-rose-500/50 rounded-[24px] p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden">
+                <div className="absolute right-0 top-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+                
+                <div className="flex items-center gap-6 z-10 relative">
+                    <div className="w-20 h-20 rounded-full flex items-center justify-center bg-gradient-to-br from-rose-500 to-purple-600 shadow-lg shadow-rose-500/30 shrink-0">
+                        <BrainCircuit className="w-10 h-10 text-white animate-pulse" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl md:text-3xl font-[900] tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-rose-600 to-purple-600 dark:from-rose-400 dark:to-purple-400 mb-1">
+                            Sovereign Auto-Pilot: Otonom CEO
+                        </h2>
+                        <p className="text-slate-600 dark:text-slate-300 font-semibold max-w-2xl text-[15px] leading-relaxed">
+                            Açıldığında yazılım şirketinizi sizin yerinize fiziksel olarak yönetmeye başlar. Daha ucuz tedarikçi bulur pazarlık yapar, nakit düşüşü sezerse borçları faktoring ile kırdırır ve sabah size sadece kâr raporu WhatsApp mesajı atar.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="z-10 shrink-0 flex flex-col items-center">
+                    <button className="relative w-36 h-16 bg-slate-100 dark:bg-slate-800 rounded-full p-2 border-2 border-slate-200 dark:border-slate-700 transition-all cursor-pointer group/btn overflow-hidden shadow-inner flex items-center">
+                        {/* Status Label */}
+                        <span className="absolute right-6 text-sm font-bold text-slate-400 dark:text-slate-500 transition-opacity">KAPALI</span>
+                        
+                        {/* The Draggable Thumb */}
+                        <div className="w-12 h-12 bg-white dark:bg-slate-700 rounded-full shadow-md flex items-center justify-center relative translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/btn:scale-105 z-10">
+                            <Power className="w-6 h-6 text-slate-400 dark:text-slate-400" />
+                        </div>
+                    </button>
+                    <span className="text-[10px] font-bold text-rose-500 tracking-widest uppercase mt-3 animate-pulse opacity-80">UYARI: NÜKLEER ÇEKİRDEK</span>
+                </div>
+            </div>
+        </div>
+
         {/* GRAND STATS OVERVIEW */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             <div className="bg-white dark:bg-slate-800/80 p-6 rounded-[24px] border border-slate-200/80 dark:border-slate-700/50 shadow-lg shadow-slate-200/20 dark:shadow-none relative overflow-hidden group">
