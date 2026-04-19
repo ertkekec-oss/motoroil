@@ -9,7 +9,7 @@ import {
     Terminal, Globe, ShoppingCart, Package, Briefcase, TrendingUp, Handshake,
     UserCircle, Landmark, Receipt, Users, Truck, Activity, Box, Map, FileText,
     Wrench, BarChart2, Clock, Search, ShieldAlert, LifeBuoy, Settings, CreditCard,
-    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool, Gift, Plug, CalendarDays, UtensilsCrossed
+    ChevronDown, ChevronRight, Store, Inbox, Library, LogOut, HelpCircle, LayoutDashboard, UploadCloud, PenTool, Gift, Plug, CalendarDays, UtensilsCrossed, Sparkles
 } from "lucide-react";
 
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -184,7 +184,7 @@ export default function Sidebar() {
                     { name: t('menu.pos'), href: '/terminal', icon: Terminal },
                     {
                         name: t('menu.kds.parent'),
-                        icon: UtensilsCrossed,
+                        icon: UtensilsCrossed, Sparkles,
                         isParent: true,
                         id: 'kitchen-system-parent',
                         subItems: [
