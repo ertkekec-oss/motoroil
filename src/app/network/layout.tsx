@@ -25,6 +25,17 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
         } catch (e) {}
     }
 
+    const [tenantConfig, setTenantConfig] = useState<any>(null)
+    const loadTenantConfig = async () => {
+        try {
+            const res = await fetch("/api/network/public/tenant")
+            const data = await res.json()
+            if (data.tenantId) {
+                setTenantConfig(data)
+            }
+        } catch (e) {}
+    }
+
     // Public sayfalar için minimal topbar veya gizli
     const isPublic = pathname === "/network/login" || pathname === "/login" || pathname === "/" || pathname.startsWith("/network/invite") || pathname.startsWith("/invite");
 
@@ -32,6 +43,7 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
         setMounted(true)
         if (!isPublic) {
             loadCart()
+            loadTenantConfig()
             const handleUpdate = () => loadCart()
             window.addEventListener("cart_update", handleUpdate)
             return () => window.removeEventListener("cart_update", handleUpdate)
@@ -57,18 +69,27 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
     const cartItems = cartData?.items || []
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900">
+        <div 
+            style={{ "--brd-primary": tenantConfig?.primaryColor || "#2563EB" } as React.CSSProperties} 
+            className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900"
+        >
             {/* Premium Top Navigation */}
             <header className="sticky top-0 z-50 bg-white border-b border-slate-200 h-16 shadow-sm">
                 <div className="mx-auto max-w-7xl px-6 h-full flex items-center justify-between relative">
                     
                     {/* Left: Brand */}
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
-                            <span className="text-blue-600 font-bold text-lg select-none">P</span>
-                        </div>
-                        <Link href={getPath("/network/dashboard")} className="text-[17px] font-semibold tracking-tight text-slate-900 hidden sm:block">
-                            B2B Portal
+                        {tenantConfig?.logoUrl ? (
+                            <img src={tenantConfig.logoUrl} alt="Logo" className="max-h-8 object-contain" />
+                        ) : (
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm" style={{ backgroundColor: 'var(--brd-primary)' }}>
+                                <span className="text-white font-bold text-lg select-none">
+                                    {tenantConfig?.name ? tenantConfig.name.charAt(0).toUpperCase() : "P"}
+                                </span>
+                            </div>
+                        )}
+                        <Link href={getPath("/network/dashboard")} className="text-[17px] font-black tracking-tight text-slate-900 hidden sm:block ml-1">
+                            {tenantConfig?.name || "B2B Portal"}
                         </Link>
                     </div>
 
@@ -81,15 +102,15 @@ export default function NetworkLayout({ children }: { children: React.ReactNode 
                                 <Link
                                     key={nav.path}
                                     href={nav.path}
-                                    className={`relative flex items-center h-full px-1 text-[14px] font-medium transition-colors ${
+                                    className={`relative flex items-center h-full px-1 text-[14px] font-bold transition-colors ${
                                         active
-                                            ? "text-blue-600"
+                                            ? "text-slate-900"
                                             : "text-slate-500 hover:text-slate-800"
                                     }`}
                                 >
                                     {nav.label}
                                     {active && (
-                                        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full" />
+                                        <span className="absolute bottom-0 left-0 w-full h-0.5 rounded-t-full" style={{ backgroundColor: 'var(--brd-primary)' }} />
                                     )}
                                 </Link>
                             )

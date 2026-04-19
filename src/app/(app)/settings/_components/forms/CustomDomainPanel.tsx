@@ -1,93 +1,69 @@
 import { useState, useEffect } from 'react';
-import { Globe, Plus, Trash2, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Globe, Palette, Link as LinkIcon, Save, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
 
 export default function CustomDomainPanel() {
-    const { showSuccess, showError, showConfirm } = useModal();
-    const [domain, setDomain] = useState('');
-    const [activeDomain, setActiveDomain] = useState<string | null>(null);
+    const { showSuccess, showError } = useModal();
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
 
+    const [config, setConfig] = useState({
+        tenantSlug: '',
+        b2bCustomDomain: '',
+        primaryColor: '#2563EB',
+        logoUrl: ''
+    });
+
     useEffect(() => {
-        fetchCurrentDomain();
+        fetchConfig();
     }, []);
 
-    const fetchCurrentDomain = async () => {
+    const fetchConfig = async () => {
         setIsFetching(true);
         try {
-            const res = await fetch('/api/admin/tenant/domain/my-domain');
+            const res = await fetch('/api/admin/tenant/portal-config');
             const data = await res.json();
-            if (res.ok && data.domain) {
-                setActiveDomain(data.domain);
+            if (res.ok) {
+                setConfig({
+                    tenantSlug: data.tenantSlug || '',
+                    b2bCustomDomain: data.b2bCustomDomain || '',
+                    primaryColor: data.primaryColor || '#2563EB',
+                    logoUrl: data.logoUrl || ''
+                });
             }
         } catch (error) {
-            console.error('Failed to fetch existing domain:', error);
+            console.error('Failed to fetch config:', error);
         } finally {
             setIsFetching(false);
         }
     };
 
-    const handleAddDomain = async () => {
-        if (!domain) {
-            showError('Hata', 'Lütfen bir alan adı girin (Örn: siparis.firmam.com)');
-            return;
-        }
-
-        // Basic domain validation
-        const domainPattern = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/;
-        if (!domainPattern.test(domain)) {
-             showError('Hata', 'Geçersiz alan adı formatı. Sadece harf, rakam ve tire kullanabilirsiniz.');
-             return;
-        }
-
+    const handleSave = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch('/api/admin/tenant/domain/my-domain', {
-                method: 'POST',
+            const res = await fetch('/api/admin/tenant/portal-config', {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ customDomain: domain.toLowerCase() })
+                body: JSON.stringify({
+                    tenantSlug: config.tenantSlug.toLowerCase(),
+                    b2bCustomDomain: config.b2bCustomDomain.toLowerCase(),
+                    primaryColor: config.primaryColor,
+                    logoUrl: config.logoUrl
+                })
             });
 
             const data = await res.json();
             
             if (res.ok) {
-                showSuccess('Başarılı', 'Özel alan adınız başarıyla kaydedildi. Lütfen DNS ayarlarından CNAME yönlendirmenizi (cname.vercel-dns.com) yapmayı unutmayın.');
-                setActiveDomain(domain.toLowerCase());
-                setDomain('');
+                showSuccess('Başarılı', 'B2B Portal görünüm ve alan adı ayarlarınız başarıyla kaydedildi.');
             } else {
-                showError('Hata', data.error || 'Alan adı eklenemedi.');
+                showError('Hata', data.error || 'Ayarlar kaydedilemedi.');
             }
         } catch (error) {
             showError('Hata', 'Sunucuya bağlanılamadı.');
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const handleRemoveDomain = async () => {
-        showConfirm('Alan Adını Kaldır', 'Özel B2B alan adınızı kaldırmak istediğinize emin misiniz? Bayileriniz sadece standart adresten erişebilecek.', async () => {
-            setIsLoading(true);
-            try {
-                const res = await fetch('/api/admin/tenant/domain/my-domain', {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ customDomain: activeDomain })
-                });
-
-                if (res.ok) {
-                    showSuccess('Silindi', 'Alan adınız başarıyla kaldırıldı.');
-                    setActiveDomain(null);
-                } else {
-                    const data = await res.json();
-                    showError('Hata', data.error || 'Alan adı kaldırılamadı.');
-                }
-            } catch (error) {
-                showError('Hata', 'Sunucuya bağlanılamadı.');
-            } finally {
-                setIsLoading(false);
-            }
-        });
     };
 
     if (isFetching) {
@@ -101,109 +77,123 @@ export default function CustomDomainPanel() {
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             <div className="bg-white dark:bg-[#0B1220] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                 
                 <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 flex items-center gap-3 relative z-10">
-                    <Globe className="w-8 h-8 text-indigo-500" />
-                    Özel B2B Alan Adı Yönetimi (White-Label)
+                    <Palette className="w-7 h-7 text-indigo-500" />
+                    B2B Portal White-Label & Tasarım
                 </h2>
                 <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-2xl relative z-10">
-                    Müşterilerinizin ve bayilerinizin kendi kurumsal kimliğinizle satış sayfanıza ulaşmasını sağlayın. 
-                    Satış panelinizi kendi <strong className="text-indigo-500">siparis.firmam.com</strong> tarzı alan adınıza bağlayın.
+                    B2B ağınızı ve bayi portalınızı kendi kurumsal kimliğinizle giydirin. Hem görünümü (logo, renk) hem de erişim linklerinizi ayarlayabilirsiniz.
                 </p>
 
-                {activeDomain ? (
-                    <div className="bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 rounded-2xl p-6 relative z-10">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div>
-                                <h3 className="text-sm font-semibold text-indigo-900 dark:text-indigo-300 uppercase tracking-widest mb-1">
-                                    Aktif Bağlantı
-                                </h3>
-                                <div className="text-xl font-black text-indigo-700 dark:text-indigo-400 flex items-center gap-2">
-                                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                                    {activeDomain}
-                                </div>
-                            </div>
-                            
-                            <button
-                                onClick={handleRemoveDomain}
-                                disabled={isLoading}
-                                className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-rose-600 font-bold hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-200 dark:hover:border-rose-800 transition-all disabled:opacity-50"
-                            >
-                                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                                Bağlantıyı Kes
-                            </button>
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                    
+                    {/* TASARIM BÖLÜMÜ */}
+                    <div className="bg-slate-50 dark:bg-slate-800/20 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-6">
+                        <h3 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <ImageIcon className="w-4 h-4 text-slate-400" /> Görsel Tercihler
+                        </h3>
 
-                        <div className="mt-6 pt-6 border-t border-indigo-200/50 dark:border-indigo-800/30">
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
-                                <AlertCircle className="w-5 h-5 text-amber-500" />
-                                Kurulum Tamamlanmadıysa:
-                            </h4>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                                Alan adınızın çalışabilmesi için domain sağlayıcınızın paneline (Örn: GoDaddy, Cloudflare) gidip aşağıdaki <strong>DNS (CNAME)</strong> ayarını eklemeniz gerekmektedir:
-                            </p>
-                            <div className="flex flex-col gap-2 mt-4">
-                                <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-sm">
-                                    <span className="w-24 font-bold text-slate-500 uppercase">TÜR:</span>
-                                    <span className="font-mono text-indigo-600 dark:text-indigo-400 font-black">CNAME</span>
-                                </div>
-                                <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-sm">
-                                    <span className="w-24 font-bold text-slate-500 uppercase">AD / HOST:</span>
-                                    <span className="font-mono text-slate-700 dark:text-slate-300">{activeDomain.split('.')[0]}</span>
-                                    <span className="ml-2 text-xs text-slate-400">(veya alt alan adı kullanıyorsanız sadece o kısmı)</span>
-                                </div>
-                                <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-sm">
-                                    <span className="w-24 font-bold text-slate-500 uppercase">DEĞER:</span>
-                                    <span className="font-mono text-slate-700 dark:text-slate-300 font-bold select-all">cname.vercel-dns.com</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-6 relative z-10">
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
-                                Yeni B2B Alan Adınız
-                            </label>
-                            <div className="flex flex-col sm:flex-row gap-3">
-                                <div className="relative flex-1">
-                                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                                        <Globe className="w-5 h-5 text-slate-400" />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        placeholder="ornek: bayi.sirketim.com"
-                                        value={domain}
-                                        onChange={(e) => setDomain(e.target.value)}
-                                        className="w-full h-14 pl-12 pr-4 rounded-xl bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:font-normal placeholder:text-slate-400"
+                        <div className="space-y-5">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Kurumsal Renk (Ana Tema)</label>
+                                <div className="flex items-center gap-3">
+                                    <input 
+                                        type="color" 
+                                        value={config.primaryColor}
+                                        onChange={(e) => setConfig({ ...config, primaryColor: e.target.value })}
+                                        className="h-12 w-16 p-1 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer bg-white dark:bg-slate-900"
+                                    />
+                                    <input 
+                                        type="text" 
+                                        value={config.primaryColor}
+                                        onChange={(e) => setConfig({ ...config, primaryColor: e.target.value })}
+                                        className="h-12 flex-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 text-slate-900 dark:text-white font-mono uppercase focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
-                                <button
-                                    onClick={handleAddDomain}
-                                    disabled={isLoading || !domain}
-                                    className="h-14 px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl whitespace-nowrap transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:-translate-y-0 flex items-center justify-center min-w-[160px]"
-                                >
-                                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
-                                        <>
-                                            <Plus className="w-5 h-5 mr-2" /> Bağla
-                                        </>
-                                    )}
-                                </button>
                             </div>
-                        </div>
 
-                        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30 rounded-xl p-5 flex gap-4">
-                            <AlertCircle className="w-6 h-6 text-amber-500 shrink-0" />
                             <div>
-                                <h4 className="font-bold text-amber-900 dark:text-amber-500 mb-1">Önemli Not</h4>
-                                <p className="text-sm text-amber-800 dark:text-amber-400/80 leading-relaxed">
-                                    Alan adını buraya ekledikten sonra, mutlaka alan adını aldığınız firmanın (GoDaddy, Cloudflare vb.) paneline giderek CNAME kaydı yapmalısınız. Hedef adres daima <strong>cname.vercel-dns.com</strong> olacaktır.
-                                </p>
+                                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Firma Logosu (URL)</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="https://..."
+                                    value={config.logoUrl}
+                                    onChange={(e) => setConfig({ ...config, logoUrl: e.target.value })}
+                                    className="h-12 w-full rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                                />
+                                {config.logoUrl && (
+                                    <div className="mt-4 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center h-24">
+                                        <img src={config.logoUrl} alt="Logo Önizleme" className="max-h-full max-w-full object-contain" />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
-                )}
+
+                    {/* DOMAIN BÖLÜMÜ */}
+                    <div className="bg-slate-50 dark:bg-slate-800/20 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-6">
+                        <h3 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <Globe className="w-4 h-4 text-slate-400" /> Alan Adı ve Erişim
+                        </h3>
+
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Periodya Ağ Uzantısı (Slug)</label>
+                                <div className="flex relative">
+                                    <span className="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold border-r border-dashed">
+                                        https://
+                                    </span>
+                                    <input 
+                                        type="text" 
+                                        placeholder="motoroil"
+                                        value={config.tenantSlug}
+                                        onChange={(e) => setConfig({ ...config, tenantSlug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
+                                        className="h-12 flex-1 w-full bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-700 px-3 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    />
+                                    <span className="inline-flex items-center px-4 rounded-r-xl border border-l-0 border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold border-l border-dashed">
+                                        .periodya.com
+                                    </span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 mt-2">Bu, platform içerisindeki standart B2B bayi giriş adresinizdir.</p>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Kendi Özel Alan Adınız</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                                        <LinkIcon className="w-4 h-4 text-slate-400" />
+                                    </div>
+                                    <input 
+                                        type="text" 
+                                        placeholder="orn: b2b.sirketim.com"
+                                        value={config.b2bCustomDomain}
+                                        onChange={(e) => setConfig({ ...config, b2bCustomDomain: e.target.value.toLowerCase().replace(/[^a-z0-9.-]/g, '') })}
+                                        className="h-12 w-full pl-11 pr-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    />
+                                </div>
+                                <div className="bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 rounded-lg p-3 mt-3 text-[11px] text-indigo-700 dark:text-indigo-400 leading-relaxed font-medium">
+                                    Özel alan adınızı bağlamak için, DNS yönetim panelinizden <strong>cname.vercel-dns.com</strong> adresine bir <strong className="font-mono">CNAME</strong> kaydı oluşturmalısınız.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                    <button
+                        onClick={handleSave}
+                        disabled={isLoading}
+                        className="h-12 px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:-translate-y-0 flex items-center justify-center min-w-[200px]"
+                    >
+                        {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                            <>
+                                <Save className="w-5 h-5 mr-2" /> Değişiklikleri Kaydet
+                            </>
+                        )}
+                    </button>
+                </div>
             </div>
         </div>
     );

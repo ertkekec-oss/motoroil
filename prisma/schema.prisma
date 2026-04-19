@@ -4319,6 +4319,8 @@ model AccountingOutbox {
 model TenantPortalConfig {
   tenantId       String         @id
   dealerAuthMode DealerAuthMode @default(PASSWORD_ONLY)
+  primaryColor   String?        @default("#2563EB")
+  logoUrl        String?
   updatedAt      DateTime       @updatedAt
 }
 

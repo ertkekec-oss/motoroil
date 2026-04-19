@@ -1,6 +1,6 @@
 import QCommerceMenuWorkspace from '@/components/qcommerce/QCommerceMenuWorkspace';
 import { Metadata } from 'next';
-import prisma from '@/lib/prisma';
+import { prismaRaw as prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 
 export const metadata: Metadata = {
