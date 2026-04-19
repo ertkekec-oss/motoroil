@@ -14,7 +14,9 @@ import {
   Sparkles,
   Link as LinkIcon,
   ShoppingBag,
-  BellRing
+  BellRing,
+  Network,
+  RefreshCcw
 } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
 
@@ -27,12 +29,32 @@ export default function SoSalesDashboard() {
 
   const SOSALES_MODULES = [
     {
+      id: "clearing-house",
+      title: "Çapraz Takas Ağı",
+      subtitle: "B2B Mahsuplaşma Odası",
+      description: "Tedarikçiler, kargo şirketleri ve üreticiler arasındaki borçları yakalar. Kasadan hiç nakit çıkartmadan takas makbuzuyla tüm borçları sıfırlar.",
+      icon: RefreshCcw,
+      color: "emerald",
+      active: true,
+      onToggle: () => {}
+    },
+    {
+      id: "universal-restock",
+      title: "Otonom Evrensel Tedarik",
+      subtitle: "Predictive AI Restocking",
+      description: "Restoranların domatesi, tamircinin yedek parçası bitmeden önce yapay zeka ile otomatik öngörü yapıp WhatsApp'tan sipariş onayı çeker.",
+      icon: Network,
+      color: "blue",
+      active: true,
+      onToggle: () => {}
+    },
+    {
       id: "zero-ui",
       title: "Zero-UI Chat Agent",
       subtitle: "WhatsApp / IG DM Müşteri Asistanı",
       description: "Müşterilerin 'aynısından yolla' mesajlarını okuyup arka planda sepet ve kargo fişi oluşturan AI asistan.",
       icon: MessageSquare,
-      color: "blue",
+      color: "indigo",
       active: activeVoiceEnabled,
       onToggle: () => setActiveVoiceEnabled(!activeVoiceEnabled)
     },
