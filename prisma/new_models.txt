@@ -1,0 +1,37 @@
+
+// ==========================================
+// AUTO-PILOT & GOLDEN ECOSYSTEM (C-LEVEL AI)
+// ==========================================
+
+model AutoPilotConfig {
+  id              String   @id @default(cuid())
+  tenantId        String   @unique
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  isActive        Boolean  @default(false)
+  settings        Json     @default("{}")
+  lastRunAt       DateTime?
+  updatedAt       DateTime @updatedAt
+}
+
+model AutoPilotLog {
+  id              String   @id @default(cuid())
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  actionType      String   
+  description     String
+  monetaryImpact  Float?   
+  status          String   
+  createdAt       DateTime @default(now())
+}
+
+model B2BClearingGraph {
+  id              String   @id @default(cuid())
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  cycleHash       String   
+  participants    Json     
+  clearingAmount  Float    
+  status          String   
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

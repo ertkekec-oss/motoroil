@@ -40,28 +40,31 @@ model Tenant {
   tenantMarketInsights TenantMarketInsight[]
   upsellEvents         UpsellEvent[]
   users                User[]
+  AutoPilotConfig      AutoPilotConfig?
+  AutoPilotLog         AutoPilotLog[]
+  B2BClearingGraph     B2BClearingGraph[]
 }
 
 model Company {
-  id                         String                         @id @default(cuid())
-  tenantId                   String
-  name                       String
-  vkn                        String
-  taxOffice                  String?
-  address                    String?
-  district                   String?
-  city                       String?
-  createdAt                  DateTime                       @default(now())
-  updatedAt                  DateTime                       @updatedAt
-  status                     CompanyStatus                  @default(ACTIVE)
-  taxNumber                  String
-  type                       CompanyType                    @default(BUYER)
-  
+  id        String        @id @default(cuid())
+  tenantId  String
+  name      String
+  vkn       String
+  taxOffice String?
+  address   String?
+  district  String?
+  city      String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  status    CompanyStatus @default(ACTIVE)
+  taxNumber String
+  type      CompanyType   @default(BUYER)
+
   // HOLDING / GROUP COMPANY ARCHITECTURE
-  groupId                    String?
-  parentCompanyId            String?
-  parentCompany              Company?                       @relation("HoldingStructure", fields: [parentCompanyId], references: [id])
-  subCompanies               Company[]                      @relation("HoldingStructure")
+  groupId         String?
+  parentCompanyId String?
+  parentCompany   Company?  @relation("HoldingStructure", fields: [parentCompanyId], references: [id])
+  subCompanies    Company[] @relation("HoldingStructure")
 
   accounts                   Account[]
   appSettings                AppSettings[]
@@ -255,18 +258,18 @@ model PlanLimit {
 }
 
 model Subscription {
-  id             String                @id @default(cuid())
-  tenantId       String                @unique
-  externalId     String?               @unique
-  planId         String
-  status         String
-  period         String
-  startDate      DateTime
-  endDate        DateTime
-  addonFeatures  String[]              @default([]) // A La Carte module Add-ons (e.g. ['field_service', 'q_commerce'])
-  plan           Plan                  @relation(fields: [planId], references: [id])
-  tenant         Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  history        SubscriptionHistory[]
+  id            String                @id @default(cuid())
+  tenantId      String                @unique
+  externalId    String?               @unique
+  planId        String
+  status        String
+  period        String
+  startDate     DateTime
+  endDate       DateTime
+  addonFeatures String[]              @default([]) // A La Carte module Add-ons (e.g. ['field_service', 'q_commerce'])
+  plan          Plan                  @relation(fields: [planId], references: [id])
+  tenant        Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  history       SubscriptionHistory[]
 }
 
 model SubscriptionHistory {
@@ -382,7 +385,7 @@ model Product {
   gtip                              String?
   // POS & Adisyon Ayarları
   isPosItem                         Boolean                      @default(false)
-  posCategory                       String?                      // Örn: "Sıcak İçecekler", "Ana Yemekler"
+  posCategory                       String? // Örn: "Sıcak İçecekler", "Ana Yemekler"
   purchaseDiscount                  Decimal?                     @default(0) @db.Decimal(5, 2)
   purchaseOtv                       Decimal?                     @default(0) @db.Decimal(10, 2)
   otvCode                           String?                      @default("7")
@@ -9512,26 +9515,63 @@ model CmsAbTest {
 model RestaurantZone {
   id        String   @id @default(cuid())
   companyId String
-  name      String   // "Teras", "Bahçe", "İç Keman"
+  name      String // "Teras", "Bahçe", "İç Keman"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tables    RestaurantTable[]
+  tables RestaurantTable[]
 
   @@index([companyId])
 }
 
 model RestaurantTable {
-  id        String   @id @default(cuid())
-  zoneId    String  
-  name      String   // "Teras-1", "Bahçe-5", "VIP-1"
-  status    String   @default("AVAILABLE") // AVAILABLE, BUSY, RESERVED
-  capacity  Int      @default(4)
-  
+  id       String @id @default(cuid())
+  zoneId   String
+  name     String // "Teras-1", "Bahçe-5", "VIP-1"
+  status   String @default("AVAILABLE") // AVAILABLE, BUSY, RESERVED
+  capacity Int    @default(4)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  zone      RestaurantZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  zone RestaurantZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
   @@index([zoneId])
+}
+
+// ==========================================
+// AUTO-PILOT & GOLDEN ECOSYSTEM (C-LEVEL AI)
+// ==========================================
+
+model AutoPilotConfig {
+  id        String    @id @default(cuid())
+  tenantId  String    @unique
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  isActive  Boolean   @default(false)
+  settings  Json      @default("{}")
+  lastRunAt DateTime?
+  updatedAt DateTime  @updatedAt
+}
+
+model AutoPilotLog {
+  id             String   @id @default(cuid())
+  tenantId       String
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  actionType     String
+  description    String
+  monetaryImpact Float?
+  status         String
+  createdAt      DateTime @default(now())
+}
+
+model B2BClearingGraph {
+  id             String   @id @default(cuid())
+  tenantId       String
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  cycleHash      String
+  participants   Json
+  clearingAmount Float
+  status         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
